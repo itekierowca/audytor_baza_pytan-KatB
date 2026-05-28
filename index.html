@@ -82,6 +82,1446 @@
 
     <!-- TOP BAR / NAGŁÓWEK -->
     <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-emerald-500 to-teal-400 p-2.5 rounded-xl shadow-lg shadow-emerald-500/10 text-slate-950 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-white flex items-center gap-2">
+                        GDE-Auditor <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded border border-emerald-500/20 font-mono">MATRYCA GDE</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400">Kompatybilność: Przepisy źródłowe i podstawy prawne GDE</p>
+                </div>
+            </div>
+
+            <!-- AKTUALNY PROFIL I WYBÓR BAZY -->
+            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end text-xs">
+                
+                <!-- SELECTOR AKTYWNEJ BAZY -->
+                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5">
+                    <span class="text-slate-400 font-semibold flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                        Baza:
+                    </span>
+                    <select id="db-selector" onchange="switchDatabase(this.value)" class="bg-transparent text-white font-bold outline-none cursor-pointer">
+                        <option value="demo" class="bg-slate-900">Baza demonstracyjna</option>
+                    </select>
+                </div>
+
+                <!-- PROFIL AUDYTERA -->
+                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5">
+                    <span class="text-slate-400 font-semibold flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Użytkownik:
+                    </span>
+                    <input type="text" id="username-input" value="rafalmatuszak" oninput="updateUsername(this.value)" class="bg-transparent text-emerald-400 font-bold outline-none border-b border-transparent hover:border-slate-500 focus:border-emerald-500 w-28 text-center transition">
+                </div>
+
+                <!-- MENU EKSPORTU (DROPDOWN GROUP) -->
+                <div class="relative inline-block text-left w-full sm:w-auto" id="export-dropdown-container">
+                    <button onclick="toggleExportDropdown()" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold px-4 py-2 rounded-xl border border-slate-700 transition-all-300 flex items-center justify-center gap-2 w-full" id="export-menu-button">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <span>Eksportuj bazę...</span>
+                        <svg class="w-3 h-3 text-slate-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+
+                    <div id="export-dropdown-menu" class="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-2xl bg-slate-900 border border-slate-800 focus:outline-none hidden z-50 p-1.5">
+                        <button onclick="triggerExport('all')" class="text-slate-200 hover:bg-slate-800 hover:text-white group flex items-center w-full px-3 py-2.5 text-xs font-medium rounded-lg transition text-left">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-400 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Eksportuj wszystko (JSON)
+                        </button>
+                        <button onclick="triggerExport('approved')" class="text-slate-200 hover:bg-slate-800 hover:text-white group flex items-center w-full px-3 py-2.5 text-xs font-medium rounded-lg transition text-left">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-400 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Eksportuj zatwierdzone
+                        </button>
+                        <button onclick="triggerExport('review')" class="text-slate-200 hover:bg-slate-800 hover:text-white group flex items-center w-full px-3 py-2.5 text-xs font-medium rounded-lg transition text-left">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-rose-400 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            Eksportuj do poprawy
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- UKŁAD GŁÓWNY -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row gap-6">
+        
+        <!-- PANEL LEWY: NAWIGACJA, STATYSTYKI I IMPORT -->
+        <aside class="w-full lg:w-80 shrink-0 flex flex-col gap-5">
+            
+            <!-- PRZEŁĄCZNIK ZAKŁADEK -->
+            <div class="bg-slate-900 p-1.5 rounded-2xl border border-slate-800 flex flex-col gap-1">
+                <button id="btn-tab-browse" onclick="switchTab('browse')" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 bg-emerald-600 text-slate-950 shadow-md">
+                    <span class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        Przegląd Działów i Pytań
+                    </span>
+                    <span id="badge-total-count" class="bg-slate-950 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">0</span>
+                </button>
+                <button id="btn-tab-exam" onclick="switchTab('exam')" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <span class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        Generator Zestawów GDE
+                    </span>
+                    <span class="bg-slate-800 text-slate-400 text-[9px] px-2 py-0.5 rounded uppercase font-bold">32 pyt.</span>
+                </button>
+            </div>
+
+            <!-- PANEL INTERAKTYWNEGO IMPORTU -->
+            <div id="drop-zone" class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-sm transition-all duration-200">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    Załaduj lub dodaj bazę pytań
+                </h3>
+                <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                    Przeciągnij i upuść plik z bazą, wgraj plik z dysku lub wklej bezpośrednio tekst poniżej. Obsługuje format standardowy oraz nowy zagnieżdżony.
+                </p>
+
+                <!-- METODA IMPORTU: ZASTĄP / SCAL -->
+                <div class="bg-slate-950 p-2 rounded-xl border border-slate-850 flex items-center justify-around mb-3 text-xs">
+                    <span class="text-slate-500 font-bold text-[10px] uppercase">Metoda:</span>
+                    <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-300 select-none">
+                        <input type="radio" name="import-mode" value="replace" checked class="accent-emerald-500 h-3.5 w-3.5 bg-slate-950 border-slate-800 rounded">
+                        <span>Zastąp</span>
+                    </label>
+                    <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-300 select-none">
+                        <input type="radio" name="import-mode" value="append" class="accent-emerald-500 h-3.5 w-3.5 bg-slate-950 border-slate-800 rounded">
+                        <span class="text-emerald-400 font-semibold">Scal (Dodaj)</span>
+                    </label>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Wybór pliku -->
+                    <label class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-700 transition cursor-pointer flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Wgraj plik (.txt / .json)
+                        <input type="file" id="file-input" accept=".txt,.json" class="hidden" onchange="handleFileSelect(event)">
+                    </label>
+
+                    <!-- Wklejanie bezpośrednie -->
+                    <div class="space-y-1.5">
+                        <textarea id="direct-textarea" placeholder="Wklej tutaj skopiowaną treść bazy (JSON)..." class="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-[10px] font-mono focus:ring-1 focus:ring-emerald-500 outline-none resize-none placeholder:text-slate-700"></textarea>
+                        <button onclick="handleDirectPaste()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Zatwierdź i importuj
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PODSUMOWANIE STATYSTYK AUDYTU -->
+            <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.003 9.003 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                    Postęp Weryfikacji
+                </h3>
+                <div class="space-y-3.5 text-xs">
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
+                        <span class="text-slate-400 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-slate-600"></span> Wszystkich pytań:
+                        </span>
+                        <span id="stat-total" class="font-mono font-bold text-slate-200">0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
+                        <span class="text-emerald-400 font-medium flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Zatwierdzone:
+                        </span>
+                        <span id="stat-approved" class="font-mono font-bold text-emerald-400">0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
+                        <span class="text-rose-400 font-medium flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-rose-500"></span> Do poprawy:
+                        </span>
+                        <span id="stat-review" class="font-mono font-bold text-rose-400">0</span>
+                    </div>
+                    <!-- ŚMIETNIK W STATYSTYKACH -->
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
+                        <span class="text-slate-500 font-medium flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-slate-500"></span> Śmietnik:
+                        </span>
+                        <span id="stat-trash" class="font-mono font-bold text-slate-400">0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5">
+                        <span class="text-amber-400 font-medium flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span> Nienaruszone:
+                        </span>
+                        <span id="stat-untouched" class="font-mono font-bold text-amber-400">0</span>
+                    </div>
+                </div>
+
+                <!-- PROGRESS BAR 1: ZAŁADOWANA BAZA -->
+                <div class="mt-5 pt-4 border-t border-slate-800">
+                    <div class="flex justify-between text-[11px] text-slate-400 mb-1.5 font-bold">
+                        <span>WERYFIKACJA ZAŁADOWANYCH:</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                        <div id="progress-bar-fill" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- PROGRESS BAR 2: MACRO 1500 TARGET -->
+                <div class="mt-4 pt-3 border-t border-slate-800/50">
+                    <div class="flex justify-between text-[11px] text-emerald-400 mb-1.5 font-bold">
+                        <span>CEL BAZY (ZATWIERDZONE / 1500):</span>
+                        <span id="macro-progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                        <div id="macro-progress-bar-fill" class="bg-gradient-to-r from-emerald-500 to-emerald-300 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POSTĘP W POSZCZEGÓLNYCH DZIAŁACH (CEL: 1500) -->
+            <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-sm flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Cel działów (Wariant 1500)
+                    </span>
+                    <span id="active-groups-count" class="text-[10px] text-slate-500 font-mono font-bold">0 działów</span>
+                </h3>
+                
+                <div id="groups-progress-container" class="space-y-4 max-h-72 overflow-y-auto pr-1">
+                    <!-- Wygenerowane dynamicznie przez JS -->
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- PANEL PRAWY: WYŚWIETLANIE PYTAŃ I FILTROWANIE -->
+        <section class="flex-1 min-w-0">
+            
+            <!-- OKNO KOMUNIKATÓW I DIAGNOSTYKI SYSTEMOWEJ -->
+            <div id="info-box" class="bg-indigo-950/20 border border-indigo-900/60 text-indigo-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4">
+                <div class="bg-indigo-500/10 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/20 shrink-0 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div class="flex-1">
+                    <h4 id="info-title" class="font-bold text-indigo-300 text-xs uppercase tracking-wider mb-1">Inicjalizacja systemu...</h4>
+                    <p id="info-message" class="text-xs text-slate-300 leading-relaxed">
+                        Załadowaliśmy startową pulę przykładowych pytań. Możesz bez przeszkód testować oznaczanie statusów, pobieranie bazy oraz losowanie zestawów! Zmień tryb importu na <strong class="text-emerald-400">"Scal"</strong>, aby dodawać nowe JSON-y bez utraty obecnych pytań.
+                    </p>
+                    <pre id="info-debug" class="hidden mt-3 bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-[10px] text-rose-400 overflow-x-auto whitespace-pre-wrap leading-relaxed"></pre>
+                </div>
+            </div>
+
+            <!-- TAB 1: PRZEGLĄDANIE BAZY (FILTROWANIE I LISTA) -->
+            <div id="tab-browse" class="space-y-5">
+                
+                <!-- PASEK FILTRÓW -->
+                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-md flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex flex-wrap gap-3 items-center w-full md:w-auto">
+                        
+                        <!-- FILTR GRUPY -->
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kategoria / Dział</label>
+                            <select id="filter-group" onchange="resetPaginationAndRender()" class="bg-slate-950 text-slate-100 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-emerald-500 border border-slate-800 outline-none">
+                                <option value="ALL">Wszystkie grupy (P1-P9, S1-S6)</option>
+                                <optgroup label="Część Podstawowa">
+                                    <option value="P1">P1 - Niechronieni uczestnicy ruchu</option>
+                                    <option value="P2">P2 - Pierwszeństwo przejazdu</option>
+                                    <option value="P3">P3 - Prędkość i odległość</option>
+                                    <option value="P4">P4 - Pierwsza pomoc</option>
+                                    <option value="P5">P5 - Czynniki ryzyka (Alkohol, Rozproszenie)</option>
+                                    <option value="P6">P6 - Znaki drogowe i sygnalizacja</option>
+                                    <option value="P7">P7 - Warunki drogowe i atmosferyczne</option>
+                                    <option value="P8">P8 - Systemy ADAS & EV</option>
+                                    <option value="P9">P9 - Przepisy ogólne i definicje</option>
+                                </optgroup>
+                                <optgroup label="Część Specjalistyczna">
+                                    <option value="S1">S1 - Dynamika jazdy i ocena ryzyka</option>
+                                    <option value="S2">S2 - Manewrowanie i technika jazdy</option>
+                                    <option value="S3">S3 - Układy bezpieczeństwa</option>
+                                    <option value="S4">S4 - Obsługa i eksploatacja podzespołów</option>
+                                    <option value="S5">S5 - Sygnalizacja i komunikacja</option>
+                                    <option value="S6">S6 - Przepisy szczegółowe kat. B</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <!-- FILTR STATUSU -->
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Status weryfikacji</label>
+                            <select id="filter-status" onchange="resetPaginationAndRender()" class="bg-slate-950 text-slate-100 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-emerald-500 border border-slate-800 outline-none">
+                                <option value="ALL">Wszystkie statusy</option>
+                                <option value="untouched">⏳ Nienaruszone (Do sprawdzenia)</option>
+                                <option value="Zatwierdzone">✔️ Zatwierdzone (OK)</option>
+                                <option value="Do poprawy">❌ Do poprawy (Korekta)</option>
+                                <option value="Śmietnik">🗑️ Śmietnik (Odrzucone)</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- WYSZUKIWARKA FRAZY -->
+                    <div class="flex flex-col gap-1 w-full md:w-64">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Szukaj frazy lub ID</label>
+                        <input type="text" id="search-input" oninput="resetPaginationAndRender()" placeholder="Wpisz treść pytania lub ID..." class="bg-slate-950 text-slate-100 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-emerald-500 border border-slate-800 outline-none placeholder:text-slate-700">
+                    </div>
+                </div>
+
+                <!-- INFO O KRYTERIACH -->
+                <div class="text-xs text-slate-400 flex justify-between items-center px-2">
+                    <div>
+                        Znaleziono: <span id="visible-count" class="font-bold text-emerald-400">0</span> pytań spełniających filtry
+                    </div>
+                </div>
+
+                <!-- LISTA PYTAŃ -->
+                <div id="browse-questions-list" class="space-y-4"></div>
+
+                <!-- PRZYCISK WCZYTAJ WIĘCEJ -->
+                <div id="load-more-container" class="flex justify-center pt-2 hidden">
+                    <button onclick="loadMoreQuestions()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold px-6 py-3 rounded-xl border border-slate-800 transition-all-300 text-xs flex items-center gap-2">
+                        Pokaż więcej pytań
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- TAB 2: SYMULATOR ZESTAWÓW EGZAMINACYJNYCH -->
+            <div id="tab-exam" class="hidden space-y-5">
+                
+                <!-- KARTA GENERATORA -->
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="space-y-1">
+                        <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Oficjalny algorytm losujący zestaw egzaminacyjny
+                        </h2>
+                        <p class="text-xs text-slate-400 max-w-xl leading-relaxed">
+                            Aplikacja buduje zestaw merytoryczny o sumie 74 punktów według matrycy merytorycznej określonej w Rozdziale 6 PDF (dokładnie 32 pytania z podziałem na część podstawową i specjalistyczną oraz precyzyjnie przypisaną wagą). Pytania odrzucone (Śmietnik) są wykluczone.
+                        </p>
+                    </div>
+                    <button onclick="generateExamSet()" class="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-black px-6 py-3.5 rounded-xl shadow-lg transition-all-300 transform hover:-translate-y-0.5 whitespace-nowrap text-xs flex items-center gap-2">
+                        🎲 Generuj Losowy Zestaw
+                    </button>
+                </div>
+
+                <!-- STATYSTYKI WYGENEROWANEGO ZESTAWU -->
+                <div id="exam-stats-bar" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
+                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Struktura testu</span>
+                        <span id="exam-total-questions" class="text-base font-bold text-emerald-400">32 / 32 pyt.</span>
+                    </div>
+                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
+                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Wartość punktowa</span>
+                        <span id="exam-total-points" class="text-base font-bold text-emerald-400">74 / 74 pkt</span>
+                    </div>
+                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
+                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Zatwierdzone w zestawie</span>
+                        <span id="exam-approved-count" class="text-base font-bold text-slate-200">0</span>
+                    </div>
+                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
+                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Do poprawy w zestawie</span>
+                        <span id="exam-review-count" class="text-base font-bold text-rose-400">0</span>
+                    </div>
+                </div>
+
+                <!-- LISTA PYTAŃ WYGENEROWANEGO TESTU -->
+                <div id="exam-questions-list" class="space-y-4"></div>
+
+            </div>
+
+        </section>
+    </main>
+
+    <!-- ROZPISKA I WYJAŚNIENIE -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-500">
+        Wsparcie merytoryczne i optymalizacja bazy pytań egzaminacyjnych w oparciu o projekt podstawy programowej Stowarzyszenia Kierowca.pl z 2026 r.
+    </footer>
+
+    <!-- SKRYPT LOGICZNY -->
+    <script>
+        // Słownik zrzutów merytorycznych baz danych (obsługuje autostart i wielobazowość)
+        let loadedDatabases = {
+            "demo": [
+                {
+                    "id": "P1_001",
+                    "group": "P1",
+                    "group_label": "Niechronieni uczestnicy ruchu",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy mijając zatrzymany autobus szkolny musisz zachować szczególną ostrożność?",
+                    "correct_answer": "TAK",
+                    "media_type": "video",
+                    "media_url": "https://cdn.e-kierowca.pl/media/video/Wyk%C5%82ad_1.147.mp4",
+                    "media_title": "Szczególna ostrożność- autobus szkolny",
+                    "media_notes": "Wideo demonstracyjne. Sprawdzić jakość i czytelność napisów bocznych na autobusie.",
+                    "przepis_zrodlowy": "Ustawa PoRD art. 57a ust. 1"
+                },
+                {
+                    "id": "P1_002",
+                    "group": "P1",
+                    "group_label": "Niechronieni uczestnicy ruchu",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy możesz wyprzedzać pojazd na przejściu dla pieszych?",
+                    "correct_answer": "NIE",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_2.104.jpeg",
+                    "media_title": "Sytuacje zabraniające wyprzedzania- przejście dla piesz",
+                    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 3 pkt 1"
+                },
+                {
+                    "id": "P1_003",
+                    "group": "P1",
+                    "group_label": "Niechronieni uczestnicy ruchu",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy zbliżając się do kolumny pieszych musisz zmniejszyć prędkość?",
+                    "correct_answer": "TAK",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_7.171.jpeg",
+                    "media_title": "Jeśli zbliżasz się do kolumny pieszych",
+                    "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 2 pkt 2"
+                },
+                {
+                    "id": "P2_001",
+                    "group": "P2",
+                    "group_label": "Pierwszeństwo przejazdu",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy na skrzyżowaniu równorzędnym ustępujesz pierwszeństwa pojazdowi nadjeżdżającemu z prawej strony?",
+                    "correct_answer": "TAK",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_1.024.jpeg",
+                    "media_title": "Przykład skrzyżowania",
+                    "przepis_zrodlowy": "Ustawa PoRD art. 25 ust. 1"
+                },
+                {
+                    "id": "P3_001",
+                    "group": "P3",
+                    "group_label": "Prędkość i odległość",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy droga hamowania przy 60 km/h jest czterokrotnie dłuższa niż przy 30 km/h?",
+                    "correct_answer": "TAK",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_4.088.jpeg",
+                    "media_title": "Wzrost prędkości i wzrost drogi hamowania",
+                    "przepis_zrodlowy": "Zasady fizyki ruchu drogowego / BHP"
+                },
+                {
+                    "id": "S1_001",
+                    "group": "S1",
+                    "group_label": "Dynamika jazdy",
+                    "part": "specjalistyczna",
+                    "type": "abc",
+                    "weight": 3,
+                    "question": "Jaka jest różnica między drogą hamowania a drogą zatrzymania?",
+                    "correct_answer": "A",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_4.083.jpeg",
+                    "media_title": "Różnica między drogą hamowania a drogą zatrzymania",
+                    "options": {
+                        "A": "Droga zatrzymania to droga hamowania plus droga reakcji.",
+                        "B": "Droga hamowania to droga reakcji plus droga zatrzymania.",
+                        "C": "Obie drogi są takie same przy dobrej nawierzchni."
+                    },
+                    "przepis_zrodlowy": "Teoria fizyki jazdy pojazdem"
+                },
+                {
+                    "id": "S1_002",
+                    "group": "S1",
+                    "group_label": "Dynamika jazdy",
+                    "part": "specjalistyczna",
+                    "type": "abc",
+                    "weight": 3,
+                    "question": "Hamulce bębnowe grzeją się podczas długiego zjazdu. Jakie ryzyko to stwarza?",
+                    "correct_answer": "A",
+                    "media_type": "video",
+                    "media_url": "https://cdn.e-kierowca.pl/media/video/v3_L10T3_04_hamulce_bebnowe.mp4",
+                    "media_title": "Hamulce bębnowe",
+                    "options": {
+                        "A": "Mogą całkowicie stracić skuteczność przez przegrzanie.",
+                        "B": "Auto przyspiesza, bo zmniejsza się opór toczenia.",
+                        "C": "Hamowanie staje się gwałtowniejsze niż normalnie."
+                    },
+                    "przepis_zrodlowy": "Budowa i eksploatacja pojazdów"
+                },
+                {
+                    "id": "S2_001",
+                    "group": "S2",
+                    "group_label": "Manewry i technika",
+                    "part": "specjalistyczna",
+                    "type": "abc",
+                    "weight": 3,
+                    "question": "Chcesz wyprzedzić samochód. Kiedy musisz włączyć kierunkowskaz?",
+                    "correct_answer": "A",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_2.159.jpeg",
+                    "media_title": "Sygnalizowanie wykonywanych manewrów",
+                    "options": {
+                        "A": "Zanim zaczniesz zmieniać pas",
+                        "B": "W chwili gdy zaczynasz skręcać",
+                        "C": "Dopiero gdy jesteś obok wyprzedzanego"
+                    },
+                    "przepis_zrodlowy": "Ustawa PoRD art. 22 ust. 5"
+                },
+                {
+                    "id": "S6_078",
+                    "group": "S6",
+                    "group_label": "Przepisy kat. B",
+                    "part": "specjalistyczna",
+                    "type": "abc",
+                    "weight": 2,
+                    "question": "Gdy policjant wyciągnie rękę poziomo, kierowca powinien:",
+                    "correct_answer": "A",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_5.055.jpeg",
+                    "media_title": "Sygnały dawane przez osoby uprawnione",
+                    "options": {
+                        "A": "zatrzymać się przed policjantem",
+                        "B": "przyspieszyć i przejechać jak najszybciej",
+                        "C": "zjechać na pobocze i zgasić silnik"
+                    },
+                    "przepis_zrodlowy": "Rozporządzenie MSWiA w sprawie kierowania ruchem drogowym"
+                }
+            ]
+        };
+
+        // Zmienne globalne stanu
+        let currentDbKey = "demo";
+        let globalQuestions = loadedDatabases["demo"];
+        let currentUsername = "rafalmatuszak"; // Domyślna symulowana nazwa profilu
+
+        let currentTab = 'browse';
+        let examSet = [];
+        let currentPage = 1;
+        const questionsPerPage = 15;
+
+        // Cel ilościowy dla Variant A (1500 pytań łącznie) na podstawie Rozdziału 7
+        const groupTargets = {
+            "P1": 176,
+            "P2": 195,
+            "P3": 147,
+            "P4": 78,
+            "P5": 98,
+            "P6": 117,
+            "P7": 78,
+            "P8": 49,
+            "P9": 39,
+            "S1": 131,
+            "S2": 105,
+            "S3": 79,
+            "S4": 79,
+            "S5": 53,
+            "S6": 79
+        };
+
+        // Słownik opisów działów GDE
+        const groupLabels = {
+            "P1": "Niechronieni uczestnicy ruchu",
+            "P2": "Pierwszeństwo przejazdu",
+            "P3": "Prędkość i odległość",
+            "P4": "Pierwsza pomoc",
+            "P5": "Czynniki ryzyka (Alkohol, Rozproszenie)",
+            "P6": "Znaki drogowe i sygnalizacja",
+            "P7": "Warunki drogowe i atmosferyczne",
+            "P8": "Systemy ADAS & EV",
+            "P9": "Przepisy ogólne i definicje",
+            "S1": "Dynamika jazdy i ocena ryzyka",
+            "S2": "Manewrowanie i technika jazdy",
+            "S3": "Układy bezpieczeństwa",
+            "S4": "Obsługa i eksploatacja podzespołów",
+            "S5": "Sygnalizacja i komunikacja",
+            "S6": "Przepisy szczegółowe kat. B"
+        };
+
+        // --- AKTUALIZACJA PROFILU ---
+        function updateUsername(val) {
+            currentUsername = val.trim() || "Anonimowy";
+            showToast("Zmień profil na: " + currentUsername, "info");
+        }
+
+        // Pomocniczy generator daty w formacie YYYY-MM-DD HH:MM
+        function getFormattedCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+
+        // --- OBSŁUGA WIELU BAZ DANYCH ---
+        function addDatabaseOption(name) {
+            const selector = document.getElementById('db-selector');
+            if (!selector) return;
+            
+            // Sprawdzenie czy opcja już istnieje
+            for (let i = 0; i < selector.options.length; i++) {
+                if (selector.options[i].value === name) return;
+            }
+
+            const option = document.createElement('option');
+            option.value = name;
+            option.className = "bg-slate-900";
+            option.innerText = name;
+            selector.appendChild(option);
+        }
+
+        function selectDatabase(name) {
+            if (!loadedDatabases[name]) return;
+            currentDbKey = name;
+            globalQuestions = loadedDatabases[name];
+            
+            const selector = document.getElementById('db-selector');
+            if (selector) selector.value = name;
+
+            initializeStatuses();
+            recalculateStats();
+            resetPaginationAndRender();
+
+            // Aktualizacja okienka informacyjnego
+            const infoTitle = document.getElementById('info-title');
+            const infoMsg = document.getElementById('info-message');
+            if (infoTitle && infoMsg) {
+                infoTitle.innerText = `Aktywna Baza: ${name}`;
+                infoMsg.innerText = `Przeglądasz aktualnie bazę pytań o nazwie "${name}". Liczba pytań w pamięci podręcznej: ${globalQuestions.length}. Wybierz metodę "Scal" po lewej stronie, aby dołączyć kolejny plik do tej listy baz.`;
+            }
+        }
+
+        window.switchDatabase = function(name) {
+            selectDatabase(name);
+            showToast(`Przełączono na bazę: ${name}`, "success");
+        };
+
+        // Autostart z pliku bazab.json na serwerze
+        function tryAutostartBazaB() {
+            const loader = document.getElementById('loading-overlay');
+            if (loader) loader.classList.remove('hidden');
+
+            fetch('bazab.json')
+                .then(response => {
+                    if (!response.ok) throw new Error("Plik bazab.json nie został odnaleziony na serwerze.");
+                    return response.text();
+                })
+                .then(text => {
+                    const parsed = tryInterpretJSON(text);
+                    if (parsed && parsed.length > 0) {
+                        loadedDatabases["bazab.json"] = parsed;
+                        addDatabaseOption("bazab.json");
+                        selectDatabase("bazab.json");
+                        
+                        const infoBox = document.getElementById('info-box');
+                        if (infoBox) {
+                            infoBox.className = "bg-emerald-950/20 border border-emerald-900/60 text-emerald-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4";
+                        }
+                        showToast("Pomyślnie zaimportowano plik bazab.json z serwera!", "success");
+                    }
+                })
+                .catch(err => {
+                    console.log("Autostart 'bazab.json': " + err.message);
+                    // Fallback do demonstracyjnej bazy
+                    selectDatabase("demo");
+                })
+                .finally(() => {
+                    if (loader) loader.classList.add('hidden');
+                });
+        }
+
+        // Definiowanie wszystkich funkcji pomocniczych jako deklaracje globalne (zapobieganie błędom w Safari)
+        function initializeStatuses() {
+            globalQuestions.forEach(q => {
+                if (!q.status) {
+                    q.status = 'untouched';
+                }
+            });
+        }
+
+        function recalculateStats() {
+            const total = globalQuestions.length;
+            const approved = globalQuestions.filter(q => q.status === 'Zatwierdzone').length;
+            const review = globalQuestions.filter(q => q.status === 'Do poprawy').length;
+            const trash = globalQuestions.filter(q => q.status === 'Śmietnik').length;
+            const untouched = globalQuestions.filter(q => !q.status || q.status === 'untouched').length;
+
+            const totalEl = document.getElementById('stat-total');
+            const approvedEl = document.getElementById('stat-approved');
+            const reviewEl = document.getElementById('stat-review');
+            const trashEl = document.getElementById('stat-trash');
+            const untouchedEl = document.getElementById('stat-untouched');
+            const progressPercentEl = document.getElementById('progress-percent');
+            const progressBarFillEl = document.getElementById('progress-bar-fill');
+            const badgeTotalCountEl = document.getElementById('badge-total-count');
+
+            // Nowe elementy globalnego postępu (cel 1500)
+            const macroProgressPercentEl = document.getElementById('macro-progress-percent');
+            const macroProgressBarFillEl = document.getElementById('macro-progress-bar-fill');
+
+            if (totalEl) totalEl.innerText = total;
+            if (approvedEl) approvedEl.innerText = approved;
+            if (reviewEl) reviewEl.innerText = review;
+            if (trashEl) trashEl.innerText = trash;
+            if (untouchedEl) untouchedEl.innerText = untouched;
+            if (badgeTotalCountEl) badgeTotalCountEl.innerText = total;
+
+            const verified = approved + review + trash;
+            const percent = total > 0 ? Math.round((verified / total) * 100) : 0;
+            if (progressPercentEl) progressPercentEl.innerText = percent + "%";
+            if (progressBarFillEl) progressBarFillEl.style.width = percent + "%";
+
+            // Wyliczanie globalnego celu 1500 zatwierdzonych pytań
+            const targetTotal = 1500;
+            const macroPercent = Math.min(100, Math.round((approved / targetTotal) * 100));
+            if (macroProgressPercentEl) macroProgressPercentEl.innerText = macroPercent + "%";
+            if (macroProgressBarFillEl) macroProgressBarFillEl.style.width = macroPercent + "%";
+
+            // Wywołaj renderowanie postępu grup w panelu po lewej stronie
+            renderGroupsProgress();
+        }
+
+        // --- DYNAMICZNY RENDERING POSTĘPU DZIAŁÓW (P1-P9, S1-S6) - WG CELU 1500 ---
+        function renderGroupsProgress() {
+            const container = document.getElementById('groups-progress-container');
+            const activeCountEl = document.getElementById('active-groups-count');
+            if (!container) return;
+
+            container.innerHTML = '';
+            
+            const basicGroups = ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"];
+            const specGroups = ["S1", "S2", "S3", "S4", "S5", "S6"];
+            
+            let activeGroupsCount = 0;
+            
+            // Renderowanie paska postępu dla działu na bazie wymaganych celów merytorycznych
+            function createGroupProgressHTML(g) {
+                const groupQuestions = globalQuestions.filter(q => q.group === g);
+                const totalInDb = groupQuestions.length;
+                const target = groupTargets[g] || 100;
+                
+                const approved = groupQuestions.filter(q => q.status === 'Zatwierdzone').length;
+                const percent = Math.min(100, Math.round((approved / target) * 100)) || 0;
+                
+                activeGroupsCount++;
+                
+                // Kodowanie kolorystyczne paska postępu
+                let barColor = "bg-slate-850";
+                let textColor = "text-slate-500 font-bold";
+                let borderHighlight = "border-slate-900";
+                
+                if (percent === 100) {
+                    barColor = "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]";
+                    textColor = "text-emerald-400 font-black";
+                    borderHighlight = "border-emerald-950 bg-emerald-950/5";
+                } else if (percent >= 50) {
+                    barColor = "bg-indigo-500";
+                    textColor = "text-indigo-400 font-semibold";
+                } else if (percent > 0) {
+                    barColor = "bg-amber-500";
+                    textColor = "text-amber-400 font-semibold";
+                }
+
+                return `
+                    <div class="space-y-1 bg-slate-950/40 p-2.5 rounded-xl border ${borderHighlight} transition-all-300">
+                        <div class="flex justify-between text-[11px] font-medium">
+                            <span class="truncate pr-1 text-slate-300" title="${g} - ${groupLabels[g] || g}">${g}: ${groupLabels[g] || g}</span>
+                            <span class="font-mono shrink-0 ${textColor} text-[10px]">${approved}/${target}</span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-900/60 flex">
+                            <div class="${barColor} h-full transition-all duration-300" style="width: ${percent}%"></div>
+                        </div>
+                        <div class="flex justify-between text-[9px] text-slate-500 font-mono">
+                            <span>W bazie: ${totalInDb}</span>
+                            <span>Cel: ${percent}%</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let basicHTML = '';
+            basicGroups.forEach(g => {
+                const html = createGroupProgressHTML(g);
+                if (html) basicHTML += html;
+            });
+
+            let specHTML = '';
+            specGroups.forEach(g => {
+                const html = createGroupProgressHTML(g);
+                if (html) specHTML += html;
+            });
+
+            let finalHTML = '';
+            if (basicHTML) {
+                finalHTML += `
+                    <div class="space-y-2">
+                        <span class="block text-[9px] font-extrabold text-slate-500 uppercase tracking-wider pl-1">Część Podstawowa</span>
+                        <div class="space-y-2">${basicHTML}</div>
+                    </div>
+                `;
+            }
+            if (specHTML) {
+                if (finalHTML) finalHTML += '<div class="border-t border-slate-800/40 my-3"></div>';
+                finalHTML += `
+                    <div class="space-y-2">
+                        <span class="block text-[9px] font-extrabold text-slate-500 uppercase tracking-wider pl-1">Część Specjalistyczna</span>
+                        <div class="space-y-2">${specHTML}</div>
+                    </div>
+                `;
+            }
+
+            if (!finalHTML) {
+                container.innerHTML = `
+                    <div class="text-center py-6 text-slate-600 text-xs">
+                        Wgraj bazę pytań, aby zobaczyć podział postępów.
+                    </div>
+                `;
+            } else {
+                container.innerHTML = finalHTML;
+            }
+
+            if (activeCountEl) {
+                activeCountEl.innerText = `${activeGroupsCount} działów`;
+            }
+        }
+
+        // --- UNIWERSALNY TRANSLATOR SCHEMATÓW I NORMALIZACJA KLUCZY ---
+        function normalizeQuestion(obj) {
+            let normalized = {};
+
+            for (let key in obj) {
+                let lowKey = key.toLowerCase().trim();
+                let val = obj[key];
+
+                if (lowKey === 'id' || lowKey === 'id_pytania' || lowKey === 'numer' || lowKey === 'numer_pytania') {
+                    normalized.id = String(val);
+                } else if (lowKey === 'question' || lowKey === 'pytanie' || lowKey === 'tekst_pytania' || lowKey === 'tresc' || lowKey === 'tresc_pytania') {
+                    normalized.question = String(val);
+                } else if (lowKey === 'group' || lowKey === 'grupa' || lowKey === 'dzial' || lowKey === 'obszar_tematyczny') {
+                    normalized.group = String(val).toUpperCase();
+                } else if (lowKey === 'weight' || lowKey === 'waga' || lowKey === 'punkty' || lowKey === 'pkt' || lowKey === 'waga_punktowa') {
+                    normalized.weight = Number(val) || 3;
+                } else if (lowKey === 'correct_answer' || lowKey === 'correct' || lowKey === 'poprawna' || lowKey === 'odp' || lowKey === 'odpowiedz_prawidlowa') {
+                    normalized.correct_answer = String(val).toUpperCase().trim();
+                } else if (lowKey === 'type' || lowKey === 'format_pytania') {
+                    let typeStr = String(val).toLowerCase().trim();
+                    if (typeStr === 'tak/nie' || typeStr === 'yn' || typeStr === 'tak_nie' || typeStr === 'tak-nie') {
+                        normalized.type = 'yn';
+                    } else if (typeStr === 'abc' || typeStr === 'single') {
+                        normalized.type = 'abc';
+                    } else {
+                        normalized.type = typeStr;
+                    }
+                } else if (lowKey === 'part' || lowKey === 'czesc_egzaminu' || lowKey === 'czesc') {
+                    let partStr = String(val).toLowerCase().trim();
+                    if (partStr === 'podstawowa' || partStr === 'basic') {
+                        normalized.part = 'podstawowa';
+                    } else if (partStr === 'specjalistyczna' || partStr === 'specialist') {
+                        normalized.part = 'specjalistyczna';
+                    } else {
+                        normalized.part = partStr;
+                    }
+                } else if (lowKey === 'media_notes' || lowKey === 'uwagi_do_grafiki' || lowKey === 'uwagi' || lowKey === 'uwagi_grafika' || lowKey === 'wyjasnienie') {
+                    normalized.media_notes = String(val);
+                } else if (lowKey === 'przepis_zrodlowy' || lowKey === 'przepis' || lowKey === 'podstawa_prawna' || lowKey === 'podstawa' || lowKey === 'przepis_źródłowy') {
+                    normalized.przepis_zrodlowy = String(val);
+                } else if (lowKey === 'media_url' || lowKey === 'url') {
+                    normalized.media_url = String(val);
+                } else if (lowKey === 'media_title' || lowKey === 'tytul') {
+                    normalized.media_title = String(val);
+                } else if (lowKey === 'media_type') {
+                    normalized.media_type = String(val);
+                } else if (lowKey === 'status') {
+                    normalized.status = String(val);
+                } else if (lowKey === 'audited_by' || lowKey === 'audytor' || lowKey === 'modyfikacja_autor') {
+                    normalized.audited_by = String(val);
+                } else if (lowKey === 'audit_date' || lowKey === 'data_audytu' || lowKey === 'modyfikacja_data') {
+                    normalized.audit_date = String(val);
+                } else if (lowKey === 'options' || lowKey === 'opcje') {
+                    normalized.options = val;
+                } else if (lowKey === 'opcja_a') {
+                    if (!normalized.options) normalized.options = {};
+                    normalized.options.A = String(val);
+                } else if (lowKey === 'opcja_b') {
+                    if (!normalized.options) normalized.options = {};
+                    normalized.options.B = String(val);
+                } else if (lowKey === 'opcja_c') {
+                    if (!normalized.options) normalized.options = {};
+                    normalized.options.C = String(val);
+                } else {
+                    normalized[key] = val; // Zachowanie dodatkowych pol
+                }
+            }
+
+            // Domyślne mapowanie po-normalizacyjne
+            if (!normalized.id) {
+                normalized.id = "TEMP_" + Math.random().toString(36).substr(2, 9).toUpperCase();
+            }
+            if (!normalized.type) {
+                normalized.type = (normalized.correct_answer === 'TAK' || normalized.correct_answer === 'NIE') ? 'yn' : 'abc';
+            }
+            if (!normalized.group) {
+                normalized.group = normalized.id.split('_')[0] || "P1";
+            }
+            normalized.group_label = groupLabels[normalized.group] || normalized.group;
+            if (!normalized.part) {
+                normalized.part = normalized.group.startsWith('P') ? 'podstawowa' : 'specjalistyczna';
+            }
+            if (!normalized.weight) {
+                normalized.weight = 3;
+            }
+            if (!normalized.status) {
+                normalized.status = 'untouched';
+            }
+            return normalized;
+        }
+
+        function extractQuestionsLoose(text) {
+            let sanitized = sanitizeJSONString(text);
+            let list = [];
+            let braceCount = 0;
+            let startIndex = -1;
+            let inString = false;
+            let escape = false;
+            let quoteChar = null;
+
+            for (let i = 0; i < sanitized.length; i++) {
+                let c = sanitized[i];
+
+                if (escape) {
+                    escape = false;
+                    continue;
+                }
+
+                if (c === '\\') {
+                    escape = true;
+                    continue;
+                }
+
+                if (inString) {
+                    if (c === quoteChar) {
+                        inString = false;
+                    }
+                    continue;
+                }
+
+                if (c === '"' || c === "'") {
+                    inString = true;
+                    quoteChar = c;
+                    continue;
+                }
+
+                if (c === '{') {
+                    if (braceCount === 0) {
+                        startIndex = i;
+                    }
+                    braceCount++;
+                } else if (c === '}') {
+                    braceCount--;
+                    if (braceCount === 0 && startIndex !== -1) {
+                        let candidate = sanitized.substring(startIndex, i + 1);
+                        try {
+                            // Luźna ewaluacja funkcją bez ograniczeń JSON.parse
+                            let obj = (new Function("return (" + candidate + ");"))();
+                            if (obj && typeof obj === 'object') {
+                                let normalized = normalizeQuestion(obj);
+                                list.push(normalized);
+                            }
+                        } catch (err) {
+                            // Ignorujemy błędy ewaluacji pojedynczych obiektów
+                        }
+                        startIndex = -1;
+                    }
+                }
+            }
+            return list;
+        }
+
+        function tryInterpretJSON(raw) {
+            let cleaned = sanitizeJSONString(raw.trim());
+            if (cleaned.startsWith("```")) {
+                const backticks = String.fromCharCode(96, 96, 96);
+                const regexStart = new RegExp("^" + backticks + "(?:json)?", "i");
+                const regexEnd = new RegExp(backticks + "$", "i");
+                cleaned = cleaned.replace(regexStart, "").trim();
+                cleaned = cleaned.replace(regexEnd, "").trim();
+            }
+
+            // Próba 1: Wyodrębnienie zagnieżdżonego klucza "pytania" przed parsowaniem luźnym
+            try {
+                let parsed = JSON.parse(cleaned);
+                if (parsed && typeof parsed === 'object') {
+                    if (Array.isArray(parsed.pytania)) {
+                        globalMetadata = parsed.metadane_banku || null;
+                        let list = parsed.pytania.map(q => normalizeQuestion(q));
+                        if (list.length > 0) return list;
+                    }
+                }
+            } catch(e) {
+                console.warn("Wstępne parsowanie zagnieżdżone nie powiodło się, przechodzenie do Loose Extractor.");
+            }
+
+            // Próba 2: Luźny ekstraktor (radzi sobie ze zniszczoną strukturą i błędami klamrowymi)
+            let result = extractQuestionsLoose(cleaned);
+            if (result && result.length > 0) {
+                try {
+                    let fullEval = (new Function("return (" + cleaned + ");"))();
+                    if (fullEval && typeof fullEval === 'object') {
+                        globalMetadata = fullEval.metadane_banku || null;
+                    } else {
+                        globalMetadata = null;
+                    }
+                } catch(e) {
+                    globalMetadata = null;
+                }
+                return result;
+            }
+
+            // Próba 3: Tradycyjne parsowanie JSON.parse
+            try {
+                const parsed = JSON.parse(cleaned);
+                if (Array.isArray(parsed)) {
+                    globalMetadata = null;
+                    return parsed.map(q => normalizeQuestion(q));
+                }
+            } catch (e) {
+                console.warn("Parsowanie standardowe nie powiodło się.");
+            }
+
+            throw new Error("Nie udało się rozpoznać obiektów pytań. Upewnij się, że plik zawiera pytania (powinny mieć treść pytania oraz identyfikator).");
+        }
+
+        // --- UNIWERSALNA METODA IMPORTOWANIA Z DYSKU LUB SCHOWKA ---
+        function importText(raw, optionalFileName) {
+            const loader = document.getElementById('loading-overlay');
+            if (loader) loader.classList.remove('hidden');
+
+            setTimeout(() => {
+                const infoBox = document.getElementById('info-box');
+                const infoTitle = document.getElementById('info-title');
+                const infoMsg = document.getElementById('info-message');
+                const infoDebug = document.getElementById('info-debug');
+
+                const importMode = document.querySelector('input[name="import-mode"]:checked')?.value || 'replace';
+
+                try {
+                    const parsed = tryInterpretJSON(raw);
+                    
+                    if (parsed && Array.isArray(parsed) && parsed.length > 0) {
+                        
+                        let dbKey = optionalFileName || "Dodana_Baza_" + (Object.keys(loadedDatabases).length);
+                        
+                        if (importMode === 'replace') {
+                            // Całkowite zastąpienie bazy w nowej sekcji słownika
+                            loadedDatabases[dbKey] = parsed;
+                            addDatabaseOption(dbKey);
+                            selectDatabase(dbKey);
+                            showToast(`Zaimportowano i utworzono bazę: ${dbKey}!`, "success");
+                        } else {
+                            // Inteligentne scalenie (upsert) do aktualnie przeglądanej bazy
+                            const existingMap = new Map(globalQuestions.map(q => [q.id, q]));
+                            let addedCount = 0;
+                            let updatedCount = 0;
+
+                            parsed.forEach(newQ => {
+                                if (existingMap.has(newQ.id)) {
+                                    const idx = globalQuestions.findIndex(q => q.id === newQ.id);
+                                    if (idx !== -1) {
+                                        globalQuestions[idx] = { ...globalQuestions[idx], ...newQ };
+                                        updatedCount++;
+                                    }
+                                } else {
+                                    globalQuestions.push(newQ);
+                                    addedCount++;
+                                }
+                            });
+                            
+                            loadedDatabases[currentDbKey] = globalQuestions;
+                            showToast(`Scalono pomyślnie! Dodano: ${addedCount}, zaktualizowano: ${updatedCount}`, "success");
+                        }
+
+                        initializeStatuses();
+                        recalculateStats();
+                        
+                        const welcomeAlert = document.getElementById('welcome-alert');
+                        if (welcomeAlert) welcomeAlert.classList.add('hidden');
+                        resetPaginationAndRender();
+
+                        if (infoBox) infoBox.className = "bg-emerald-950/20 border border-emerald-900/60 text-emerald-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4";
+                        if (infoTitle) infoTitle.innerText = `PROCES IMPORTU ZAKOŃCZONY POMYŚLNIE: ${currentDbKey}`;
+                        if (infoMsg) infoMsg.innerText = `Baza zawiera obecnie łącznie ${globalQuestions.length} pytań egzaminacyjnych. Wszystkie ewentualne błędy struktury, cudzysłowów i brakujących przecinków zostały automatycznie naprawione!`;
+                        if (infoDebug) infoDebug.classList.add('hidden');
+                        
+                    } else {
+                        throw new Error("Plik nie zawiera dających się odczytać pytań.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    if (infoBox) infoBox.className = "bg-rose-950/20 border border-rose-900/60 text-rose-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4";
+                    if (infoTitle) infoTitle.innerText = "BŁĄD STRUKTURY PLIKU";
+                    if (infoMsg) infoMsg.innerText = "Nie udało się zaimportować pytań. Twój plik tekstowy zawiera poważne błędy składniowe lub został niekompletnie skopiowany z dokumentu tekstowego. Spróbuj pobrać go z Google Docs jako plik tekstowy (.txt) i wgrać ponownie.";
+                    
+                    if (infoDebug) {
+                        infoDebug.innerText = `[Błąd: ${err.message}]`;
+                        infoDebug.classList.remove('hidden');
+                    }
+
+                    showToast("Błąd wczytywania bazy!", "error");
+                } finally {
+                    if (loader) loader.classList.add('hidden');
+                }
+            }, 50);
+        }
+
+        // --- EDYCJA PYTANIA INLINE ---
+        window.startEditQuestion = function(id) {
+            const q = globalQuestions.find(item => item.id === id);
+            if (!q) return;
+
+            const card = document.getElementById(`card-${id}`);
+            if (!card) return;
+
+            const isYN = q.type === 'yn' || q.type === 'TAK/NIE';
+            
+            let optionsMarkup = '';
+            if (!isYN) {
+                optionsMarkup = `
+                    <div class="space-y-2 mt-3">
+                        <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Opcje odpowiedzi (ABC):</span>
+                        <div class="flex gap-2 items-center">
+                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">A</span>
+                            <input type="text" id="edit-opt-A-${q.id}" value="${q.options?.A || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">B</span>
+                            <input type="text" id="edit-opt-B-${q.id}" value="${q.options?.B || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">C</span>
+                            <input type="text" id="edit-opt-C-${q.id}" value="${q.options?.C || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none">
+                        </div>
+                    </div>
+                `;
+            }
+
+            const groupOptions = Object.keys(groupLabels).map(g => 
+                `<option value="${g}" ${q.group === g ? 'selected' : ''}>${g} - ${groupLabels[g]}</option>`
+            ).join('');
+
+            const correctOptions = isYN 
+                ? `<option value="TAK" ${q.correct_answer === 'TAK' ? 'selected' : ''}>TAK</option>
+                   <option value="NIE" ${q.correct_answer === 'NIE' ? 'selected' : ''}>NIE</option>`
+                : `<option value="A" ${q.correct_answer === 'A' ? 'selected' : ''}>A</option>
+                   <option value="B" ${q.correct_answer === 'B' ? 'selected' : ''}>B</option>
+                   <option value="C" ${q.correct_answer === 'C' ? 'selected' : ''}>C</option>`;
+
+            // Usuń kolory statusów na czas edycji
+            card.className = "bg-slate-900 border-2 border-indigo-500/50 rounded-2xl p-6 shadow-xl transition-all-300";
+
+            card.innerHTML = `
+                <div class="space-y-4 w-full text-slate-100">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            Tryb Edycji Pytania: ${q.id}
+                        </span>
+                        <span class="text-[10px] text-slate-500 font-mono font-bold">Autor modyfikacji: ${currentUsername}</span>
+                    </div>
+
+                    <!-- TREŚĆ PYTANIA -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Treść pytania</label>
+                        <textarea id="edit-q-text-${q.id}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none resize-y min-h-[60px]">${q.question}</textarea>
+                    </div>
+
+                    <!-- MATRYCA METRYCZNA -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Dział / Grupa GDE</label>
+                            <select id="edit-group-${q.id}" class="bg-slate-950 text-slate-100 border border-slate-800 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-indigo-500 outline-none">
+                                ${groupOptions}
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Waga punktowa</label>
+                            <select id="edit-weight-${q.id}" class="bg-slate-950 text-slate-100 border border-slate-800 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-indigo-500 outline-none">
+                                <option value="1" ${q.weight == 1 ? 'selected' : ''}>1 pkt</option>
+                                <option value="2" ${q.weight == 2 ? 'selected' : ''}>2 pkt</option>
+                                <option value="3" ${q.weight == 3 ? 'selected' : ''}>3 pkt</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Typ odpowiedzi</label>
+                            <select id="edit-type-${q.id}" onchange="toggleEditOptions('${q.id}', this.value)" class="bg-slate-950 text-slate-100 border border-slate-800 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-indigo-500 outline-none">
+                                <option value="yn" ${isYN ? 'selected' : ''}>TAK / NIE (Y/N)</option>
+                                <option value="abc" ${!isYN ? 'selected' : ''}>Wielokrotny wybór (ABC)</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Poprawny klucz</label>
+                            <select id="edit-correct-${q.id}" class="bg-slate-950 text-slate-100 border border-slate-800 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-indigo-500 outline-none">
+                                ${correctOptions}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- ABC OPTIONS CONTAINER -->
+                    <div id="edit-options-container-${q.id}">
+                        ${optionsMarkup}
+                    </div>
+
+                    <!-- PODSTAWA PRAWNA / PRZEPIS ŹRÓDŁOWY -->
+                    <div class="flex flex-col gap-1.5 pt-1">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            Podstawa prawna (przepis źródłowy)
+                        </label>
+                        <input type="text" id="edit-przepis-${q.id}" value="${q.przepis_zrodlowy || ''}" placeholder="np. Ustawa PoRD art. 26 ust. 1" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+
+                    <!-- UWAGI DO GRAFIKI -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            Uwagi do grafiki / wyjasnienie merytoryczne
+                        </label>
+                        <textarea id="edit-media-notes-${q.id}" placeholder="Wpisz ewentualne uwagi, korekty lub wyjaśnienia..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none resize-y min-h-[50px]">${q.media_notes || ''}</textarea>
+                    </div>
+
+                    <!-- MULTIMEDIA -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Adres URL multimediów</label>
+                            <input type="text" id="edit-media-url-${q.id}" value="${q.media_url || ''}" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tytuł załącznika</label>
+                            <input type="text" id="edit-media-title-${q.id}" value="${q.media_title || ''}" placeholder="np. Sytuacja drogowa" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                        <button onclick="cancelEditQuestion('${q.id}')" class="bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-semibold px-4 py-2 rounded-xl border border-slate-755 transition">
+                            Anuluj
+                        </button>
+                        <button onclick="saveEditQuestion('${q.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-5 py-2 rounded-xl transition">
+                            Zapisz edycję
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+
+        window.toggleEditOptions = function(id, type) {
+            const container = document.getElementById(`edit-options-container-${id}`);
+            const correctSelect = document.getElementById(`edit-correct-${id}`);
+            if (!container || !correctSelect) return;
+
+            if (type === 'yn') {
+                container.innerHTML = '';
+                correctSelect.innerHTML = `
+                    <option value="TAK">TAK</option>
+                    <option value="NIE">NIE</option>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="space-y-2 mt-3">
+                        <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Opcje odpowiedzi (ABC):</span>
+                        <div class="flex gap-2 items-center">
+                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">A</span>
+                            <input type="text" id="edit-opt-A-${id}" value="" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">B</span>
+                            <input type="text" id="edit-opt-B-${id}" value="" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">C</span>
+                            <input type="text" id="edit-opt-C-${id}" value="" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+                `;
+                correctSelect.innerHTML = `
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                `;
+            }
+        };
+
+        window.cancelEditQuestion = function(id) {
+            const q = globalQuestions.find(item => item.id === id);
+            if (!q) return;
+
+            const card = document.getElementById(`card-${id}`);
+            if (card) {
+                const tempDiv = createQuestionCard(q);
+                card.innerHTML = tempDiv.innerHTML;
+                card.className = tempDiv.className;
+            }
+        };
+
+        window.saveEditQuestion = function(id) {
+            const q = globalQuestions.find(item => item.id === id);
+            if (!q) return;
+
+            const card = document.getElementById(`card-${id}`);
+            if (!card) return;
+
+            const textVal = document.getElementById(`edit-q-text-${id}`).value.trim();
+            const groupVal = document.getElementById(`edit-group-${id}`).value;
+            const weightVal = Number(document.getElementById(`edit-weight-${id}`).value);
+            const typeVal = document.getElementById(`edit-type-${id}`).value;
+            const correctVal = document.getElementById(`edit-correct-${id}`).value;
+            const mediaUrlVal = document.getElementById(`edit-media-url-${id}`).value.trim();
+            const mediaTitleVal = document.getElementById(`edit-media-title-${id}`).value.trim();
+            const mediaNotesVal = document.getElementById(`edit-media-notes-${id}`).value.trim();
+            const przepisVal = document.getElementById(`edit-przepis-${id}`).value.trim();
+
+            if (!textVal) {
+                showToast("Treść pytania nie może być pusta!", "error");
+                return;
+            }
+
+            // Aktualizacja zmiennych obiektu
+            q.question = textVal;
+            q.group = groupVal;
+            q.weight = weightVal;
+            q.type = typeVal;
+            q.correct_answer = correctVal;
+            q.media_url = mediaUrlVal || null;
+            q.media_title = mediaTitleVal || null;
+            q.media_notes = mediaNotesVal || null;
+            q.przepis_zrodlowy = przepisVal || null;
+
+            // Zapis audytora
+            q.audited_by = currentUsername;
+            q.audit_date = getFormattedCurrentDate();
+
+            // Przypisanie etykiety merytorycznej oraz części egzaminu na podstawie klucza GDE
+            q.group_label = groupLabels[groupVal] || groupVal;
+            q.part = groupVal.startsWith('P') ? 'podstawowa' : 'specjalistyczna';
+
+            if (typeVal === 'abc') {
+                q.options = {
+                    A: document.getElementById(`edit-opt-A-${id}`).value.trim(),
+                    B: document.getElementById(`edit-opt-B-${id}`).value.trim(),
+                    C: document.getElementById(`edit-opt-C-${id}`).value.trim()
+                };
+            } else {
+                delete q.options;
+            }
+
+            recalculateStats();
+
+            // Re-renderowanie karty pytania w trybie zwykłym
+            const tempDiv = createQuestionCard(q);
+            card.innerHTML = tempDiv.innerHTML;
+            card.className = tempDiv.className;
+
+            showToast(`Zapisano edycję pytania ${id}! Autor: ${currentUsername}`, "success");
+        };
+
+        // --- GLOBALNE AKCJE POWIĄZANE Z PRZYCISKAMI ---
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            const btnBrowse = document.getElementById('btn-tab-browse');
+            const btnExam = document.getElementById('btn-tab-exam');
+            const tabBrowse = document.getElementById('tab-browse');
+            const tabExam = document.getElementById('tab-exam');
+
+            if (tab === 'browse') {
+                if (tabBrowse) tabBrowse.classList.remove('hidden');
+                if (tabExam) tabExam.classList.add('hidden');
+                if (btnBrowse) btnBrowse.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 bg-emerald-600 text-slate-950 shadow-md";
+                if (btnExam) btnExam.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 text-slate-400 hover:bg-slate-800 hover:text-slate-200";
+                renderBrowseTab();
+            } else {
+                if (tabBrowse) tabBrowse.classList.add('hidden');
+                if (tabExam) tabExam.classList.remove('hidden');
+                if (btnBrowse) btnBrowse.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 text-slate-400 hover:bg-slate-800 hover:text-slate-200";
+                if (btnExam) btnExam.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 bg-emerald-600 text-slate-950 shadow-md";
+                renderExamTab();
+            }
+        };
+
+        window.resetPaginationAndRender = function() {
+            currentPage = 1;
+            renderBrowseTab();
+        };
+
+        window.loadMoreQuestions = function() {
+            currentPage++;
+            renderBrowseTab();
+        };
+
+        window.handleFileSelect = function(event) {    <!-- ASYNCHRONICZNY EKRAN ŁADOWANIA DLA DUŻYCH BAZ -->
+    <div id="loading-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center hidden p-4 text-center">
+        <div class="relative w-20 h-20 mb-6">
+            <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-t-emerald-500 animate-spin"></div>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Przetwarzanie i optymalizacja bazy pytań...</h3>
+        <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
+            Nasz inteligentny silnik naprawia strukturę bazy, koryguje cudzysłowy drukarskie, uzupełnia brakujące przecinki i optymalizuje układ pytań, aby Safari i Chrome działały niezwykle płynnie.
+        </p>
+    </div>
+
+    <!-- SYSTEM POWIADOMIEŃ TOAST -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none"></div>
+
+    <!-- OKNO DIALOGOWE KOMUNIKATÓW I BŁĘDÓW -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl transform scale-95 transition-all duration-300" id="modal-box">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div id="modal-icon-container" class="p-3 rounded-xl bg-slate-800 text-emerald-400 border border-slate-750 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 id="modal-title" class="text-lg font-bold text-white">Komunikat systemowy</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="mt-4 space-y-3">
+                <p id="modal-message" class="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap"></p>
+                <div id="modal-debug-container" class="hidden">
+                    <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Miejsce błędu w strukturze:</span>
+                    <pre id="modal-debug-content" class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-rose-400 overflow-x-auto whitespace-pre-wrap leading-relaxed"></pre>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="closeModal()" class="bg-slate-850 hover:bg-slate-800 text-slate-200 px-5 py-2.5 rounded-xl text-sm font-semibold border border-slate-755 transition">
+                    Zamknij okno
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP BAR / NAGŁÓWEK -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="bg-gradient-to-tr from-emerald-500 to-teal-400 p-2.5 rounded-xl shadow-lg shadow-emerald-500/10 text-slate-950 flex items-center justify-center">
