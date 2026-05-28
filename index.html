@@ -501,9 +501,9 @@
                     "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_4.083.jpeg",
                     "media_title": "Różnica między drogą hamowania a drogą zatrzymania",
                     "options": {
-                        "A": "Droga zatrzymania to droga hamowania plus droga reakcji.",
-                        "B": "Droga hamowania to droga reakcji plus droga zatrzymania.",
-                        "C": "Obie drogi są takie same przy dobrej nawierzchni."
+                        "A": "Droga zatrzymania uwzględnia czas reakcji kierowcy oraz drogę hamowania.",
+                        "B": "Droga hamowania jest zawsze dłuższa od drogi zatrzymania.",
+                        "C": "Nie ma żadnej różnicy merytorycznej między tymi pojęciami."
                     },
                     "przepis_zrodlowy": "Teoria fizyki jazdy pojazdem"
                 },
@@ -798,17 +798,21 @@
             }
 
             // 2. Skanowanie katalogu /bazy w repozytorium GitHub przy użyciu API
-            const githubFiles = await scanGitHubBazyFolder();
-            if (githubFiles && githubFiles.length > 0) {
-                githubFiles.forEach(file => {
-                    addDatabaseOption(file.name, file.download_url);
-                    // Jeśli to plik bazab.json i nie został wcześniej załadowany, pobierz go
-                    if (file.name === "bazab.json" && !bazabLoaded) {
-                        fetchDatabaseFromUrl(file.name, file.download_url);
-                        bazabLoaded = true;
-                    }
-                });
-                showToast("Wykryto dodatkowe bazy danych w folderze /bazy w GitHub!", "info");
+            try {
+                const githubFiles = await scanGitHubBazyFolder();
+                if (githubFiles && githubFiles.length > 0) {
+                    githubFiles.forEach(file => {
+                        addDatabaseOption(file.name, file.download_url);
+                        // Jeśli to plik bazab.json i nie został wcześniej załadowany, pobierz go
+                        if (file.name === "bazab.json" && !bazabLoaded) {
+                            fetchDatabaseFromUrl(file.name, file.download_url);
+                            bazabLoaded = true;
+                        }
+                    });
+                    showToast("Wykryto dodatkowe bazy danych w folderze /bazy w GitHub!", "info");
+                }
+            } catch (githubErr) {
+                console.warn("Skanowanie folderu GitHub nie powiodło się:", githubErr);
             }
 
             // 3. Fallback: Jeśli plik bazab.json nie został załadowany, wyświetl diagnostykę i przełącz na demo
@@ -1108,7 +1112,7 @@
             if (!finalHTML) {
                 container.innerHTML = `
                     <div class="text-center py-6 text-slate-600 text-xs">
-                        Wgraj bazę pytań, aby zobaczyć podział postępów.
+                        Wgraj baza pytań, aby zobaczyć podział postępów.
                     </div>
                 `;
             } else {
@@ -1229,67 +1233,6 @@
             return str;
         }
 
-        function extractQuestionsLoose(text) {
-            let sanitized = sanitizeJSONString(text);
-            let list = [];
-            let braceCount = 0;
-            let startIndex = -1;
-            let inString = false;
-            let escape = false;
-            let quoteChar = null;
-
-            for (let i = 0; i < sanitized.length; i++) {
-                let c = sanitized[i];
-
-                if (escape) {
-                    escape = false;
-                    continue;
-                }
-
-                if (c === '\\') {
-                    escape = true;
-                    continue;
-                }
-
-                if (inString) {
-                    if (c === quoteChar) {
-                        inString = false;
-                    }
-                    continue;
-                }
-
-                if (c === '"' || c === "'") {
-                    inString = true;
-                    quoteChar = c;
-                    continue;
-                }
-
-                if (c === '{') {
-                    if (braceCount === 0) {
-                        startIndex = i;
-                    }
-                    braceCount++;
-                } else if (c === '}') {
-                    braceCount--;
-                    if (braceCount === 0 && startIndex !== -1) {
-                        let candidate = sanitized.substring(startIndex, i + 1);
-                        try {
-                            // Luźna ewaluacja funkcją bez ograniczeń JSON.parse
-                            let obj = (new Function("return (" + candidate + ");"))();
-                            if (obj && typeof obj === 'object') {
-                                let normalized = normalizeQuestion(obj);
-                                list.push(normalized);
-                            }
-                        } catch (err) {
-                            // Ignorujemy błędy ewaluacji pojedynczych obiektów
-                        }
-                        startIndex = -1;
-                    }
-                }
-            }
-            return list;
-        }
-
         function tryInterpretJSON(raw) {
             let cleaned = sanitizeJSONString(raw.trim());
             if (cleaned.startsWith("```")) {
@@ -1298,6 +1241,12 @@
                 const regexEnd = new RegExp(backticks + "$", "i");
                 cleaned = cleaned.replace(regexStart, "").trim();
                 cleaned = cleaned.replace(regexEnd, "").trim();
+            }
+
+            // Najpierw spróbujmy wyodrębnić pytania bezpośrednio z tekstu (metoda odporna na błędy składni)
+            let result = extractQuestionsLoose(cleaned);
+            if (result && result.length > 0) {
+                return result;
             }
 
             // Próba 1: Wyodrębnienie zagnieżdżonego klucza "pytania" przed parsowaniem luźnym
@@ -1311,26 +1260,10 @@
                     }
                 }
             } catch(e) {
-                console.warn("Wstępne parsowanie zagnieżdżone nie powiodło się, przechodzenie do Loose Extractor.");
+                console.warn("Wstępne parsowanie zagnieżdżone nie powiodło się, przechodzenie do standardowego JSON.parse.");
             }
 
-            // Próba 2: Luźny ekstraktor (radzi sobie ze zniszczoną strukturą i błędami klamrowymi)
-            let result = extractQuestionsLoose(cleaned);
-            if (result && result.length > 0) {
-                try {
-                    let fullEval = (new Function("return (" + cleaned + ");"))();
-                    if (fullEval && typeof fullEval === 'object') {
-                        globalMetadata = fullEval.metadane_banku || null;
-                    } else {
-                        globalMetadata = null;
-                    }
-                } catch(e) {
-                    globalMetadata = null;
-                }
-                return result;
-            }
-
-            // Próba 3: Tradycyjne parsowanie JSON.parse
+            // Próba 2: Tradycyjne parsowanie JSON.parse
             try {
                 const parsed = JSON.parse(cleaned);
                 if (Array.isArray(parsed)) {
@@ -1401,7 +1334,7 @@
 
                         if (infoBox) infoBox.className = "bg-emerald-950/20 border border-emerald-900/60 text-emerald-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4";
                         if (infoTitle) infoTitle.innerText = `PROCES IMPORTU ZAKOŃCZONY POMYŚLNIE: ${currentDbKey}`;
-                        if (infoMsg) infoMsg.innerText = `Baza zawiera obecnie łącznie ${globalQuestions.length} pytań egzaminacyjnych. Wszystkie ewentualne błędy struktury, cudzysłowów i brakujących przecinków zostały automatycznie naprawione!`;
+                        if (infoMsg) infoMsg.innerText = `Baza zawiera obecnie łącznie ${globalQuestions.length} pytań egzaminacyjnych. Narzędzie automatycznie skorygowało formatowanie wejściowe i zoptymalizowało dane pod kątem GDE.`;
                         if (infoDebug) infoDebug.classList.add('hidden');
                         
                     } else {
@@ -2251,7 +2184,7 @@
             if (examSet.length === 0) {
                 container.innerHTML = `
                     <div class="bg-slate-900/30 text-center py-16 text-slate-500 rounded-2xl border border-dashed border-slate-800/80 flex flex-col items-center justify-center gap-3">
-                        <i class="fa-solid fa-circle-question text-4xl text-slate-700"></i>
+                        <svg class="w-10 h-10 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                         <div class="font-medium text-slate-400">Brak wygenerowanego zestawu</div>
                         <p class="text-xs text-slate-600 max-w-sm leading-relaxed">Kliknij przycisk u góry, aby wygenerować test merytoryczny.</p>
                     </div>`;
@@ -2364,13 +2297,6 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
         }
-
-        // Inicjalizacja przy pełnym wczytaniu kodu DOM
-        window.addEventListener('DOMContentLoaded', () => {
-            // Próba automatycznego załadowania bazy z folderu bazy/bazab.json
-            tryAutostartBazaB();
-            updateActiveFiltersUI();
-        });
     </script>
 </body>
 </html>
