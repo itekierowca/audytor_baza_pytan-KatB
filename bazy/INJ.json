@@ -1,1 +1,59 @@
-
+{
+  "metadane_banku": {
+    "data_generowania": "2026-05-25",
+    "kategoria": "B",
+    "opis": "Probka pytan — po 3 na kazdy obszar P1-P9 i S1-S6 (45 pytan), z analiza grafik i animacji z pliku XLS",
+    "liczba_pytan_tak_nie": 2,
+    "liczba_pytan_abc": 0
+  },
+  "pytania": [
+    {
+      "id": "P1_201",
+      "wersja": 1,
+      "data_zatwierdzenia": "2026-05-25",
+      "kategoria_prawa_jazdy": "B",
+      "group": "P1",
+      "group_label": "Niechronieni uczestnicy ruchu",
+      "cel_dydaktyczny": "Ocena ryzyka",
+      "weight": 3,
+      "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
+      "data_obowiazywania_przepisu": "2022-06-01",
+      "status": "Zatwierdzone",
+      "jezyki_tlumaczen": [
+        "pl"
+      ],
+      "type": "yn",
+      "material_wizualny": "tak",
+      "part": "podstawowa",
+      "question": "Czy pieszy przechodzący przez pierwszą połowę przejścia rozdzielonego wysepką ma już ustąpione pierwszeństwo do przejścia przez drugą połowę?",
+      "correct_answer": "NIE",
+      "media_notes": "Slajd W3.097 (IMAGE): każda połowa przejścia traktowana jest jako odrębne. Pieszy, który minął wysepkę, nie ma automatycznie pierwszeństwa na drugiej połowie — kierowca z drugiej nitki jezdni musi ustąpić oddzielnie. Grafika: dwa oddzielne przejścia z wysepką, pojazd po lewej zatrzymał się, pojazd po prawej jedzie — pieszy dopiero zbliża się do drugiej połowy.",
+      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.097.jpeg",
+      "media_title": "Przejście dla pieszych rozdzielone wysepką"
+    },
+    {
+      "id": "P2_202",
+      "wersja": 1,
+      "data_zatwierdzenia": "2026-05-25",
+      "kategoria_prawa_jazdy": "B",
+      "group": "P2",
+      "group_label": "Pierwszeństwo przejazdu",
+      "cel_dydaktyczny": "Rozumienie",
+      "weight": 3,
+      "przepis_zrodlowy": "Ustawa PoRD art. 25 ust. 3",
+      "data_obowiazywania_przepisu": "2022-06-01",
+      "status": "Zatwierdzone",
+      "jezyki_tlumaczen": [
+        "pl"
+      ],
+      "type": "yn",
+      "material_wizualny": "tak",
+      "part": "podstawowa",
+      "question": "Czy wjeżdżając na rondo oznakowane znakiem A-7 (ustąp pierwszeństwa), masz obowiązek ustąpić wszystkim pojazdom jadącym już po rondzie?",
+      "correct_answer": "TAK",
+      "media_notes": "Slajd W3 video (VIDEO): animacja z rondem — pojazdy na rondzie mają pierwszeństwo przed wjeżdżającymi. Animacja pokazuje: pojazd zatrzymujący się przy wjeździe na rondo ze znakiem A-7, przepuszczający kolejno dwa samochody jadące po rondzie. Znak A-7 wyraźnie widoczny przy wjeździe.",
+      "media_url": "https://cdn.e-kierowca.pl/media/video/Slajd_49.mp4",
+      "media_title": "Pierwszeństwo przejazdu na skrzyżowaniu o ruchu okrężnym"
+    }
+  ]
+}
