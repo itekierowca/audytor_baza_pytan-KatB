@@ -1,2298 +1,1202 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GDE-Auditor - Baza Pytań Kat. B</title>
-    <!-- Tailwind CSS do szybkiej i responsywnej stylizacji -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .transition-all-300 {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        /* Customowy scrollbar dla ciemnego motywu */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #090d16;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
-        }
-        /* Styl dla aktywnej strefy upuszczania pliku */
-        .drag-over-zone {
-            border: 3px dashed #10b981 !important;
-            background-color: rgba(16, 185, 129, 0.08) !important;
-        }
-    </style>
-</head>
-<body id="app-body" class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
-
-    <!-- ASYNCHRONICZNY EKRAN ŁADOWANIA DLA DUŻYCH BAZ -->
-    <div id="loading-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center hidden p-4 text-center">
-        <div class="relative w-20 h-20 mb-6">
-            <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
-            <div class="absolute inset-0 rounded-full border-4 border-t-emerald-500 animate-spin"></div>
-        </div>
-        <h3 class="text-lg font-bold text-white mb-2">Przetwarzanie i optymalizacja bazy pytań...</h3>
-        <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
-            Nasz inteligentny silnik naprawia strukturę bazy, koryguje cudzysłowy drukarskie, uzupełnia brakujące przecinki i optymalizuje układ pytań, aby Safari i Chrome działały niezwykle płynnie.
-        </p>
-    </div>
-
-    <!-- SYSTEM POWIADOMIEŃ TOAST -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none"></div>
-
-    <!-- OKNO DIALOGOWE KOMUNIKATÓW I BŁĘDÓW -->
-    <div id="custom-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl transform scale-95 transition-all duration-300" id="modal-box">
-            <div class="flex items-start justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div id="modal-icon-container" class="p-3 rounded-xl bg-slate-800 text-emerald-400 border border-slate-750 flex items-center justify-center">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 id="modal-title" class="text-lg font-bold text-white">Komunikat systemowy</h3>
-                </div>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div class="mt-4 space-y-3">
-                <p id="modal-message" class="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap"></p>
-                <div id="modal-debug-container" class="hidden">
-                    <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Miejsce błędu w strukturze:</span>
-                    <pre id="modal-debug-content" class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-rose-400 overflow-x-auto whitespace-pre-wrap leading-relaxed"></pre>
-                </div>
-            </div>
-            <div class="mt-6 flex justify-end gap-3">
-                <button onclick="closeModal()" class="bg-slate-850 hover:bg-slate-800 text-slate-200 px-5 py-2.5 rounded-xl text-sm font-semibold border border-slate-755 transition">
-                    Zamknij okno
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOP BAR / NAGŁÓWEK -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-gradient-to-tr from-emerald-500 to-teal-400 p-2.5 rounded-xl shadow-lg shadow-emerald-500/10 text-slate-950 flex items-center justify-center shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-base font-bold text-white flex items-center gap-2">
-                        GDE-Auditor <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded border border-emerald-500/20 font-mono">MATRYCA GDE</span>
-                    </h1>
-                    <p class="text-[11px] text-slate-400">Kompatybilność: Przepisy źródłowe i podstawy prawne GDE</p>
-                </div>
-            </div>
-
-            <!-- AKTUALNY PROFIL I WYBÓR BAZY -->
-            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end text-xs">
-                
-                <!-- SELECTOR AKTYWNEJ BAZY -->
-                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5">
-                    <span class="text-slate-400 font-semibold flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                        Baza:
-                    </span>
-                    <select id="db-selector" onchange="switchDatabase(this.value)" class="bg-transparent text-white font-bold outline-none cursor-pointer max-w-[140px] truncate">
-                        <option value="demo" class="bg-slate-900">Baza demonstracyjna</option>
-                    </select>
-                </div>
-
-                <!-- PROFIL AUDYTERA -->
-                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5">
-                    <span class="text-slate-400 font-semibold flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                        Użytkownik:
-                    </span>
-                    <input type="text" id="username-input" value="rafalmatuszak" oninput="updateUsername(this.value)" class="bg-transparent text-emerald-400 font-bold outline-none border-b border-transparent hover:border-slate-500 focus:border-emerald-500 w-28 text-center transition">
-                </div>
-
-                <!-- MENU EKSPORTU (DROPDOWN GROUP) -->
-                <div class="relative inline-block text-left w-full sm:w-auto" id="export-dropdown-container">
-                    <button onclick="toggleExportDropdown()" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition-all-300 flex items-center justify-center gap-2 w-full" id="export-menu-button">
-                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                        </svg>
-                        <span>Eksportuj bazę...</span>
-                        <svg class="w-3 h-3 text-slate-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-
-                    <div id="export-dropdown-menu" class="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-2xl bg-slate-900 border border-slate-800 focus:outline-none hidden z-50 p-1.5">
-                        <button onclick="triggerExport('all')" class="text-slate-200 hover:bg-slate-800 hover:text-white group flex items-center w-full px-3 py-2.5 text-xs font-medium rounded-lg transition text-left">
-                            <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-400 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                            </svg>
-                            Eksportuj wszystko (JSON)
-                        </button>
-                        <button onclick="triggerExport('approved')" class="text-slate-200 hover:bg-slate-800 hover:text-white group flex items-center w-full px-3 py-2.5 text-xs font-medium rounded-lg transition text-left">
-                            <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-400 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Eksportuj zatwierdzone
-                        </button>
-                        <button onclick="triggerExport('review')" class="text-slate-200 hover:bg-slate-800 hover:text-white group flex items-center w-full px-3 py-2.5 text-xs font-medium rounded-lg transition text-left">
-                            <svg class="w-4 h-4 text-slate-400 group-hover:text-rose-400 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                            </svg>
-                            Eksportuj do poprawy
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </header>
-
-    <!-- UKŁAD GŁÓWNY -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row gap-6">
-        
-        <!-- PANEL LEWY: DASHBOARD AUDYTU I IMPORT -->
-        <aside class="w-full lg:w-80 shrink-0 flex flex-col gap-5">
-            
-            <!-- PRZEŁĄCZNIK ZAKŁADEK -->
-            <div class="bg-slate-900 p-1.5 rounded-2xl border border-slate-800 flex flex-col gap-1">
-                <button id="btn-tab-browse" onclick="switchTab('browse')" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 bg-emerald-600 text-slate-950 shadow-md">
-                    <span class="flex items-center gap-2.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                        Przegląd Działów i Pytań
-                    </span>
-                    <span id="badge-total-count" class="bg-slate-950 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">9</span>
-                </button>
-                <button id="btn-tab-exam" onclick="switchTab('exam')" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 text-slate-400 hover:bg-slate-800 hover:text-slate-200">
-                    <span class="flex items-center gap-2.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                        Generator Zestawów GDE
-                    </span>
-                    <span class="bg-slate-800 text-slate-400 text-[9px] px-2 py-0.5 rounded uppercase font-bold">32 pyt.</span>
-                </button>
-            </div>
-
-            <!-- PANEL INTERAKTYWNEGO IMPORTU -->
-            <div id="drop-zone" class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-sm transition-all duration-200">
-                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                    Załaduj lub dodaj bazę pytań
-                </h3>
-                <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
-                    Przeciągnij i upuść plik z bazą, wgraj plik z dysku lub wklej bezpośrednio tekst poniżej. Obsługuje format standardowy oraz nowy zagnieżdżony.
-                </p>
-
-                <!-- METODA IMPORTU: ZASTĄP / SCAL -->
-                <div class="bg-slate-950 p-2 rounded-xl border border-slate-850 flex items-center justify-around mb-3 text-xs">
-                    <span class="text-slate-500 font-bold text-[10px] uppercase">Metoda:</span>
-                    <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-300 select-none">
-                        <input type="radio" name="import-mode" value="replace" checked class="accent-emerald-500 h-3.5 w-3.5 bg-slate-950 border-slate-800 rounded">
-                        <span>Zastąp</span>
-                    </label>
-                    <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-300 select-none">
-                        <input type="radio" name="import-mode" value="append" class="accent-emerald-500 h-3.5 w-3.5 bg-slate-950 border-slate-800 rounded">
-                        <span class="text-emerald-400 font-semibold">Scal (Dodaj)</span>
-                    </label>
-                </div>
-
-                <div class="space-y-3">
-                    <!-- Wybór pliku -->
-                    <label class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-700 transition cursor-pointer flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Wgraj plik (.txt / .json)
-                        <input type="file" id="file-input" accept=".txt,.json" class="hidden" onchange="handleFileSelect(event)">
-                    </label>
-
-                    <!-- Wklejanie bezpośrednie -->
-                    <div class="space-y-1.5">
-                        <textarea id="direct-textarea" placeholder="Wklej tutaj skopiowaną treść bazy (JSON)..." class="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-[10px] font-mono focus:ring-1 focus:ring-emerald-500 outline-none resize-none placeholder:text-slate-700"></textarea>
-                        <button onclick="handleDirectPaste()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            Zatwierdź i importuj
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SCALONY HIPERAKTYWNY DASHBOARD AUDYTU -->
-            <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-xl flex flex-col gap-5">
-                <!-- Header -->
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.003 9.003 0 1020.945 13H11V3.055z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
-                        </svg>
-                        Pulpit Audytu GDE
-                    </h3>
-                    <button onclick="clearAllFilters()" id="clear-filters-btn" class="hidden text-[10px] bg-slate-950 hover:bg-slate-800 text-rose-400 font-bold px-2.5 py-1 rounded border border-rose-500/20 transition-all-300">
-                        Wyczyść
-                    </button>
-                </div>
-
-                <!-- Status Filters -->
-                <div class="space-y-2">
-                    <span class="block text-[9px] font-extrabold text-slate-500 uppercase tracking-wider pl-1">Filtruj po statusie</span>
-                    <div class="grid grid-cols-1 gap-1.5 text-xs">
-                        <div id="stat-row-all" onclick="toggleStatusFilter('ALL')" class="flex justify-between items-center p-2.5 rounded-xl border border-slate-850 bg-slate-950/40 hover:bg-slate-800/40 cursor-pointer transition-all-300">
-                            <span class="text-slate-400 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-slate-400"></span> Wszystkie pytania:
-                            </span>
-                            <span id="stat-total" class="font-mono font-bold text-slate-200">0</span>
-                        </div>
-                        <div id="stat-row-approved" onclick="toggleStatusFilter('Zatwierdzone')" class="flex justify-between items-center p-2.5 rounded-xl border border-slate-850 bg-slate-950/40 hover:bg-slate-800/40 cursor-pointer transition-all-300">
-                            <span class="text-emerald-400 font-medium flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Zatwierdzone (OK):
-                            </span>
-                            <span id="stat-approved" class="font-mono font-bold text-emerald-400">0</span>
-                        </div>
-                        <div id="stat-row-review" onclick="toggleStatusFilter('Do poprawy')" class="flex justify-between items-center p-2.5 rounded-xl border border-slate-850 bg-slate-950/40 hover:bg-slate-800/40 cursor-pointer transition-all-300">
-                            <span class="text-rose-400 font-medium flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-rose-500"></span> Do poprawy (Korekta):
-                            </span>
-                            <span id="stat-review" class="font-mono font-bold text-rose-400">0</span>
-                        </div>
-                        <div id="stat-row-trash" onclick="toggleStatusFilter('Śmietnik')" class="flex justify-between items-center p-2.5 rounded-xl border border-slate-850 bg-slate-950/40 hover:bg-slate-800/40 cursor-pointer transition-all-300">
-                            <span class="text-slate-500 font-medium flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-slate-500"></span> Śmietnik:
-                            </span>
-                            <span id="stat-trash" class="font-mono font-bold text-slate-300">0</span>
-                        </div>
-                        <div id="stat-row-untouched" onclick="toggleStatusFilter('untouched')" class="flex justify-between items-center p-2.5 rounded-xl border border-slate-850 bg-slate-950/40 hover:bg-slate-800/40 cursor-pointer transition-all-300">
-                            <span class="text-amber-400 font-medium flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-amber-500"></span> Nienaruszone:
-                            </span>
-                            <span id="stat-untouched" class="font-mono font-bold text-amber-400">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Global Progress Bars inside unified card -->
-                <div class="border-t border-slate-800/60 pt-3 space-y-3">
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-[11px] text-slate-400 font-bold">
-                            <span>WERYFIKACJA ZAŁADOWANYCH:</span>
-                            <span id="progress-percent">0%</span>
-                        </div>
-                        <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-900">
-                            <div id="progress-bar-fill" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-0 transition-all duration-300"></div>
-                        </div>
-                    </div>
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-[11px] text-emerald-400 font-bold">
-                            <span>POSTĘP BAZY (ZATWIERDZONE / 1500):</span>
-                            <span id="macro-progress-percent">0%</span>
-                        </div>
-                        <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-900">
-                            <div id="macro-progress-bar-fill" class="bg-gradient-to-r from-emerald-500 to-emerald-300 h-full w-0 transition-all duration-300"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Department Targets (Scrollable container with filter triggers) -->
-                <div class="border-t border-slate-800/60 pt-3 flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
-                        <span class="block text-[9px] font-extrabold text-slate-500 uppercase tracking-wider pl-1">Filtruj po dziale (Cel 1500)</span>
-                        <span id="active-groups-count" class="text-[9px] font-bold text-indigo-400 font-mono">0 działów</span>
-                    </div>
-                    <div id="groups-progress-container" class="space-y-2 max-h-[380px] overflow-y-auto pr-1">
-                        <!-- Wygenerowane dynamicznie przez JS -->
-                    </div>
-                </div>
-            </div>
-
-        </aside>
-
-        <!-- PANEL PRAWY: WYŚWIETLANIE PYTAŃ I FILTROWANIE -->
-        <section class="flex-1 min-w-0">
-            
-            <!-- OKNO KOMUNIKATÓW I DIAGNOSTYKI SYSTEMOWEJ -->
-            <div id="info-box" class="bg-indigo-950/20 border border-indigo-900/60 text-indigo-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4">
-                <div class="bg-indigo-500/10 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/20 shrink-0 flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <div class="flex-1">
-                    <h4 id="info-title" class="font-bold text-indigo-300 text-xs uppercase tracking-wider mb-1">Załadowano startową bazę pytań</h4>
-                    <p id="info-message" class="text-xs text-slate-300 leading-relaxed">
-                        Załadowaliśmy startową pulę przykładowych pytań. Możesz bez przeszkód testować oznaczanie statusów, pobieranie bazy oraz losowanie zestawów! Zmień tryb importu na <strong class="text-emerald-400">"Scal"</strong>, aby dodawać nowe JSON-y bez utraty obecnych pytań.
-                    </p>
-                    <pre id="info-debug" class="hidden mt-3 bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-[10px] text-rose-400 overflow-x-auto whitespace-pre-wrap leading-relaxed"></pre>
-                </div>
-            </div>
-
-            <!-- TAB 1: PRZEGLĄDANIE BAZY (FILTROWANIE I LISTA) -->
-            <div id="tab-browse" class="space-y-5">
-                
-                <!-- PASEK FILTRÓW: AKTYWNE FILTRY I WYSZUKIWARKA -->
-                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <!-- Aktywne filtry w formie pillboxa -->
-                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto" id="active-filters-indicator">
-                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Filtry:</span>
-                        <span class="text-xs bg-slate-950 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-800">
-                            Wszystkie pytania
-                        </span>
-                    </div>
-
-                    <!-- Wyszukiwarka frazy lub ID -->
-                    <div class="relative w-full sm:w-72 shrink-0">
-                        <input type="text" id="search-input" oninput="resetPaginationAndRender()" placeholder="Szukaj frazy lub ID..." class="w-full bg-slate-950 text-slate-100 rounded-xl text-xs pl-9 pr-4 py-2.5 focus:ring-1 focus:ring-emerald-500 border border-slate-800 outline-none placeholder:text-slate-700">
-                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-600">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- INFO O KRYTERIACH -->
-                <div class="text-xs text-slate-400 flex justify-between items-center px-2">
-                    <div>
-                        Znaleziono: <span id="visible-count" class="font-bold text-emerald-400">0</span> pytań spełniających filtry
-                    </div>
-                </div>
-
-                <!-- LISTA PYTAŃ -->
-                <div id="browse-questions-list" class="space-y-4"></div>
-
-                <!-- PRZYCISK WCZYTAJ WIĘCEJ -->
-                <div id="load-more-container" class="flex justify-center pt-2 hidden">
-                    <button onclick="loadMoreQuestions()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold px-6 py-3 rounded-xl border border-slate-800 transition-all-300 text-xs flex items-center gap-2">
-                        Pokaż więcej pytań
-                    </button>
-                </div>
-
-            </div>
-
-            <!-- TAB 2: SYMULATOR ZESTAWÓW EGZAMINACYJNYCH -->
-            <div id="tab-exam" class="hidden space-y-5">
-                
-                <!-- KARTA GENERATORA -->
-                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div class="space-y-1">
-                        <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Oficjalny algorytm losujący zestaw egzaminacyjny
-                        </h2>
-                        <p class="text-xs text-slate-400 max-w-xl leading-relaxed">
-                            Aplikacja buduje zestaw merytoryczny o sumie 74 punktów według matrycy merytorycznej określonej w Rozdziale 6 PDF (dokładnie 32 pytania z podziałem na część podstawową i specjalistyczną oraz precyzyjnie przypisaną wagą). Pytania odrzucone (Śmietnik) są wykluczone.
-                        </p>
-                    </div>
-                    <button onclick="generateExamSet()" class="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-black px-6 py-3.5 rounded-xl shadow-lg transition-all-300 transform hover:-translate-y-0.5 whitespace-nowrap text-xs flex items-center gap-2">
-                        🎲 Generuj Losowy Zestaw
-                    </button>
-                </div>
-
-                <!-- STATYSTYKI WYGENEROWANEGO ZESTAWU -->
-                <div id="exam-stats-bar" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
-                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Struktura testu</span>
-                        <span id="exam-total-questions" class="text-base font-bold text-emerald-400">32 / 32 pyt.</span>
-                    </div>
-                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
-                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Wartość punktowa</span>
-                        <span id="exam-total-points" class="text-base font-bold text-emerald-400">74 / 74 pkt</span>
-                    </div>
-                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
-                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Zatwierdzone w zestawie</span>
-                        <span id="exam-approved-count" class="text-base font-bold text-slate-200">0</span>
-                    </div>
-                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
-                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Do poprawy w zestawie</span>
-                        <span id="exam-review-count" class="text-base font-bold text-rose-400">0</span>
-                    </div>
-                </div>
-
-                <!-- LISTA PYTAŃ WYGENEROWANEGO TESTU -->
-                <div id="exam-questions-list" class="space-y-4"></div>
-
-            </div>
-
-        </section>
-    </main>
-
-    <!-- ROZPISKA I WYJAŚNIENIE -->
-    <footer class="bg-slate-900 border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-500">
-        Wsparcie merytoryczne i optymalizacja bazy pytań egzaminacyjnych w oparciu o projekt podstawy programowej Stowarzyszenia Kierowca.pl z 2026 r.
-    </footer>
-
-    <!-- SKRYPT LOGICZNY -->
-    <script>
-        // Startowy, w 100% spójny zestaw startowy pytań prosto z pliku 1500 pytań!
-        let loadedDatabases = {
-            "demo": [
-                {
-                    "id": "P1_001",
-                    "group": "P1",
-                    "group_label": "Niechronieni uczestnicy ruchu",
-                    "part": "podstawowa",
-                    "type": "yn",
-                    "weight": 3,
-                    "question": "Czy mijając zatrzymany autobus szkolny musisz zachować szczególną ostrożność?",
-                    "correct_answer": "TAK",
-                    "media_type": "video",
-                    "media_url": "https://cdn.e-kierowca.pl/media/video/Wyk%C5%82ad_1.147.mp4",
-                    "media_title": "Szczególna ostrożność- autobus szkolny",
-                    "media_notes": "Wideo demonstracyjne. Sprawdzić jakość i czytelność napisów bocznych na autobusie.",
-                    "przepis_zrodlowy": "Ustawa PoRD art. 57a ust. 1"
-                },
-                {
-                    "id": "P1_002",
-                    "group": "P1",
-                    "group_label": "Niechronieni uczestnicy ruchu",
-                    "part": "podstawowa",
-                    "type": "yn",
-                    "weight": 3,
-                    "question": "Czy możesz wyprzedzać pojazd na przejściu dla pieszych?",
-                    "correct_answer": "NIE",
-                    "media_type": "image",
-                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_2.104.jpeg",
-                    "media_title": "Sytuacje zabraniające wyprzedzania- przejście dla piesz",
-                    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 3 pkt 1"
-                },
-                {
-                    "id": "P1_003",
-                    "group": "P1",
-                    "group_label": "Niechronieni uczestnicy ruchu",
-                    "part": "podstawowa",
-                    "type": "yn",
-                    "weight": 3,
-                    "question": "Czy zbliżając się do kolumny pieszych musisz zmniejszyć prędkość?",
-                    "correct_answer": "TAK",
-                    "media_type": "image",
-                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_7.171.jpeg",
-                    "media_title": "Jeśli zbliżasz się do kolumny pieszych",
-                    "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 2 pkt 2"
-                },
-                {
-                    "id": "P2_001",
-                    "group": "P2",
-                    "group_label": "Pierwszeństwo przejazdu",
-                    "part": "podstawowa",
-                    "type": "yn",
-                    "weight": 3,
-                    "question": "Czy na skrzyżowaniu równorzędnym ustępujesz pierwszeństwa pojazdowi nadjeżdżającemu z prawej strony?",
-                    "correct_answer": "TAK",
-                    "media_type": "image",
-                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_1.024.jpeg",
-                    "media_title": "Przykład skrzyżowania",
-                    "przepis_zrodlowy": "Ustawa PoRD art. 25 ust. 1"
-                },
-                {
-                    "id": "P3_001",
-                    "group": "P3",
-                    "group_label": "Prędkość i odległość",
-                    "part": "podstawowa",
-                    "type": "yn",
-                    "weight": 3,
-                    "question": "Czy droga hamowania przy 60 km/h jest czterokrotnie dłuższa niż przy 30 km/h?",
-                    "correct_answer": "TAK",
-                    "media_type": "image",
-                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_4.088.jpeg",
-                    "media_title": "Wzrost prędkości i wzrost drogi hamowania",
-                    "przepis_zrodlowy": "Zasady fizyki ruchu drogowego / BHP"
-                },
-                {
-                    "id": "S1_001",
-                    "group": "S1",
-                    "group_label": "Dynamika jazdy",
-                    "part": "specjalistyczna",
-                    "type": "abc",
-                    "weight": 3,
-                    "question": "Jaka jest różnica między drogą hamowania a drogą zatrzymania?",
-                    "correct_answer": "A",
-                    "media_type": "image",
-                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_4.083.jpeg",
-                    "media_title": "Różnica między drogą hamowania a drogą zatrzymania",
-                    "options": {
-                        "A": "Droga zatrzymania to droga hamowania plus droga reakcji.",
-                        "B": "Droga hamowania to droga reakcji plus droga zatrzymania.",
-                        "C": "Obie drogi są takie same przy dobrej nawierzchni."
-                    },
-                    "przepis_zrodlowy": "Teoria fizyki jazdy pojazdem"
-                },
-                {
-                    "id": "S1_002",
-                    "group": "S1",
-                    "group_label": "Dynamika jazdy",
-                    "part": "specjalistyczna",
-                    "type": "abc",
-                    "weight": 3,
-                    "question": "Hamulce bębnowe grzeją się podczas długiego zjazdu. Jakie ryzyko to stwarza?",
-                    "correct_answer": "A",
-                    "media_type": "video",
-                    "media_url": "https://cdn.e-kierowca.pl/media/video/v3_L10T3_04_hamulce_bebnowe.mp4",
-                    "media_title": "Hamulce bębnowe",
-                    "options": {
-                        "A": "Mogą całkowicie stracić skuteczność przez przegrzanie.",
-                        "B": "Auto przyspiesza, bo zmniejsza się opór toczenia.",
-                        "C": "Hamowanie staje się gwałtowniejsze niż normalnie."
-                    },
-                    "przepis_zrodlowy": "Budowa i eksploatacja pojazdów"
-                },
-                {
-                    "id": "S2_001",
-                    "group": "S2",
-                    "group_label": "Manewry i technika",
-                    "part": "specjalistyczna",
-                    "type": "abc",
-                    "weight": 3,
-                    "question": "Chcesz wyprzedzić samochód. Kiedy musisz włączyć kierunkowskaz?",
-                    "correct_answer": "A",
-                    "media_type": "image",
-                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_2.159.jpeg",
-                    "media_title": "Sygnalizowanie wykonywanych manewrów",
-                    "options": {
-                        "A": "Zanim zaczniesz zmieniać pas",
-                        "B": "W chwili gdy zaczynasz skręcać",
-                        "C": "Dopiero gdy jesteś obok wyprzedzanego"
-                    },
-                    "przepis_zrodlowy": "Ustawa PoRD art. 22 ust. 5"
-                },
-                {
-                    "id": "S6_078",
-                    "group": "S6",
-                    "group_label": "Przepisy kat. B",
-                    "part": "specjalistyczna",
-                    "type": "abc",
-                    "weight": 2,
-                    "question": "Gdy policjant wyciągnie rękę poziomo, kierowca powinien:",
-                    "correct_answer": "A",
-                    "media_type": "image",
-                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_5.055.jpeg",
-                    "media_title": "Sygnały dawane przez osoby uprawnione",
-                    "options": {
-                        "A": "zatrzymać się przed policjantem",
-                        "B": "przyspieszyć i przejechać jak najszybciej",
-                        "C": "zjechać na pobocze i zgasić silnik"
-                    },
-                    "przepis_zrodlowy": "Rozporządzenie MSWiA w sprawie kierowania ruchem drogowym"
-                }
-            ]
-        };
-
-        let globalMetadata = null; // Zachowanie nagłówka metadanych banku przy imporcie i eksporcie
-        let currentDbKey = "demo";
-        let globalQuestions = loadedDatabases["demo"];
-        let currentUsername = "rafalmatuszak"; // Domyślna symulowana nazwa profilu
-
-        let currentTab = 'browse';
-        let examSet = [];
-        let currentPage = 1;
-        const questionsPerPage = 15;
-
-        // Aktywne filtry wybrane w Hiperaktywnym Dashboardzie
-        let activeStatusFilter = 'ALL';
-        let activeGroupFilter = 'ALL';
-
-        // Cel ilościowy dla Variant A (1500 pytań łącznie) na podstawie Rozdziału 7
-        const groupTargets = {
-            "P1": 176,
-            "P2": 195,
-            "P3": 147,
-            "P4": 78,
-            "P5": 98,
-            "P6": 117,
-            "P7": 78,
-            "P8": 49,
-            "P9": 39,
-            "S1": 131,
-            "S2": 105,
-            "S3": 79,
-            "S4": 79,
-            "S5": 53,
-            "S6": 79
-        };
-
-        // Słownik opisów działów GDE
-        const groupLabels = {
-            "P1": "Niechronieni uczestnicy ruchu",
-            "P2": "Pierwszeństwo przejazdu",
-            "P3": "Prędkość i odległość",
-            "P4": "Pierwsza pomoc",
-            "P5": "Czynniki ryzyka (Alkohol, Rozproszenie)",
-            "P6": "Znaki drogowe i sygnalizacja",
-            "P7": "Warunki drogowe i atmosferyczne",
-            "P8": "Systemy ADAS & EV",
-            "P9": "Przepisy ogólne i definicje",
-            "S1": "Dynamika jazdy i ocena ryzyka",
-            "S2": "Manewrowanie i technika jazdy",
-            "S3": "Układy bezpieczeństwa",
-            "S4": "Obsługa i eksploatacja podzespołów",
-            "S5": "Sygnalizacja i komunikacja",
-            "S6": "Przepisy szczegółowe kat. B"
-        };
-
-        // --- AKTUALIZACJA PROFILU ---
-        function updateUsername(val) {
-            currentUsername = val.trim() || "Anonimowy";
-            showToast("Zmieniono profil na: " + currentUsername, "info");
-        }
-
-        // Pomocniczy generator daty w formacie YYYY-MM-DD HH:MM
-        function getFormattedCurrentDate() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day} ${hours}:${minutes}`;
-        }
-
-        // --- OBSŁUGA WIELU BAZ DANYCH ---
-        function addDatabaseOption(name, url) {
-            const selector = document.getElementById('db-selector');
-            if (!selector) return;
-            
-            // Sprawdzenie czy opcja już istnieje
-            for (let i = 0; i < selector.options.length; i++) {
-                if (selector.options[i].value === name) {
-                    if (url) {
-                        selector.options[i].setAttribute('data-url', url);
-                    }
-                    return;
-                }
-            }
-
-            const option = document.createElement('option');
-            option.value = name;
-            option.className = "bg-slate-900";
-            option.innerText = name;
-            if (url) {
-                option.setAttribute('data-url', url);
-            }
-            selector.appendChild(option);
-        }
-
-        function selectDatabase(name) {
-            if (!loadedDatabases[name]) return;
-            currentDbKey = name;
-            globalQuestions = loadedDatabases[name];
-            
-            const selector = document.getElementById('db-selector');
-            if (selector) selector.value = name;
-
-            initializeStatuses();
-            recalculateStats();
-            resetPaginationAndRender();
-
-            // Aktualizacja okienka informacyjnego
-            const infoTitle = document.getElementById('info-title');
-            const infoMsg = document.getElementById('info-message');
-            if (infoTitle && infoMsg) {
-                infoTitle.innerText = `Aktywna Baza: ${name}`;
-                infoMsg.innerText = `Przeglądasz aktualnie bazę pytań o nazwie "${name}". Liczba pytań w pamięci podręcznej: ${globalQuestions.length}. Wybierz metodę "Scal" po lewej stronie, aby dołączyć kolejny plik do tej listy baz.`;
-            }
-        }
-
-        window.switchDatabase = async function(name) {
-            const selector = document.getElementById('db-selector');
-            if (!selector) return;
-            const selectedOption = selector.options[selector.selectedIndex];
-            const downloadUrl = selectedOption ? selectedOption.getAttribute('data-url') : null;
-
-            if (loadedDatabases[name]) {
-                selectDatabase(name);
-                showToast(`Przełączono na bazę: ${name}`, "success");
-            } else if (downloadUrl) {
-                await fetchDatabaseFromUrl(name, downloadUrl);
-            } else {
-                // Próba wczytania lokalnej ścieżki względnej
-                await fetchDatabaseFromUrl(name, `bazy/${name}`);
-            }
-        };
-
-        // Pobieranie bazy z zewnętrznego URL
-        async function fetchDatabaseFromUrl(name, url) {
-            const loader = document.getElementById('loading-overlay');
-            if (loader) loader.classList.remove('hidden');
-            try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error("Błąd pobierania pliku.");
-                const text = await res.text();
-                const parsed = tryInterpretJSON(text);
-                if (parsed && parsed.length > 0) {
-                    loadedDatabases[name] = parsed;
-                    addDatabaseOption(name, url);
-                    selectDatabase(name);
-                    showToast(`Pomyślnie wczytano bazę: ${name}`, "success");
-                } else {
-                    throw new Error("Plik jest pusty lub uszkodzony.");
-                }
-            } catch (e) {
-                console.error(e);
-                showToast(`Nie udało się wczytać bazy ${name}: ${e.message}`, "error");
-                if (currentDbKey !== "demo") {
-                    selectDatabase("demo");
-                }
-            } finally {
-                if (loader) loader.classList.add('hidden');
-            }
-        }
-
-        // Automatyczne skanowanie repozytorium GitHub w celu wykrycia plików w katalogu /bazy
-        async function scanGitHubBazyFolder() {
-            try {
-                let owner = "";
-                let repo = "";
-                let branch = "main";
-                const href = window.location.href;
-
-                if (href.includes("github.io")) {
-                    const url = new URL(href);
-                    owner = url.hostname.split('.')[0];
-                    const pathParts = url.pathname.split('/').filter(p => p);
-                    if (pathParts.length > 0) {
-                        repo = pathParts[0];
-                    }
-                } else if (href.includes("raw.githubusercontent.com")) {
-                    const parts = href.split('/');
-                    owner = parts[3];
-                    repo = parts[4];
-                    branch = parts[5] || "main";
-                } else if (href.includes("github.com")) {
-                    const parts = href.split('/');
-                    owner = parts[3];
-                    repo = parts[4];
-                    if (parts[5] === "tree" || parts[5] === "blob") {
-                        branch = parts[6] || "main";
-                    }
-                }
-
-                if (owner && repo) {
-                    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/bazy?ref=${branch}`;
-                    const res = await fetch(apiUrl);
-                    if (res.ok) {
-                        const files = await res.json();
-                        if (Array.isArray(files)) {
-                            return files.filter(f => f.type === 'file' && (f.name.endsWith('.json') || f.name.endsWith('.txt')));
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn("Nie udało się przeskanować folderu GitHub za pomocą API:", e);
-            }
-            return null;
-        }
-
-        // Autostart z pliku bazy/bazab.json z dynamicznym logowaniem błędów CORS/lokalnych
-        async function tryAutostartBazaB() {
-            const loader = document.getElementById('loading-overlay');
-            if (loader) loader.classList.remove('hidden');
-
-            let bazabLoaded = false;
-
-            // 1. Próba bezpośredniego pobrania ze względnej ścieżki bazy/bazab.json
-            try {
-                const response = await fetch('bazy/bazab.json');
-                if (response.ok) {
-                    const text = await response.text();
-                    const parsed = tryInterpretJSON(text);
-                    if (parsed && parsed.length > 0) {
-                        loadedDatabases["bazab.json"] = parsed;
-                        addDatabaseOption("bazab.json", "bazy/bazab.json");
-                        selectDatabase("bazab.json");
-                        bazabLoaded = true;
-                        showToast("Pomyślnie zaimportowano plik bazy/bazab.json!", "success");
-                    }
-                }
-            } catch (err) {
-                console.warn("Autostart względny bazy/bazab.json nie powiódł się:", err);
-            }
-
-            // 2. Skanowanie katalogu /bazy w repozytorium GitHub przy użyciu API
-            const githubFiles = await scanGitHubBazyFolder();
-            if (githubFiles && githubFiles.length > 0) {
-                githubFiles.forEach(file => {
-                    addDatabaseOption(file.name, file.download_url);
-                    // Jeśli to plik bazab.json i nie został wcześniej załadowany, pobierz go
-                    if (file.name === "bazab.json" && !bazabLoaded) {
-                        fetchDatabaseFromUrl(file.name, file.download_url);
-                        bazabLoaded = true;
-                    }
-                });
-                showToast("Wykryto dodatkowe bazy danych w folderze /bazy w GitHub!", "info");
-            }
-
-            // 3. Fallback: Jeśli plik bazab.json nie został załadowany, wyświetl diagnostykę i przełącz na demo
-            if (!bazabLoaded) {
-                const infoTitle = document.getElementById('info-title');
-                const infoMsg = document.getElementById('info-message');
-                const infoBox = document.getElementById('info-box');
-                
-                if (infoBox && infoTitle && infoMsg) {
-                    infoBox.className = "bg-amber-950/20 border border-amber-900/60 text-amber-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4 transition-all-300";
-                    infoTitle.innerText = "Nie załadowano automatycznie pliku bazy/bazab.json";
-                    
-                    let reason = "";
-                    if (window.location.protocol === 'file:') {
-                        reason = "Uruchamiasz aplikację bezpośrednio z dysku (protokół <code>file://</code>). Przeglądarki (Safari, Chrome) całkowicie blokują odpytywanie plików lokalnych ze względów bezpieczeństwa (błąd CORS).";
-                    } else {
-                        reason = "Nie znaleziono pliku merytorycznego w ścieżce <code class='text-emerald-400 font-bold font-mono'>bazy/bazab.json</code> na tym serwerze. Upewnij się, że plik o nazwie <code class='text-emerald-400 font-bold font-mono'>bazab.json</code> znajduje się dokładnie w katalogu <code class='text-slate-300 font-mono'>bazy/</code>.";
-                    }
-                    
-                    infoMsg.innerHTML = `
-                        <div class="space-y-3">
-                            <p class="text-xs text-slate-300 leading-relaxed">${reason}</p>
-                            <div class="border-t border-amber-900/40 pt-3">
-                                <p class="font-bold text-white text-xs mb-1.5">Co możesz teraz zrobić?</p>
-                                <ul class="list-none space-y-1.5 text-xs text-slate-300">
-                                    <li class="flex items-start gap-2">
-                                        <span class="text-emerald-400 mt-0.5">✔</span>
-                                        <span><strong>Przeciągnij i upuść:</strong> Chwyć plik <code class="text-emerald-400 font-bold font-mono">bazab.json</code> ze swojego komputera i upuść go w dowolnym miejscu na tę stronę.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2">
-                                        <span class="text-emerald-400 mt-0.5">✔</span>
-                                        <span><strong>Wgraj ręcznie:</strong> Kliknij przycisk <strong class="text-emerald-400">"Wgraj plik"</strong> w lewym panelu i wybierz go z dysku.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2">
-                                        <span class="text-emerald-400 mt-0.5">✔</span>
-                                        <span><strong>Użyj serwera lokalnego:</strong> Uruchom dowolny lokalny serwer HTTP (np. Live Server w VS Code lub <code>python -m http.server</code>) — wtedy bazy wgrają się automatycznie.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                }
-                selectDatabase("demo");
-            }
-
-            if (loader) loader.classList.add('hidden');
-        }
-
-        // --- HIPERAKTYWNY DASHBOARD: OBSŁUGA FILTRACJI ---
-        window.toggleStatusFilter = function(status) {
-            if (activeStatusFilter === status) {
-                activeStatusFilter = 'ALL'; // toggle off
-            } else {
-                activeStatusFilter = status;
-            }
-            updateActiveFiltersUI();
-            resetPaginationAndRender();
-            recalculateStats();
-        };
-
-        window.toggleGroupFilter = function(group) {
-            if (activeGroupFilter === group) {
-                activeGroupFilter = 'ALL'; // toggle off
-            } else {
-                activeGroupFilter = group;
-            }
-            updateActiveFiltersUI();
-            resetPaginationAndRender();
-            recalculateStats();
-        };
-
-        window.clearAllFilters = function() {
-            activeGroupFilter = 'ALL';
-            activeStatusFilter = 'ALL';
-            document.getElementById('search-input').value = '';
-            updateActiveFiltersUI();
-            resetPaginationAndRender();
-            recalculateStats();
-            showToast("Wszystkie filtry zostały zresetowane", "info");
-        };
-
-        // Wizualna aktualizacja aktywnej pigułki filtrów nad listą pytań
-        function updateActiveFiltersUI() {
-            const container = document.getElementById('active-filters-indicator');
-            const clearBtn = document.getElementById('clear-filters-btn');
-            if (!container) return;
-
-            let markup = '<span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Filtry:</span>';
-
-            if (activeStatusFilter === 'ALL' && activeGroupFilter === 'ALL') {
-                markup += `
-                    <span class="text-xs bg-slate-950 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-800">
-                        Wszystkie pytania
-                    </span>`;
-                if (clearBtn) clearBtn.classList.add('hidden');
-            } else {
-                if (clearBtn) clearBtn.classList.remove('hidden');
-                
-                if (activeStatusFilter !== 'ALL') {
-                    let label = activeStatusFilter;
-                    if (activeStatusFilter === 'untouched') label = 'Nienaruszone';
-                    markup += `
-                        <span class="text-xs bg-indigo-950/60 text-indigo-300 px-3 py-1.5 rounded-lg border border-indigo-900/30 flex items-center gap-1.5 font-semibold">
-                            Status: ${label}
-                            <button onclick="toggleStatusFilter('${activeStatusFilter}')" class="hover:text-rose-400 font-bold ml-1 text-sm">&times;</button>
-                        </span>`;
-                }
-
-                if (activeGroupFilter !== 'ALL') {
-                    markup += `
-                        <span class="text-xs bg-emerald-950/60 text-emerald-300 px-3 py-1.5 rounded-lg border border-emerald-900/30 flex items-center gap-1.5 font-semibold">
-                            Dział: ${activeGroupFilter}
-                            <button onclick="toggleGroupFilter('${activeGroupFilter}')" class="hover:text-rose-400 font-bold ml-1 text-sm">&times;</button>
-                        </span>`;
-                }
-            }
-
-            container.innerHTML = markup;
-        }
-
-        // Wizualne podświetlanie aktywnych statusów w Sidebarze
-        function updateStatusRowsHighlight() {
-            const rows = {
-                'ALL': 'stat-row-all',
-                'Zatwierdzone': 'stat-row-approved',
-                'Do poprawy': 'stat-row-review',
-                'Śmietnik': 'stat-row-trash',
-                'untouched': 'stat-row-untouched'
-            };
-
-            // Reset stylów wierszy
-            Object.values(rows).forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.className = "flex justify-between items-center p-2.5 rounded-xl border border-slate-850 bg-slate-950/40 hover:bg-slate-800/40 cursor-pointer transition-all-300";
-                }
-            });
-
-            // Podświetlenie aktualnie wybranego statusu
-            const activeId = rows[activeStatusFilter];
-            const activeEl = document.getElementById(activeId);
-            if (activeEl) {
-                if (activeStatusFilter === 'Zatwierdzone') {
-                    activeEl.className = "flex justify-between items-center p-2.5 rounded-xl border border-emerald-500/30 bg-emerald-950/15 ring-1 ring-emerald-500/40 cursor-pointer transition-all-300";
-                } else if (activeStatusFilter === 'Do poprawy') {
-                    activeEl.className = "flex justify-between items-center p-2.5 rounded-xl border border-rose-500/30 bg-rose-950/15 ring-1 ring-rose-500/40 cursor-pointer transition-all-300";
-                } else if (activeStatusFilter === 'Śmietnik') {
-                    activeEl.className = "flex justify-between items-center p-2.5 rounded-xl border border-slate-500/30 bg-slate-800/20 ring-1 ring-slate-500/40 cursor-pointer transition-all-300";
-                } else if (activeStatusFilter === 'untouched') {
-                    activeEl.className = "flex justify-between items-center p-2.5 rounded-xl border border-amber-500/30 bg-amber-950/15 ring-1 ring-amber-500/40 cursor-pointer transition-all-300";
-                } else {
-                    activeEl.className = "flex justify-between items-center p-2.5 rounded-xl border border-indigo-500/30 bg-indigo-950/15 ring-1 ring-indigo-500/40 cursor-pointer transition-all-300";
-                }
-            }
-        }
-
-        function recalculateStats() {
-            const total = globalQuestions.length;
-            const approved = globalQuestions.filter(q => q.status === 'Zatwierdzone').length;
-            const review = globalQuestions.filter(q => q.status === 'Do poprawy').length;
-            const trash = globalQuestions.filter(q => q.status === 'Śmietnik').length;
-            const untouched = globalQuestions.filter(q => !q.status || q.status === 'untouched').length;
-
-            const totalEl = document.getElementById('stat-total');
-            const approvedEl = document.getElementById('stat-approved');
-            const reviewEl = document.getElementById('stat-review');
-            const trashEl = document.getElementById('stat-trash');
-            const untouchedEl = document.getElementById('stat-untouched');
-            const progressPercentEl = document.getElementById('progress-percent');
-            const progressBarFillEl = document.getElementById('progress-bar-fill');
-            const badgeTotalCountEl = document.getElementById('badge-total-count');
-
-            // Globalne liczniki postępu celu merytorycznego
-            const macroProgressPercentEl = document.getElementById('macro-progress-percent');
-            const macroProgressBarFillEl = document.getElementById('macro-progress-bar-fill');
-
-            if (totalEl) totalEl.innerText = total;
-            if (approvedEl) approvedEl.innerText = approved;
-            if (reviewEl) reviewEl.innerText = review;
-            if (trashEl) trashEl.innerText = trash;
-            if (untouchedEl) untouchedEl.innerText = untouched;
-            if (badgeTotalCountEl) badgeTotalCountEl.innerText = total;
-
-            const verified = approved + review + trash;
-            const percent = total > 0 ? Math.round((verified / total) * 100) : 0;
-            if (progressPercentEl) progressPercentEl.innerText = percent + "%";
-            if (progressBarFillEl) progressBarFillEl.style.width = percent + "%";
-
-            // Wyliczanie celu 1500 zatwierdzonych pytań
-            const targetTotal = 1500;
-            const macroPercent = Math.min(100, Math.round((approved / targetTotal) * 100));
-            if (macroProgressPercentEl) macroProgressPercentEl.innerText = macroPercent + "%";
-            if (macroProgressBarFillEl) macroProgressBarFillEl.style.width = macroPercent + "%";
-
-            // Wywołaj dynamiczne renderowanie działów oraz podświetlanie statusów
-            updateStatusRowsHighlight();
-            renderGroupsProgress();
-        }
-
-        // --- DYNAMICZNY RENDERING POSTĘPU DZIAŁÓW (P1-P9, S1-S6) - WG CELU 1500 ---
-        function renderGroupsProgress() {
-            const container = document.getElementById('groups-progress-container');
-            const activeCountEl = document.getElementById('active-groups-count');
-            if (!container) return;
-
-            container.innerHTML = '';
-            
-            const basicGroups = ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"];
-            const specGroups = ["S1", "S2", "S3", "S4", "S5", "S6"];
-            
-            let activeGroupsCount = 0;
-            
-            // Konstruowanie klikalnej karty działu dla Hiperaktywnego Dashboardu
-            function createGroupProgressHTML(g) {
-                const groupQuestions = globalQuestions.filter(q => q.group === g);
-                const totalInDb = groupQuestions.length;
-                const target = groupTargets[g] || 100;
-                
-                const approved = groupQuestions.filter(q => q.status === 'Zatwierdzone').length;
-                const percent = Math.min(100, Math.round((approved / target) * 100)) || 0;
-                
-                activeGroupsCount++;
-                
-                // Konfiguracja stylów kaset w zależności od stanu aktywnego/ukończonego
-                let barColor = "bg-slate-800";
-                let textColor = "text-slate-500 font-bold";
-                let borderHighlight = "border-slate-900 hover:border-slate-700/80 cursor-pointer";
-                
-                if (g === activeGroupFilter) {
-                    // Stan zaznaczenia (Filter On)
-                    barColor = "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]";
-                    textColor = "text-emerald-400 font-black";
-                    borderHighlight = "border-emerald-500 bg-emerald-950/20 ring-1 ring-emerald-500/40 cursor-pointer";
-                } else if (percent === 100) {
-                    // Stan ukończenia 100% celu merytorycznego
-                    barColor = "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]";
-                    textColor = "text-emerald-400 font-black";
-                    borderHighlight = "border-emerald-950 bg-emerald-950/5 hover:border-emerald-800/80 cursor-pointer";
-                } else if (percent >= 50) {
-                    barColor = "bg-indigo-500";
-                    textColor = "text-indigo-400 font-semibold";
-                    borderHighlight = "border-slate-900 hover:border-indigo-900 cursor-pointer";
-                } else if (percent > 0) {
-                    barColor = "bg-amber-500";
-                    textColor = "text-amber-400 font-semibold";
-                    borderHighlight = "border-slate-900 hover:border-amber-900/60 cursor-pointer";
-                }
-
-                return `
-                    <div onclick="toggleGroupFilter('${g}')" class="space-y-1 bg-slate-950/40 p-2.5 rounded-xl border ${borderHighlight} transition-all-300 select-none">
-                        <div class="flex justify-between text-[11px] font-medium">
-                            <span class="truncate pr-1 text-slate-300" title="${g} - ${groupLabels[g] || g}">${g}: ${groupLabels[g] || g}</span>
-                            <span class="font-mono shrink-0 ${textColor} text-[10px]">${approved}/${target}</span>
-                        </div>
-                        <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-900/60 flex">
-                            <div class="${barColor} h-full transition-all duration-300" style="width: ${percent}%"></div>
-                        </div>
-                        <div class="flex justify-between text-[9px] text-slate-500 font-mono">
-                            <span>W bazie: ${totalInDb}</span>
-                            <span>Cel: ${percent}%</span>
-                        </div>
-                    </div>
-                `;
-            }
-
-            let basicHTML = '';
-            basicGroups.forEach(g => {
-                const html = createGroupProgressHTML(g);
-                if (html) basicHTML += html;
-            });
-
-            let specHTML = '';
-            specGroups.forEach(g => {
-                const html = createGroupProgressHTML(g);
-                if (html) specHTML += html;
-            });
-
-            let finalHTML = '';
-            if (basicHTML) {
-                finalHTML += `
-                    <div class="space-y-2">
-                        <span class="block text-[9px] font-extrabold text-slate-500 uppercase tracking-wider pl-1">Część Podstawowa</span>
-                        <div class="space-y-2">${basicHTML}</div>
-                    </div>
-                `;
-            }
-            if (specHTML) {
-                if (finalHTML) finalHTML += '<div class="border-t border-slate-800/40 my-3"></div>';
-                finalHTML += `
-                    <div class="space-y-2">
-                        <span class="block text-[9px] font-extrabold text-slate-500 uppercase tracking-wider pl-1">Część Specjalistyczna</span>
-                        <div class="space-y-2">${specHTML}</div>
-                    </div>
-                `;
-            }
-
-            if (!finalHTML) {
-                container.innerHTML = `
-                    <div class="text-center py-6 text-slate-600 text-xs">
-                        Wgraj bazę pytań, aby zobaczyć podział postępów.
-                    </div>
-                `;
-            } else {
-                container.innerHTML = finalHTML;
-            }
-
-            if (activeCountEl) {
-                activeCountEl.innerText = `${activeGroupsCount} działów`;
-            }
-        }
-
-        // --- ULTRA ODPORNY SILNIK SANITYZACJI I EKSTRAKCJI ---
-        function sanitizeJSONString(str) {
-            if (str.charCodeAt(0) === 0xFEFF) {
-                str = str.substring(1);
-            }
-            // Zmiana cudzysłowów drukarskich na standardowe proste programistyczne
-            str = str.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036„”]/g, '"');
-            str = str.replace(/[\u2018\u2019\u201A\u201B\u2032\u2035’`‘]/g, '"');
-
-            // Usuwanie spacji niełamliwych (NBSP) i ukrytych znaków formatowania
-            str = str.replace(/\u00A0/g, ' ');
-            str = str.replace(/[\u200B-\u200D\uFEFF]/g, '');
-
-            // Usuwanie nadmiarowych przecinków przed zamknięciem nawiasów klamrowych lub kwadratowych
-            str = str.replace(/,\s*([\]}])/g, '$1');
-
-            return str;
-        }
-
-        function extractQuestionsLoose(text) {
-            let sanitized = sanitizeJSONString(text);
-            let list = [];
-            let braceCount = 0;
-            let startIndex = -1;
-            let inString = false;
-            let escape = false;
-            let quoteChar = null;
-
-            for (let i = 0; i < sanitized.length; i++) {
-                let c = sanitized[i];
-
-                if (escape) {
-                    escape = false;
-                    continue;
-                }
-
-                if (c === '\\') {
-                    escape = true;
-                    continue;
-                }
-
-                if (inString) {
-                    if (c === quoteChar) {
-                        inString = false;
-                    }
-                    continue;
-                }
-
-                if (c === '"' || c === "'") {
-                    inString = true;
-                    quoteChar = c;
-                    continue;
-                }
-
-                if (c === '{') {
-                    if (braceCount === 0) {
-                        startIndex = i;
-                    }
-                    braceCount++;
-                } else if (c === '}') {
-                    braceCount--;
-                    if (braceCount === 0 && startIndex !== -1) {
-                        let candidate = sanitized.substring(startIndex, i + 1);
-                        try {
-                            // Luźna ewaluacja funkcją bez ograniczeń JSON.parse
-                            let obj = (new Function("return (" + candidate + ");"))();
-                            if (obj && typeof obj === 'object') {
-                                let normalized = normalizeQuestion(obj);
-                                list.push(normalized);
-                            }
-                        } catch (err) {
-                            // Ignorujemy błędy ewaluacji pojedynczych obiektów
-                        }
-                        startIndex = -1;
-                    }
-                }
-            }
-            return list;
-        }
-
-        function tryInterpretJSON(raw) {
-            let cleaned = sanitizeJSONString(raw.trim());
-            if (cleaned.startsWith("```")) {
-                const backticks = String.fromCharCode(96, 96, 96);
-                const regexStart = new RegExp("^" + backticks + "(?:json)?", "i");
-                const regexEnd = new RegExp(backticks + "$", "i");
-                cleaned = cleaned.replace(regexStart, "").trim();
-                cleaned = cleaned.replace(regexEnd, "").trim();
-            }
-
-            // Próba 1: Wyodrębnienie zagnieżdżonego klucza "pytania" przed parsowaniem luźnym
-            try {
-                let parsed = JSON.parse(cleaned);
-                if (parsed && typeof parsed === 'object') {
-                    if (Array.isArray(parsed.pytania)) {
-                        globalMetadata = parsed.metadane_banku || null;
-                        let list = parsed.pytania.map(q => normalizeQuestion(q));
-                        if (list.length > 0) return list;
-                    }
-                }
-            } catch(e) {
-                console.warn("Wstępne parsowanie zagnieżdżone nie powiodło się, przechodzenie do Loose Extractor.");
-            }
-
-            // Próba 2: Luźny ekstraktor (radzi sobie ze zniszczoną strukturą i błędami klamrowymi)
-            let result = extractQuestionsLoose(cleaned);
-            if (result && result.length > 0) {
-                try {
-                    let fullEval = (new Function("return (" + cleaned + ");"))();
-                    if (fullEval && typeof fullEval === 'object') {
-                        globalMetadata = fullEval.metadane_banku || null;
-                    } else {
-                        globalMetadata = null;
-                    }
-                } catch(e) {
-                    globalMetadata = null;
-                }
-                return result;
-            }
-
-            // Próba 3: Tradycyjne parsowanie JSON.parse
-            try {
-                const parsed = JSON.parse(cleaned);
-                if (Array.isArray(parsed)) {
-                    globalMetadata = null;
-                    return parsed.map(q => normalizeQuestion(q));
-                }
-            } catch (e) {
-                console.warn("Parsowanie standardowe nie powiodło się.");
-            }
-
-            throw new Error("Nie udało się rozpoznać obiektów pytań. Upewnij się, że plik zawiera pytania (powinny mieć treść pytania oraz identyfikator).");
-        }
-
-        function importText(raw, optionalFileName) {
-            const loader = document.getElementById('loading-overlay');
-            if (loader) loader.classList.remove('hidden');
-
-            setTimeout(() => {
-                const infoBox = document.getElementById('info-box');
-                const infoTitle = document.getElementById('info-title');
-                const infoMsg = document.getElementById('info-message');
-                const infoDebug = document.getElementById('info-debug');
-
-                const importMode = document.querySelector('input[name="import-mode"]:checked')?.value || 'replace';
-
-                try {
-                    const parsed = tryInterpretJSON(raw);
-                    
-                    if (parsed && Array.isArray(parsed) && parsed.length > 0) {
-                        
-                        let dbKey = optionalFileName || "Dodana_Baza_" + (Object.keys(loadedDatabases).length);
-                        
-                        if (importMode === 'replace') {
-                            // Całkowite zastąpienie bazy w nowej sekcji słownika
-                            loadedDatabases[dbKey] = parsed;
-                            addDatabaseOption(dbKey);
-                            selectDatabase(dbKey);
-                            showToast(`Zaimportowano i utworzono bazę: ${dbKey}!`, "success");
-                        } else {
-                            // Inteligentne scalenie (upsert) do aktualnie przeglądanej bazy
-                            const existingMap = new Map(globalQuestions.map(q => [q.id, q]));
-                            let addedCount = 0;
-                            let updatedCount = 0;
-
-                            parsed.forEach(newQ => {
-                                if (existingMap.has(newQ.id)) {
-                                    const idx = globalQuestions.findIndex(q => q.id === newQ.id);
-                                    if (idx !== -1) {
-                                        globalQuestions[idx] = { ...globalQuestions[idx], ...newQ };
-                                        updatedCount++;
-                                    }
-                                } else {
-                                    globalQuestions.push(newQ);
-                                    addedCount++;
-                                }
-                            });
-                            
-                            loadedDatabases[currentDbKey] = globalQuestions;
-                            showToast(`Scalono pomyślnie! Dodano: ${addedCount}, zaktualizowano: ${updatedCount}`, "success");
-                        }
-
-                        initializeStatuses();
-                        recalculateStats();
-                        
-                        const welcomeAlert = document.getElementById('welcome-alert');
-                        if (welcomeAlert) welcomeAlert.classList.add('hidden');
-                        resetPaginationAndRender();
-
-                        if (infoBox) infoBox.className = "bg-emerald-950/20 border border-emerald-900/60 text-emerald-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4";
-                        if (infoTitle) infoTitle.innerText = `PROCES IMPORTU ZAKOŃCZONY POMYŚLNIE: ${currentDbKey}`;
-                        if (infoMsg) infoMsg.innerText = `Baza zawiera obecnie łącznie ${globalQuestions.length} pytań egzaminacyjnych. Wszystkie ewentualne błędy struktury, cudzysłowów i brakujących przecinków zostały automatycznie naprawione!`;
-                        if (infoDebug) infoDebug.classList.add('hidden');
-                        
-                    } else {
-                        throw new Error("Plik nie zawiera dających się odczytać pytań.");
-                    }
-                } catch (err) {
-                    console.error(err);
-                    if (infoBox) infoBox.className = "bg-rose-950/20 border border-rose-900/60 text-rose-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4";
-                    if (infoTitle) infoTitle.innerText = "BŁĄD STRUKTURY PLIKU";
-                    if (infoMsg) infoMsg.innerText = "Nie udało się zaimportować pytań. Twój plik tekstowy zawiera poważne błędy składniowe lub został niekompletnie skopiowany z dokumentu tekstowego. Spróbuj pobrać go z Google Docs jako plik tekstowy (.txt) i wgrać ponownie.";
-                    
-                    if (infoDebug) {
-                        infoDebug.innerText = `[Błąd: ${err.message}]`;
-                        infoDebug.classList.remove('hidden');
-                    }
-
-                    showToast("Błąd wczytywania bazy!", "error");
-                } finally {
-                    if (loader) loader.classList.add('hidden');
-                }
-            }, 50);
-        }
-
-        // --- EDYCJA PYTANIA INLINE ---
-        window.startEditQuestion = function(id) {
-            const q = globalQuestions.find(item => item.id === id);
-            if (!q) return;
-
-            const card = document.getElementById(`card-${id}`);
-            if (!card) return;
-
-            const isYN = q.type === 'yn' || q.type === 'TAK/NIE';
-            
-            let optionsMarkup = '';
-            if (!isYN) {
-                optionsMarkup = `
-                    <div class="space-y-2 mt-3">
-                        <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Opcje odpowiedzi (ABC):</span>
-                        <div class="flex gap-2 items-center">
-                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">A</span>
-                            <input type="text" id="edit-opt-A-${q.id}" value="${q.options?.A || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none">
-                        </div>
-                        <div class="flex gap-2 items-center">
-                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">B</span>
-                            <input type="text" id="edit-opt-B-${q.id}" value="${q.options?.B || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none">
-                        </div>
-                        <div class="flex gap-2 items-center">
-                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">C</span>
-                            <input type="text" id="edit-opt-C-${q.id}" value="${q.options?.C || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none">
-                        </div>
-                    </div>
-                `;
-            }
-
-            const groupOptions = Object.keys(groupLabels).map(g => 
-                `<option value="${g}" ${q.group === g ? 'selected' : ''}>${g} - ${groupLabels[g]}</option>`
-            ).join('');
-
-            const correctOptions = isYN 
-                ? `<option value="TAK" ${q.correct_answer === 'TAK' ? 'selected' : ''}>TAK</option>
-                   <option value="NIE" ${q.correct_answer === 'NIE' ? 'selected' : ''}>NIE</option>`
-                : `<option value="A" ${q.correct_answer === 'A' ? 'selected' : ''}>A</option>
-                   <option value="B" ${q.correct_answer === 'B' ? 'selected' : ''}>B</option>
-                   <option value="C" ${q.correct_answer === 'C' ? 'selected' : ''}>C</option>`;
-
-            // Usuń kolory statusów na czas edycji
-            card.className = "bg-slate-900 border-2 border-indigo-500/50 rounded-2xl p-6 shadow-xl transition-all-300";
-
-            card.innerHTML = `
-                <div class="space-y-4 w-full text-slate-100">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
-                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            Tryb Edycji Pytania: ${q.id}
-                        </span>
-                        <span class="text-[10px] text-slate-500 font-mono font-bold">Autor modyfikacji: ${currentUsername}</span>
-                    </div>
-
-                    <!-- TREŚĆ PYTANIA -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Treść pytania</label>
-                        <textarea id="edit-q-text-${q.id}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none resize-y min-h-[60px]">${q.question}</textarea>
-                    </div>
-
-                    <!-- MATRYCA METRYCZNA -->
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Dział / Grupa GDE</label>
-                            <select id="edit-group-${q.id}" class="bg-slate-950 text-slate-100 border border-slate-800 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-indigo-500 outline-none">
-                                ${groupOptions}
-                            </select>
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Waga punktowa</label>
-                            <select id="edit-weight-${q.id}" class="bg-slate-950 text-slate-100 border border-slate-800 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-indigo-500 outline-none">
-                                <option value="1" ${q.weight == 1 ? 'selected' : ''}>1 pkt</option>
-                                <option value="2" ${q.weight == 2 ? 'selected' : ''}>2 pkt</option>
-                                <option value="3" ${q.weight == 3 ? 'selected' : ''}>3 pkt</option>
-                            </select>
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Typ odpowiedzi</label>
-                            <select id="edit-type-${q.id}" onchange="toggleEditOptions('${q.id}', this.value)" class="bg-slate-950 text-slate-100 border border-slate-800 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-indigo-500 outline-none">
-                                <option value="yn" ${isYN ? 'selected' : ''}>TAK / NIE (Y/N)</option>
-                                <option value="abc" ${!isYN ? 'selected' : ''}>Wielokrotny wybór (ABC)</option>
-                            </select>
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Poprawny klucz</label>
-                            <select id="edit-correct-${q.id}" class="bg-slate-950 text-slate-100 border border-slate-800 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-indigo-500 outline-none">
-                                ${correctOptions}
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- ABC OPTIONS CONTAINER -->
-                    <div id="edit-options-container-${q.id}">
-                        ${optionsMarkup}
-                    </div>
-
-                    <!-- PODSTAWA PRAWNA / PRZEPIS ŹRÓDŁOWY -->
-                    <div class="flex flex-col gap-1.5 pt-1">
-                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                            </svg>
-                            Podstawa prawna (przepis źródłowy)
-                        </label>
-                        <input type="text" id="edit-przepis-${q.id}" value="${q.przepis_zrodlowy || ''}" placeholder="np. Ustawa PoRD art. 26 ust. 1" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
-                    </div>
-
-                    <!-- UWAGI DO GRAFIKI -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            Uwagi do grafiki / wyjasnienie merytoryczne
-                        </label>
-                        <textarea id="edit-media-notes-${q.id}" placeholder="Wpisz ewentualne uwagi, korekty lub wyjaśnienia..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none resize-y min-h-[50px]">${q.media_notes || ''}</textarea>
-                    </div>
-
-                    <!-- MULTIMEDIA -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Adres URL multimediów</label>
-                            <input type="text" id="edit-media-url-${q.id}" value="${q.media_url || ''}" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tytuł załącznika</label>
-                            <input type="text" id="edit-media-title-${q.id}" value="${q.media_title || ''}" placeholder="np. Sytuacja drogowa" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
-                        </div>
-                    </div>
-
-                    <!-- ACTION BUTTONS -->
-                    <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
-                        <button onclick="cancelEditQuestion('${q.id}')" class="bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-semibold px-4 py-2 rounded-xl border border-slate-755 transition">
-                            Anuluj
-                        </button>
-                        <button onclick="saveEditQuestion('${q.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-5 py-2 rounded-xl transition">
-                            Zapisz edycję
-                        </button>
-                    </div>
-                </div>
-            `;
-        };
-
-        window.toggleEditOptions = function(id, type) {
-            const container = document.getElementById(`edit-options-container-${id}`);
-            const correctSelect = document.getElementById(`edit-correct-${id}`);
-            if (!container || !correctSelect) return;
-
-            if (type === 'yn') {
-                container.innerHTML = '';
-                correctSelect.innerHTML = `
-                    <option value="TAK">TAK</option>
-                    <option value="NIE">NIE</option>
-                `;
-            } else {
-                container.innerHTML = `
-                    <div class="space-y-2 mt-3">
-                        <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Opcje odpowiedzi (ABC):</span>
-                        <div class="flex gap-2 items-center">
-                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">A</span>
-                            <input type="text" id="edit-opt-A-${id}" value="" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
-                        </div>
-                        <div class="flex gap-2 items-center">
-                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">B</span>
-                            <input type="text" id="edit-opt-B-${id}" value="" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
-                        </div>
-                        <div class="flex gap-2 items-center">
-                            <span class="bg-slate-800 text-slate-400 w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold border border-slate-700">C</span>
-                            <input type="text" id="edit-opt-C-${id}" value="" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
-                        </div>
-                    </div>
-                `;
-                correctSelect.innerHTML = `
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                `;
-            }
-        };
-
-        window.cancelEditQuestion = function(id) {
-            const q = globalQuestions.find(item => item.id === id);
-            if (!q) return;
-
-            const card = document.getElementById(`card-${id}`);
-            if (card) {
-                const tempDiv = createQuestionCard(q);
-                card.innerHTML = tempDiv.innerHTML;
-                card.className = tempDiv.className;
-            }
-        };
-
-        window.saveEditQuestion = function(id) {
-            const q = globalQuestions.find(item => item.id === id);
-            if (!q) return;
-
-            const card = document.getElementById(`card-${id}`);
-            if (!card) return;
-
-            const textVal = document.getElementById(`edit-q-text-${id}`).value.trim();
-            const groupVal = document.getElementById(`edit-group-${id}`).value;
-            const weightVal = Number(document.getElementById(`edit-weight-${id}`).value);
-            const typeVal = document.getElementById(`edit-type-${id}`).value;
-            const correctVal = document.getElementById(`edit-correct-${id}`).value;
-            const mediaUrlVal = document.getElementById(`edit-media-url-${id}`).value.trim();
-            const mediaTitleVal = document.getElementById(`edit-media-title-${id}`).value.trim();
-            const mediaNotesVal = document.getElementById(`edit-media-notes-${id}`).value.trim();
-            const przepisVal = document.getElementById(`edit-przepis-${id}`).value.trim();
-
-            if (!textVal) {
-                showToast("Treść pytania nie może być pusta!", "error");
-                return;
-            }
-
-            // Aktualizacja zmiennych obiektu
-            q.question = textVal;
-            q.group = groupVal;
-            q.weight = weightVal;
-            q.type = typeVal;
-            q.correct_answer = correctVal;
-            q.media_url = mediaUrlVal || null;
-            q.media_title = mediaTitleVal || null;
-            q.media_notes = mediaNotesVal || null;
-            q.przepis_zrodlowy = przepisVal || null;
-
-            // Zapis audytora
-            q.audited_by = currentUsername;
-            q.audit_date = getFormattedCurrentDate();
-
-            // Przypisanie etykiety merytorycznej oraz części egzaminu na podstawie klucza GDE
-            q.group_label = groupLabels[groupVal] || groupVal;
-            q.part = groupVal.startsWith('P') ? 'podstawowa' : 'specjalistyczna';
-
-            if (typeVal === 'abc') {
-                q.options = {
-                    A: document.getElementById(`edit-opt-A-${id}`).value.trim(),
-                    B: document.getElementById(`edit-opt-B-${id}`).value.trim(),
-                    C: document.getElementById(`edit-opt-C-${id}`).value.trim()
-                };
-            } else {
-                delete q.options;
-            }
-
-            recalculateStats();
-
-            // Re-renderowanie karty pytania w trybie zwykłym
-            const tempDiv = createQuestionCard(q);
-            card.innerHTML = tempDiv.innerHTML;
-            card.className = tempDiv.className;
-
-            showToast(`Zmiany w pytaniu ${id} zostały zapisane!`, "success");
-        };
-
-        // --- GLOBALNE AKCJE POWIĄZANE Z PRZYCISKAMI ---
-        window.switchTab = function(tab) {
-            currentTab = tab;
-            const btnBrowse = document.getElementById('btn-tab-browse');
-            const btnExam = document.getElementById('btn-tab-exam');
-            const tabBrowse = document.getElementById('tab-browse');
-            const tabExam = document.getElementById('tab-exam');
-
-            if (tab === 'browse') {
-                if (tabBrowse) tabBrowse.classList.remove('hidden');
-                if (tabExam) tabExam.classList.add('hidden');
-                if (btnBrowse) btnBrowse.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 bg-emerald-600 text-slate-950 shadow-md";
-                if (btnExam) btnExam.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 text-slate-400 hover:bg-slate-800 hover:text-slate-200";
-                renderBrowseTab();
-            } else {
-                if (tabBrowse) tabBrowse.classList.add('hidden');
-                if (tabExam) tabExam.classList.remove('hidden');
-                if (btnBrowse) btnBrowse.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 text-slate-400 hover:bg-slate-800 hover:text-slate-200";
-                if (btnExam) btnExam.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 bg-emerald-600 text-slate-950 shadow-md";
-                renderExamTab();
-            }
-        };
-
-        window.resetPaginationAndRender = function() {
-            currentPage = 1;
-            renderBrowseTab();
-        };
-
-        window.loadMoreQuestions = function() {
-            currentPage++;
-            renderBrowseTab();
-        };
-
-        window.handleFileSelect = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                importText(e.target.result, file.name);
-            };
-            reader.readAsText(file);
-        };
-
-        window.handleDirectPaste = function() {
-            const text = document.getElementById('direct-textarea').value;
-            if (!text.trim()) {
-                showToast("Pole tekstowe jest puste!", "error");
-                return;
-            }
-            importText(text, "Wklejona_Baza_" + Math.random().toString(36).substr(2, 5).toUpperCase());
-        };
-
-        window.updateQuestionStatus = function(id, newStatus) {
-            const q = globalQuestions.find(item => item.id === id);
-            if (q) {
-                q.status = newStatus;
-                q.audited_by = currentUsername;
-                q.audit_date = getFormattedCurrentDate();
-                
-                recalculateStats();
-
-                // Płynna aktualizacja samej karty w DOM
-                const card = document.getElementById("card-" + id);
-                if (card) {
-                    const borderColors = {
-                        'Zatwierdzone': 'border-l-4 border-emerald-500 shadow-emerald-950/10',
-                        'Do poprawy': 'border-l-4 border-rose-500 shadow-rose-950/10',
-                        'Śmietnik': 'border-l-4 border-slate-700 opacity-60 grayscale-[25%]',
-                        'untouched': 'border-l-4 border-slate-800'
-                    };
-                    card.className = "bg-slate-900/40 rounded-2xl p-5 border border-slate-800/85 shadow-md transition-all-300 " + (borderColors[newStatus] || borderColors['untouched']);
-
-                    const btnApprove = card.querySelector('.btn-approve');
-                    const btnReview = card.querySelector('.btn-review');
-                    const btnTrash = card.querySelector('.btn-trash');
-                    const btnReset = card.querySelector('.btn-reset');
-
-                    if (newStatus === 'Zatwierdzone') {
-                        if (btnApprove) btnApprove.className = "btn-approve px-4 py-2 text-xs font-bold rounded-lg transition-all-300 bg-emerald-500/15 text-emerald-400 border border-emerald-500/20";
-                        if (btnReview) btnReview.className = "btn-review px-4 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition-all-300";
-                        if (btnTrash) btnTrash.className = "btn-trash px-4 py-2 text-xs font-semibold rounded-lg text-slate-500 hover:bg-slate-800 transition-all-300";
-                        if (btnReset) btnReset.className = "btn-reset text-xs text-slate-600 hover:text-slate-400 py-1.5 transition text-center xl:w-full flex justify-center";
-                    } else if (newStatus === 'Do poprawy') {
-                        if (btnApprove) btnApprove.className = "btn-approve px-4 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition-all-300";
-                        if (btnReview) btnReview.className = "btn-review px-4 py-2 text-xs font-bold rounded-lg transition-all-300 bg-rose-500/15 text-rose-400 border border-rose-500/20";
-                        if (btnTrash) btnTrash.className = "btn-trash px-4 py-2 text-xs font-semibold rounded-lg text-slate-500 hover:bg-slate-800 transition-all-300";
-                        if (btnReset) btnReset.className = "btn-reset text-xs text-slate-600 hover:text-slate-400 py-1.5 transition text-center xl:w-full flex justify-center";
-                    } else if (newStatus === 'Śmietnik') {
-                        if (btnApprove) btnApprove.className = "btn-approve px-4 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition-all-300";
-                        if (btnReview) btnReview.className = "btn-review px-4 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition-all-300";
-                        if (btnTrash) btnTrash.className = "btn-trash px-4 py-2 text-xs font-bold rounded-lg transition-all-300 bg-slate-700/30 text-slate-400 border border-slate-700/40";
-                        if (btnReset) btnReset.className = "btn-reset text-xs text-slate-600 hover:text-slate-400 py-1.5 transition text-center xl:w-full flex justify-center";
-                    } else {
-                        if (btnApprove) btnApprove.className = "btn-approve px-4 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition-all-300";
-                        if (btnReview) btnReview.className = "btn-review px-4 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition-all-300";
-                        if (btnTrash) btnTrash.className = "btn-trash px-4 py-2 text-xs font-semibold rounded-lg text-slate-500 hover:bg-slate-800 transition-all-300";
-                        if (btnReset) btnReset.className = "btn-reset text-xs text-amber-500 font-bold py-1.5 pointer-events-none text-center xl:w-full flex justify-center";
-                    }
-                    
-                    // Odświeżenie podpisu modyfikacji na karcie
-                    const auditSection = card.querySelector('.audit-info-pills');
-                    if (auditSection) {
-                        auditSection.innerHTML = `
-                            <span class="bg-indigo-950/60 text-indigo-300 px-2.5 py-1 rounded-lg border border-indigo-900/30 flex items-center gap-1 font-mono text-[9px]" title="Zatwierdził: ${q.audited_by}">
-                                👤 Mod: ${q.audited_by} (${q.audit_date})
-                            </span>
-                        `;
-                    }
-                }
-
-                if (currentTab === 'exam') {
-                    updateExamStats();
-                }
-
-                showToast(`Zmieniono status dla ${id} przez ${currentUsername}`, "info");
-            }
-        };
-
-        // --- LOSOWANIE ZESTAWU WG PROPORCJI GDE (ROZDZIAŁ 6 PDF) - WYKLUCZA ŚMIETNIK ---
-        window.generateExamSet = function() {
-            const shuffle = (arr) => [...arr].sort(() => 0.5 - Math.random());
-            const pick = (pool, count) => shuffle(pool).slice(0, count);
-
-            // Pobieramy wyłącznie aktywne pytania (odrzucamy Śmietnik)
-            const activeQuestions = globalQuestions.filter(q => q.status !== 'Śmietnik');
-            const getPart = (p) => activeQuestions.filter(q => q.part === p || (p === 'podstawowa' && (!q.part || q.part === 'podstawowa')));
-            const getGroup = (g) => activeQuestions.filter(q => q.group === g);
-
-            let selectedBasic = [];
-            let selectedSpecialist = [];
-
-            try {
-                // --- CZĘŚĆ PODSTAWOWA (20 pytań) ---
-                const basicPool = getPart('podstawowa');
-                const basic3 = basicPool.filter(q => q.weight == 3);
-                const basic2 = basicPool.filter(q => q.weight == 2);
-                const basic1 = basicPool.filter(q => q.weight == 1);
-
-                // Losowanie podstawowych 3-punktowych (dokładnie 10)
-                let p1_3 = basic3.filter(q => q.group === 'P1');
-                let p2_3 = basic3.filter(q => q.group === 'P2');
-                let p3_3 = basic3.filter(q => q.group === 'P3');
-                let p4_3 = basic3.filter(q => q.group === 'P4');
-                let p5_3 = basic3.filter(q => q.group === 'P5');
-
-                let chosenBasic3 = [];
-                chosenBasic3.push(...pick(p1_3, Math.min(p1_3.length, 2)));
-                chosenBasic3.push(...pick(p2_3, Math.min(p2_3.length, 2)));
-                chosenBasic3.push(...pick(p3_3, Math.min(p3_3.length, 2)));
-                chosenBasic3.push(...pick(p4_3, Math.min(p4_3.length, 1)));
-                chosenBasic3.push(...pick(p5_3, Math.min(p5_3.length, 1)));
-
-                let basic3Rem = basic3.filter(q => !chosenBasic3.includes(q));
-                let neededBasic3 = 10 - chosenBasic3.length;
-                if (neededBasic3 > 0) {
-                    chosenBasic3.push(...pick(basic3Rem, Math.min(basic3Rem.length, neededBasic3)));
-                }
-                if (chosenBasic3.length < 10) {
-                    let anyBasic3 = basicPool.filter(q => q.weight == 3 && !chosenBasic3.includes(q));
-                    chosenBasic3.push(...pick(anyBasic3, 10 - chosenBasic3.length));
-                }
-                selectedBasic.push(...chosenBasic3);
-
-                // Losowanie podstawowych 2-punktowych (dokładnie 6)
-                let p8_2 = basic2.filter(q => q.group === 'P8');
-                let p7_2 = basic2.filter(q => q.group === 'P7');
-                let p6_2 = basic2.filter(q => q.group === 'P6');
-
-                let chosenBasic2 = [];
-                chosenBasic2.push(...pick(p8_2, Math.min(p8_2.length, 1)));
-                chosenBasic2.push(...pick(p7_2, Math.min(p7_2.length, 2)));
-                chosenBasic2.push(...pick(p6_2, Math.min(p6_2.length, 3)));
-
-                let basic2Rem = basic2.filter(q => !chosenBasic2.includes(q));
-                let neededBasic2 = 6 - chosenBasic2.length;
-                if (neededBasic2 > 0) {
-                    chosenBasic2.push(...pick(basic2Rem, Math.min(basic2Rem.length, neededBasic2)));
-                }
-                if (chosenBasic2.length < 6) {
-                    let anyBasic2 = basicPool.filter(q => q.weight == 2 && !chosenBasic2.includes(q));
-                    chosenBasic2.push(...pick(anyBasic2, 6 - chosenBasic2.length));
-                }
-                selectedBasic.push(...chosenBasic2);
-
-                // Losowanie podstawowych 1-punktowych (dokładnie 4)
-                let p9_1 = basic1.filter(q => q.group === 'P9');
-                let chosenBasic1 = [];
-                chosenBasic1.push(...pick(p9_1, Math.min(p9_1.length, 4)));
-                if (chosenBasic1.length < 4) {
-                    let anyBasic1 = basicPool.filter(q => q.weight == 1 && !chosenBasic1.includes(q));
-                    chosenBasic1.push(...pick(anyBasic1, 4 - chosenBasic1.length));
-                }
-                selectedBasic.push(...chosenBasic1);
-
-                // --- CZĘŚĆ SPECJALISTYCZNA (12 pytań) ---
-                const specPool = getPart('specjalistyczna');
-                const spec3 = specPool.filter(q => q.weight == 3);
-                const spec2 = specPool.filter(q => q.weight == 2);
-                const spec1 = specPool.filter(q => q.weight == 1);
-
-                // Losowanie specjalistycznych 3-punktowych (dokładnie 6)
-                let s1_3 = spec3.filter(q => q.group === 'S1');
-                let s2_3 = spec3.filter(q => q.group === 'S2');
-
-                let chosenSpec3 = [];
-                chosenSpec3.push(...pick(s1_3, Math.min(s1_3.length, 2)));
-                chosenSpec3.push(...pick(s2_3, Math.min(s2_3.length, 2)));
-
-                let spec3Rem = spec3.filter(q => !chosenSpec3.includes(q));
-                let neededSpec3 = 6 - chosenSpec3.length;
-                if (neededSpec3 > 0) {
-                    chosenSpec3.push(...pick(spec3Rem, Math.min(spec3Rem.length, neededSpec3)));
-                }
-                if (chosenSpec3.length < 6) {
-                    let anySpec3 = specPool.filter(q => q.weight == 3 && !chosenSpec3.includes(q));
-                    chosenSpec3.push(...pick(anySpec3, 6 - chosenSpec3.length));
-                }
-                selectedSpecialist.push(...chosenSpec3);
-
-                // Losowanie specjalistycznych 2-punktowych (dokładnie 4)
-                let chosenSpec2 = [];
-                chosenSpec2.push(...pick(spec2, Math.min(spec2.length, 4)));
-                if (chosenSpec2.length < 4) {
-                    let anySpec2 = specPool.filter(q => q.weight == 2 && !chosenSpec2.includes(q));
-                    chosenSpec2.push(...pick(anySpec2, 4 - chosenSpec2.length));
-                }
-                selectedSpecialist.push(...chosenSpec2);
-
-                // Losowanie specjalistycznych 1-punktowych (dokładnie 2)
-                let s6_1 = spec1.filter(q => q.group === 'S6');
-                let chosenSpec1 = [];
-                chosenSpec1.push(...pick(s6_1, Math.min(s6_1.length, 2)));
-                if (chosenSpec1.length < 2) {
-                    let anySpec1 = specPool.filter(q => q.weight == 1 && !chosenSpec1.includes(q));
-                    chosenSpec1.push(...pick(anySpec1, 2 - chosenSpec1.length));
-                }
-                selectedSpecialist.push(...chosenSpec1);
-
-            } catch (err) {
-                console.warn("Szczegółowa matryca GDE nie mogła być w pełni spełniona, uruchamiam fallback...");
-            }
-
-            let merged = [...selectedBasic, ...selectedSpecialist];
-
-            // Jeśli brakuje nam do 32 pytań, uzupełniamy ze wszystkiego co aktywne
-            if (merged.length < 32) {
-                const uniqueIds = new Set(merged.map(q => q.id));
-                const remaining = activeQuestions.filter(q => !uniqueIds.has(q.id));
-                const needed = 32 - merged.length;
-                merged.push(...pick(remaining, needed));
-            }
-
-            examSet = merged.slice(0, 32);
-
-            const statsBar = document.getElementById('exam-stats-bar');
-            if (statsBar) statsBar.classList.remove('hidden');
-            renderExamTab();
-            showToast("Zestaw wygenerowany pomyślnie!", "success");
-        };
-
-        // --- OBSŁUGA ROZWIJANEGO MENU EKSPORTU (DROPDOWN) ---
-        window.toggleExportDropdown = function() {
-            const menu = document.getElementById('export-dropdown-menu');
-            if (menu) {
-                menu.classList.toggle('hidden');
-            }
-        };
-
-        window.triggerExport = function(type) {
-            handleExport(type);
-            const menu = document.getElementById('export-dropdown-menu');
-            if (menu) {
-                menu.classList.add('hidden');
-            }
-        };
-
-        // Zamknięcie menu eksportu przy kliknięciu poza obszar dropdownu
-        document.addEventListener('click', function(event) {
-            const container = document.getElementById('export-dropdown-container');
-            const menu = document.getElementById('export-dropdown-menu');
-            if (container && menu && !container.contains(event.target)) {
-                menu.classList.add('hidden');
-            }
-        });
-
-        // --- ROZBUDOWANY EKSPORT Z FILTROWANIEM I METADANYMI ---
-        window.handleExport = function(filterType = 'all') {
-            try {
-                let questionsToExport = globalQuestions;
-                let filename = "audytowana_baza_pytan.json";
-                
-                if (filterType === 'approved') {
-                    questionsToExport = globalQuestions.filter(q => q.status === 'Zatwierdzone');
-                    filename = "zatwierdzone_pytania.json";
-                    if (questionsToExport.length === 0) {
-                        showToast("Brak zatwierdzonych pytań do wyeksportowania!", "error");
-                        return;
-                    }
-                } else if (filterType === 'review') {
-                    questionsToExport = globalQuestions.filter(q => q.status === 'Do poprawy');
-                    filename = "pytania_do_poprawy.json";
-                    if (questionsToExport.length === 0) {
-                        showToast("Brak pytań do poprawy do wyeksportowania!", "error");
-                        return;
-                    }
-                }
-
-                let exportData;
-                if (globalMetadata) {
-                    // Klonujemy metadane i dynamicznie przeliczamy liczbę wyeksportowanych pytań wg typów
-                    let updatedMetadata = { ...globalMetadata };
-                    updatedMetadata.liczba_pytan_tak_nie = questionsToExport.filter(q => q.type === 'yn').length;
-                    updatedMetadata.liczba_pytan_abc = questionsToExport.filter(q => q.type === 'abc').length;
-                    
-                    exportData = {
-                        "metadane_banku": updatedMetadata,
-                        "pytania": questionsToExport
-                    };
-                } else {
-                    exportData = questionsToExport;
-                }
-
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
-                const downloadAnchor = document.createElement('a');
-                downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", filename);
-                document.body.appendChild(downloadAnchor);
-                downloadAnchor.click();
-                downloadAnchor.remove();
-                
-                let successMessage = "Pełna baza wyeksportowana pomyślnie!";
-                if (filterType === 'approved') successMessage = `Wyeksportowano ${questionsToExport.length} zatwierdzonych pytań!`;
-                if (filterType === 'review') successMessage = `Wyeksportowano ${questionsToExport.length} pytań do poprawy!`;
-                
-                showToast(successMessage, "success");
-            } catch (err) {
-                console.error(err);
-                showToast("Eksport pliku nie powiódł się!", "error");
-            }
-        };
-
-        // --- RENDERING I FILTROWANIE ---
-        function getFilteredQuestions() {
-            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
-
-            return globalQuestions.filter(q => {
-                const matchesGroup = (activeGroupFilter === 'ALL' || q.group === activeGroupFilter);
-                const matchesStatus = (activeStatusFilter === 'ALL' || q.status === activeStatusFilter || (activeStatusFilter === 'untouched' && (!q.status || q.status === 'untouched')));
-                
-                let matchesSearch = true;
-                if (searchQuery) {
-                    const inId = q.id.toLowerCase().includes(searchQuery);
-                    const inQuestion = q.question.toLowerCase().includes(searchQuery);
-                    const inMedia = q.media_title ? q.media_title.toLowerCase().includes(searchQuery) : false;
-                    matchesSearch = (inId || inQuestion || inMedia);
-                }
-
-                return (matchesGroup && matchesStatus && matchesSearch);
-            });
-        }
-
-        function renderBrowseTab() {
-            const container = document.getElementById('browse-questions-list');
-            if (!container) return;
-            const filtered = getFilteredQuestions();
-
-            const visibleCountEl = document.getElementById('visible-count');
-            if (visibleCountEl) visibleCountEl.innerText = filtered.length;
-
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-slate-900/30 text-center py-16 text-slate-500 rounded-2xl border border-dashed border-slate-800/80 flex flex-col items-center justify-center gap-3">
-                        <svg class="w-10 h-10 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v4.5m16 0h-3.586a1 1 0 00-.707.293l-1.414 1.414a1 1 0 01-.707.293h-2.122a1 1 0 01-.707-.293l-1.414-1.414a1 1 0 00-.707-.293H4"></path></svg>
-                        <div class="font-medium text-slate-400">Brak pytań spełniających kryteria</div>
-                    </div>`;
-                const loadMoreContainer = document.getElementById('load-more-container');
-                if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
-                return;
-            }
-
-            const visibleQuestions = filtered.slice(0, currentPage * questionsPerPage);
-            container.innerHTML = '';
-            visibleQuestions.forEach(q => {
-                container.appendChild(createQuestionCard(q));
-            });
-
-            const loadMoreContainer = document.getElementById('load-more-container');
-            if (loadMoreContainer) {
-                if (visibleQuestions.length < filtered.length) {
-                    loadMoreContainer.classList.remove('hidden');
-                } else {
-                    loadMoreContainer.classList.add('hidden');
-                }
-            }
-        }
-
-        function createQuestionCard(q) {
-            const div = document.createElement('div');
-            div.id = "card-" + q.id;
-
-            const borderColors = {
-                'Zatwierdzone': 'border-l-4 border-emerald-500 shadow-emerald-950/10',
-                'Do poprawy': 'border-l-4 border-rose-500 shadow-rose-950/10',
-                'Śmietnik': 'border-l-4 border-slate-700 opacity-50 shadow-none saturate-[60%] brightness-[85%]',
-                'untouched': 'border-l-4 border-slate-800'
-            };
-            div.className = "bg-slate-900/40 rounded-2xl p-5 border border-slate-800/85 shadow-md transition-all-300 " + (borderColors[q.status] || borderColors['untouched']);
-
-            // Treść odpowiedzi
-            let answersMarkup = '';
-            if (q.type === 'yn' || q.type === 'TAK/NIE') {
-                const isCorrectTak = q.correct_answer === 'TAK';
-                const isCorrectNie = q.correct_answer === 'NIE';
-
-                answersMarkup = `
-                    <div class="mt-4 flex gap-3 text-xs font-bold">
-                        <span class="px-4 py-2.5 rounded-xl border flex items-center gap-2 ${isCorrectTak ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' : 'bg-slate-950/60 text-slate-500 border-slate-800/80'}">
-                            TAK
-                        </span>
-                        <span class="px-4 py-2.5 rounded-xl border flex items-center gap-2 ${isCorrectNie ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' : 'bg-slate-950/60 text-slate-500 border-slate-800/80'}">
-                            NIE
-                        </span>
-                    </div>`;
-            } else if (q.options) {
-                answersMarkup = `
-                    <div class="mt-4 space-y-2 text-xs">
-                        <div class="p-3 rounded-xl border flex items-start gap-2.5 ${q.correct_answer === 'A' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 font-medium' : 'bg-slate-950/40 text-slate-400 border-slate-850'}">
-                            <span class="font-extrabold text-emerald-400 shrink-0 bg-slate-950/60 w-5 h-5 rounded-full flex items-center justify-center text-[10px] border border-slate-850">A</span>
-                            <span class="leading-relaxed">${q.options.A || ''}</span>
-                        </div>
-                        <div class="p-3 rounded-xl border flex items-start gap-2.5 ${q.correct_answer === 'B' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 font-medium' : 'bg-slate-950/40 text-slate-400 border-slate-850'}">
-                            <span class="font-extrabold text-emerald-400 shrink-0 bg-slate-950/60 w-5 h-5 rounded-full flex items-center justify-center text-[10px] border border-slate-850">B</span>
-                            <span class="leading-relaxed">${q.options.B || ''}</span>
-                        </div>
-                        <div class="p-3 rounded-xl border flex items-start gap-2.5 ${q.correct_answer === 'C' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 font-medium' : 'bg-slate-950/40 text-slate-400 border-slate-850'}">
-                            <span class="font-extrabold text-emerald-400 shrink-0 bg-slate-950/60 w-5 h-5 rounded-full flex items-center justify-center text-[10px] border border-slate-850">C</span>
-                            <span class="leading-relaxed">${q.options.C || ''}</span>
-                        </div>
-                    </div>`;
-            }
-
-            // Multimedia
-            let mediaMarkup = '';
-            if (q.media_url) {
-                const isVideo = q.media_type === 'video' || q.media_url.endsWith('.mp4');
-                const title = q.media_title || 'Załącznik multimedialny';
-                if (isVideo) {
-                    mediaMarkup = `
-                        <div class="mt-4 bg-slate-950 rounded-xl overflow-hidden border border-slate-850 p-2 max-w-lg">
-                            <video class="w-full h-auto rounded-lg max-h-64 object-cover" controls preload="metadata">
-                                <source src="${q.media_url}" type="video/mp4">
-                            </video>
-                            <div class="text-[10px] text-slate-500 mt-2 px-1 flex justify-between items-center">
-                                <span>🎥 Wideo: ${title}</span>
-                                <a href="${q.media_url}" target="_blank" class="text-blue-400 hover:text-blue-300 underline font-semibold flex items-center gap-1">Otwórz w nowej karcie</a>
-                            </div>
-                        </div>`;
-                } else {
-                    mediaMarkup = `
-                        <div class="mt-4 bg-slate-950 rounded-xl overflow-hidden border border-slate-850 p-2 max-w-lg">
-                            <img class="w-full h-auto rounded-lg max-h-64 object-cover" src="${q.media_url}" alt="${title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22[http://www.w3.org/2000/svg%22](http://www.w3.org/2000/svg%22) width=%22100%22 height=%2250%22 viewBox=%220 0 100 50%22><rect width=%22100%22 height=%2250%22 fill=%22%230f172a%22/><text x=%2250%22 y=%2228%22 font-size=%225%22 fill=%22%23334155%22 font-family=%22sans-serif%22 text-anchor=%22middle%22>Brak obrazka</text></svg>';">
-                            <div class="text-[10px] text-slate-500 mt-2 px-1 flex justify-between items-center">
-                                <span>🖼️ Grafika: ${title}</span>
-                                <a href="${q.media_url}" target="_blank" class="text-blue-400 hover:text-blue-300 underline font-semibold flex items-center gap-1">Pobierz obraz</a>
-                            </div>
-                        </div>`;
-                }
-            }
-
-            // UWAGI DO GRAFIKI (WIZUALIZACJA NA KARCIE)
-            let notesMarkup = '';
-            if (q.media_notes) {
-                notesMarkup = `
-                    <div class="mt-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200">
-                        <span class="font-extrabold uppercase text-[9px] tracking-wider block mb-1">📝 Uwagi do grafiki / Wyjaśnienie:</span>
-                        <p class="leading-relaxed whitespace-pre-wrap">${q.media_notes}</p>
-                    </div>
-                `;
-            }
-
-            // SYMULOWANY PODPIS AUDYTERA (DODANO)
-            let auditInfoMarkup = '';
-            if (q.audited_by) {
-                auditInfoMarkup = `
-                    <span class="bg-indigo-950/60 text-indigo-300 px-2.5 py-1 rounded-lg border border-indigo-900/30 flex items-center gap-1 font-mono text-[9px]" title="Zatwierdził: ${q.audited_by}">
-                        👤 Mod: ${q.audited_by} (${q.audit_date || ''})
-                    </span>
-                `;
-            }
-
-            const isApproved = q.status === 'Zatwierdzone';
-            const isReview = q.status === 'Do poprawy';
-            const isTrash = q.status === 'Śmietnik';
-            const isUntouched = !q.status || q.status === 'untouched';
-
-            div.innerHTML = `
-                <div class="flex flex-col xl:flex-row justify-between items-start gap-4">
-                    <div class="space-y-1 flex-1 w-full">
-                        <div class="flex flex-wrap gap-2 items-center text-[10px] font-bold">
-                            <span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg font-mono border border-slate-755">${q.id}</span>
-                            <span class="bg-indigo-950/60 text-indigo-400 px-2.5 py-1 rounded-lg border border-indigo-900/30">${q.group_label || q.group}</span>
-                            <span class="bg-amber-950/60 text-amber-400 px-2.5 py-1 rounded-lg border border-amber-900/30">${q.weight} pkt</span>
-                            
-                            <!-- PODSTAWA PRAWNA -->
-                            ${q.przepis_zrodlowy ? `
-                                <span class="bg-purple-950/60 text-purple-300 px-2.5 py-1 rounded-lg border border-purple-900/30 flex items-center gap-1 font-mono text-[9px]">
-                                    ⚖️ Art: ${q.przepis_zrodlowy}
-                                </span>
-                            ` : ''}
-
-                            <!-- SYGNATURA AUDYTU -->
-                            <span class="audit-info-pills flex items-center gap-1">
-                                ${auditInfoMarkup}
-                            </span>
-                            
-                            <span class="text-slate-500 uppercase font-bold text-[9px] px-1">${q.part || ''}</span>
-                        </div>
-                        <p class="text-sm font-semibold text-slate-100 mt-3 leading-relaxed">${q.question}</p>
-                        ${answersMarkup}
-                        ${mediaMarkup}
-                        ${notesMarkup}
-                    </div>
-
-                    <!-- AKCJE STATUSU Z PRZYCISKIEM EDYCJI I ŚMIETNIKA -->
-                    <div class="bg-slate-950/60 p-1.5 rounded-xl flex xl:flex-col gap-1 w-full xl:w-36 border border-slate-800/80 shrink-0 justify-around xl:justify-start xl:self-stretch">
-                        <button onclick="updateQuestionStatus('${q.id}', 'Zatwierdzone')" class="btn-approve px-4 py-2 text-xs font-semibold rounded-lg transition-all-300 flex items-center justify-center gap-1.5 xl:w-full ${isApproved ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 font-bold' : 'text-slate-400 hover:bg-slate-800'}">
-                            ✔️ OK
-                        </button>
-                        <button onclick="updateQuestionStatus('${q.id}', 'Do poprawy')" class="btn-review px-4 py-2 text-xs font-semibold rounded-lg transition-all-300 flex items-center justify-center gap-1.5 xl:w-full ${isReview ? 'bg-rose-500/15 text-rose-400 border border-rose-500/20 font-bold' : 'text-slate-400 hover:bg-slate-800'}">
-                            ❌ Popraw
-                        </button>
-                        <button onclick="updateQuestionStatus('${q.id}', 'Śmietnik')" class="btn-trash px-4 py-2 text-xs font-semibold rounded-lg transition-all-300 flex items-center justify-center gap-1.5 xl:w-full ${isTrash ? 'bg-slate-700/40 text-slate-300 border border-slate-700/50 font-bold' : 'text-slate-500 hover:bg-slate-800'}">
-                            🗑️ Śmietnik
-                        </button>
-                        <!-- PRZYCISK EDYCJI TREŚCI -->
-                        <button onclick="startEditQuestion('${q.id}')" class="btn-edit px-4 py-2 text-xs font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition-all-300 flex items-center justify-center gap-1.5 xl:w-full">
-                            ✏️ Edytuj
-                        </button>
-                        <button onclick="updateQuestionStatus('${q.id}', 'untouched')" class="btn-reset text-xs text-slate-500 hover:text-slate-300 py-1.5 transition text-center xl:w-full flex justify-center ${isUntouched ? 'text-amber-500 font-bold pointer-events-none' : ''}">
-                            🔄 Reset
-                        </button>
-                    </div>
-                </div>
-            `;
-            return div;
-        }
-
-        function updateExamStats() {
-            let approved = 0;
-            let review = 0;
-
-            examSet.forEach(q => {
-                const liveQ = globalQuestions.find(item => item.id === q.id) || q;
-                if (liveQ.status === 'Zatwierdzone') approved++;
-                if (liveQ.status === 'Do poprawy') review++;
-            });
-
-            const approvedEl = document.getElementById('exam-approved-count');
-            const reviewEl = document.getElementById('exam-review-count');
-
-            if (approvedEl) approvedEl.innerText = approved;
-            if (reviewEl) reviewEl.innerText = review;
-        }
-
-        function renderExamTab() {
-            const container = document.getElementById('exam-questions-list');
-            if (!container) return;
-            container.innerHTML = '';
-
-            if (examSet.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-slate-900/30 text-center py-16 text-slate-500 rounded-2xl border border-dashed border-slate-800/80 flex flex-col items-center justify-center gap-3">
-                        <svg class="w-10 h-10 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                        <div class="font-medium text-slate-400">Brak wygenerowanego zestawu</div>
-                        <p class="text-xs text-slate-600 max-w-sm leading-relaxed">Kliknij przycisk u góry, aby wygenerować test merytoryczny.</p>
-                    </div>`;
-                return;
-            }
-
-            let sumPoints = 0;
-            examSet.forEach((q, index) => {
-                const liveQ = globalQuestions.find(item => item.id === q.id) || q;
-                sumPoints += (Number(liveQ.weight) || 0);
-
-                const card = createQuestionCard(liveQ);
-                
-                const badge = document.createElement('div');
-                badge.className = "bg-slate-800 text-slate-400 text-[10px] font-bold px-3 py-1 rounded-lg mb-3 w-max uppercase tracking-wider border border-slate-755 flex items-center gap-1.5";
-                badge.innerHTML = "<span>Pozycja " + (index + 1) + " w wygenerowanym teście</span>";
-                card.insertBefore(badge, card.firstChild);
-
-                container.appendChild(card);
-            });
-
-            const totalPointsEl = document.getElementById('exam-total-points');
-            const totalQuestionsEl = document.getElementById('exam-total-questions');
-
-            if (totalPointsEl) totalPointsEl.innerText = sumPoints + " / 74 pkt";
-            if (totalQuestionsEl) totalQuestionsEl.innerText = examSet.length + " / 32 pyt.";
-            updateExamStats();
-        }
-
-        // --- OKNO DIALOGOWE ---
-        function showModal(title, message, isError = false) {
-            const modal = document.getElementById('custom-modal');
-            const modalBox = document.getElementById('modal-box');
-            const iconContainer = document.getElementById('modal-icon-container');
-            const messageEl = document.getElementById('modal-message');
-            const titleEl = document.getElementById('modal-title');
-
-            if (titleEl) titleEl.innerText = title;
-            if (messageEl) messageEl.innerText = message;
-
-            if (isError) {
-                if (iconContainer) iconContainer.className = "p-3 rounded-xl bg-rose-950/40 text-rose-400 border border-rose-900/30 flex items-center justify-center";
-            } else {
-                if (iconContainer) iconContainer.className = "p-3 rounded-xl bg-emerald-950/40 text-emerald-400 border border-emerald-900/30 flex items-center justify-center";
-            }
-
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        window.closeModal = function() {
-            const modal = document.getElementById('custom-modal');
-            if (modal) modal.classList.add('hidden');
-        };
-
-        // --- REJESTRACJA DRAG & DROP ---
-        const dropBody = document.getElementById('app-body');
-        if (dropBody) {
-            window.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                const dropZone = document.getElementById('drop-zone');
-                if (dropZone) dropZone.classList.add('drag-over-zone');
-            });
-            window.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                if (e.clientX === 0 && e.clientY === 0) {
-                    const dropZone = document.getElementById('drop-zone');
-                    if (dropZone) dropZone.classList.remove('drag-over-zone');
-                }
-            });
-            window.addEventListener('drop', (e) => {
-                e.preventDefault();
-                const dropZone = document.getElementById('drop-zone');
-                if (dropZone) dropZone.classList.remove('drag-over-zone');
-                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        importText(evt.target.result, e.dataTransfer.files[0].name);
-                    };
-                    reader.readAsText(e.dataTransfer.files[0]);
-                }
-            });
-        }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            const toast = document.createElement('div');
-            
-            const bgClasses = {
-                success: 'bg-slate-900 border-emerald-500/30 text-emerald-400',
-                error: 'bg-slate-900 border-rose-500/30 text-rose-400',
-                info: 'bg-slate-900 border-blue-500/30 text-blue-400'
-            };
-
-            toast.className = "flex items-center gap-3 p-4 rounded-xl border shadow-2xl transform translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto " + bgClasses[type];
-            toast.innerHTML = `
-                <div class="text-xs font-semibold text-slate-200 flex-1">${message}</div>
-                <button onclick="this.parentElement.remove()" class="text-slate-500 hover:text-slate-300 transition text-sm">
-                    &times;
-                </button>
-            `;
-
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-
-        // Inicjalizacja przy pełnym wczytaniu kodu DOM
-        window.addEventListener('DOMContentLoaded', () => {
-            // Próba automatycznego załadowania bazy z folderu bazy/bazab.json
-            tryAutostartBazaB();
-            updateActiveFiltersUI();
-        });
-    </script>
-</body>
-</html>
+[
+  {
+    "id": "P1_001",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca może przejechać przez przejście, gdy pieszy stoi przy krawężniku i czeka?",
+    "correct_answer": "NIE",
+    "media_notes": "Pieszy stojący przy krawężniku i wyraźnie oczekujący na przejście sygnalizuje zamiar skorzystania z niego. Kierowca musi się zatrzymać. Grafika: animacja pokazująca pieszego przy krawężniku, samochód zwalnia.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.096.jpeg",
+    "media_title": "Pieszy wchodzi na przejście — kierowca zwalnia",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_002",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy wolno ominąć pojazd, który zatrzymał się przed przejściem dla pieszych?",
+    "correct_answer": "NIE",
+    "media_notes": "Omijanie zatrzymanego pojazdu przed przejściem jest zabronione — zza niego może wyjść niewidoczny pieszy. Grafika: widok zza ciężarówki stojącej przed pasami; animacja wskazująca pieszego wyłaniającego się z zasłoniętej strefy — usunąć strzałkę czerwoną bo sugeruje odpowiedź.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.105.jpeg",
+    "media_title": "Pojazd stojący przed przejściem — zakaz omijania",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_003",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy wolno wyprzedzać bezpośrednio przed przejściem dla pieszych?",
+    "correct_answer": "NIE",
+    "media_notes": "Wyprzedzanie jest zakazane na przejściach i bezpośrednio przed nimi — niezależnie od tego, czy ktoś aktualnie przechodzi. Grafika: widok drogi z widocznym przejściem z przodu.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.104.jpeg",
+    "media_title": "Zakaz wyprzedzania przed przejściem dla pieszych",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_004",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy na przejściu dla pieszych z sygnalizacją świetlną wolno wyprzedzać, gdy świeci się zielone?",
+    "correct_answer": "TAK",
+    "media_notes": "Jeśli ruch jest kierowany sygnalizacją, zakaz wyprzedzania przed przejściem nie obowiązuje — pod warunkiem zachowania ostrożności wobec pieszych. Grafika: sygnalizator świetlny z zielonym światłem.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.105.jpeg",
+    "media_title": "Przejście dla pieszych z sygnalizacją — zielone",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_005",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 27 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca może przejechać przez przejazd dla rowerzystów, gdy rowerzysta jest już na nim?",
+    "correct_answer": "NIE",
+    "media_notes": "Rowerzysta na przejeździe ma zawsze pierwszeństwo — kierowca musi czekać i przepuścić. Grafika: rowerzysta na przejeździe, zbliżający się samochód.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.124.jpeg",
+    "media_title": "Rowerzysta na przejeździe — pierwszeństwo",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_006",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 27 ust. 2",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy wolno wyprzedzać na przejeździe dla rowerzystów?",
+    "correct_answer": "NIE",
+    "media_notes": "Wyprzedzanie na przejeździe dla rowerzystów i bezpośrednio przed nim jest zakazane. Rowerzysta może pojawić się nagle. Wyjątek: ruch kierowany sygnalizacją. Grafika: przejazd rowerowy.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_10.104.jpg",
+    "media_title": "Przejazd dla rowerzystów — zakaz wyprzedzania",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_007",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 2",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy skręcając w drogę poprzeczną, kierowca musi ustąpić pieszemu na przejściu?",
+    "correct_answer": "TAK",
+    "media_notes": "Skręcając, nawet na zielonym świetle, kierowca musi ustąpić pieszym na przejściu przez drogę, na którą wjeżdża. Grafika: animacja pojazdu skręcającego — pieszy na pasach. Usunąć strzałkę czerwoną bo sugeruje odpowiedź.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/video/Wykład_3.069.mp4",
+    "media_title": "Skręt w prawo — pieszy na przejściu (animacja)",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_008",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 2",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy skręcając w drogę poprzeczną, kierowca może pominąć pieszego przechodzącego tuż obok przejścia?",
+    "correct_answer": "NIE",
+    "media_notes": "Kierowca skręcający musi ustąpić pieszemu nawet poza przejściem — jeśli pieszy jest na jezdni drogi, na którą wjeżdża. Grafika: pieszy idący przez jezdnię poza pasami, skręcający pojazd.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.099.jpeg",
+    "media_title": "Ustąpienie pierwszeństwa pieszemu poza przejściem",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_009",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy zachowanie kierowcy na nagraniu jest prawidłowe, jeśli wjeżdża on na przejście, gdy pieszy dopiero podchodzi do krawężnika?",
+    "correct_answer": "NIE",
+    "media_notes": "Kierowca musi ustąpić pieszemu wchodzącemu — to znaczy już zbliżającemu się do przejścia z zamiarem skorzystania z niego. Przejechanie przed pieszym podchodzącym do krawężnika jest nieprawidłowe. Grafika: animacja — pieszy podchodzi, samochód jedzie. Usunąć strzałkę czerwoną bo sugeruje odpowiedź.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_10.066.jpeg",
+    "media_title": "Pieszy podchodzi do przejścia — reakcja kierowcy",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_010",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy pieszy ma pierwszeństwo przed tramwajem na przejściu dla pieszych?",
+    "correct_answer": "NIE",
+    "media_notes": "Tramwaj nie musi ustępować pieszemu na przejściu — to wyjątek od zasady ogólnej. Kierowcy tramwajów ze względu na długą drogę hamowania mają pierwszeństwo. Grafika: tramwaj i przejście dla pieszych.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.096.jpeg",
+    "media_title": "Tramwaj a przejście dla pieszych",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_011",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy na przejściu podzielonym wysepką pieszy na pierwszym pasie ma już pierwszeństwo na drugim pasie?",
+    "correct_answer": "NIE",
+    "media_notes": "Każda część przejścia rozdzielonego wysepką traktowana jest osobno. Pieszy ma pierwszeństwo dopiero, gdy wejdzie na dany pas. Grafika: schematyczny widok przejścia z wysepką.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.097.jpeg",
+    "media_title": "Przejście z wysepką — dwa osobne przejścia",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_012",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 14 pkt 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy wolno prowadzić samochód wzdłuż chodnika, po którym idą piesi?",
+    "correct_answer": "NIE",
+    "media_notes": "Jazda samochodem wzdłuż chodnika jest zabroniona — chodnik jest przeznaczony wyłącznie dla pieszych. Grafika: chodnik z pieszymi, samochód obok.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.106.jpeg",
+    "media_title": "Jazda wzdłuż chodnika — zakaz",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_013",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 11 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy pieszy może przejść przez jezdnię w miejscu, gdzie nie ma przejścia, jeśli najbliższe jest dalej niż 100 metrów?",
+    "correct_answer": "TAK",
+    "media_notes": "Przepisy dopuszczają taką sytuację, ale pieszy musi upewnić się, że nie spowoduje zagrożenia, iść prostopadle i najkrótszą drogą. Musi też ustąpić pierwszeństwa pojazdom. Grafika: pieszy przechodzący przez jezdnię poza przejściem.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.109.jpeg",
+    "media_title": "Pieszy poza przejściem — warunki",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_014",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 7",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca ma obowiązek zatrzymać się, gdy widzi osobę niewidomą z białą laską czekającą przy przejściu?",
+    "correct_answer": "TAK",
+    "media_notes": "Osoba z białą laską ma absolutne pierwszeństwo. Kierowca musi zatrzymać się i umożliwić jej bezpieczne przejście. Grafika: osoba z białą laską przy krawężniku, samochód.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_10.068.jpeg",
+    "media_title": "Osoba z białą laską — pierwszeństwo bezwzględne",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_015",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 11 ust. 4",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca jadący przez strefę zamieszkania może ominąć pieszego idącego środkiem jezdni?",
+    "correct_answer": "NIE",
+    "media_notes": "W strefie zamieszkania pieszy ma pierwszeństwo na całej szerokości drogi. Kierowca nie może go omijać w sposób stwarzający zagrożenie — musi zwolnić lub zatrzymać się. Grafika: strefa zamieszkania ze znakiem D-40, pieszy na środku drogi.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_10.069.jpeg",
+    "media_title": "Strefa zamieszkania — pierwszeństwo pieszych",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_016",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 3 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy w rejonie szkoły kierowca może jechać z normalną prędkością, jeśli żadne dziecko nie jest widoczne?",
+    "correct_answer": "NIE",
+    "media_notes": "Dzieci mogą pojawić się nagle zza zaparkowanego auta lub furtki. Zasada ograniczonego zaufania w strefie szkół i przedszkoli obowiązuje zawsze — nie tylko gdy dziecko jest widoczne. Grafika: dzieci niewidoczne za samochodami.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.118.jpeg",
+    "media_title": "Strefa szkoły — dzieci przy drodze",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_017",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 18 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca musi zatrzymać się, gdy zatrzymany tramwaj przy przystanku bez wysepki wypuszcza pasażerów?",
+    "correct_answer": "TAK",
+    "media_notes": "Gdy tramwaj zatrzymuje się przy przystanku bez wysepki, kierowca musi zatrzymać pojazd, by umożliwić pasażerom bezpieczne wyjście i dojście do chodnika. Grafika: tramwaj przy przystanku bez wysepki.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.119.jpeg",
+    "media_title": "Tramwaj przy przystanku bez wysepki",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_018",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 18 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy przy przystanku z wysepką kierowca może przejechać obok tramwaju, który wypuszcza pasażerów?",
+    "correct_answer": "TAK",
+    "media_notes": "Gdy przy przystanku jest wysepka, kierowca może przejechać obok tramwaju — ale tylko z zachowaniem szczególnej ostrożności i nie utrudniając pieszym przejścia z wysepki na chodnik. Grafika: tramwaj przy przystanku z wysepką i usunąć przechodzącego przez przejscie",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.120.jpeg",
+    "media_title": "Tramwaj przy przystanku z wysepką",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_019",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 27 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy hulajnoga elektryczna poruszająca się po przejeździe dla rowerów ma obowiązek ustąpić samochodowi?",
+    "correct_answer": "NIE",
+    "media_notes": "Hulajnoga elektryczna na przejeździe dla rowerów ma pierwszeństwo przed pojazdem nadjeżdżającym. To kierowca samochodu musi ustąpić. Grafika: przejazd rowerowy, hulajnoga elektryczna na przejezdzie dorysowac lub zamienic z jednym z rowerów",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.123.jpeg",
+    "media_title": "Przejazd — hulajnoga elektryczna ma pierwszeństwo",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_020",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 24 ust. 7",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy wyprzedzając kolumnę pieszych, wystarczy zachować odstęp 1 metra?",
+    "correct_answer": "TAK",
+    "media_notes": "1 metr to minimum wymagane przepisami — zalecane jest zachowanie większego odstępu, bo pieszy może potknąć się lub zatrzymać niespodziewanie. Grafika: samochód mijający grupę pieszych.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.157.jpeg",
+    "media_title": "Odstęp przy wyprzedzaniu kolumny pieszych — 1 metr",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_021",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 32 ust. 2",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy wolno wjechać samochodem między rowerzystów jadących w kolumnie?",
+    "correct_answer": "NIE",
+    "media_notes": "Rozdzielanie kolumny rowerowej jest zakazane — mogłoby doprowadzić do wypadku i jest wykroczeniem. Grafika: kolumna rowerzystów, samochód z boku.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.159.jpeg",
+    "media_title": "Kolumna rowerzystów — zakaz wjazdu",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_022",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 32 ust. 2",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy wolno rozdzielić kolumnę pieszych, jeśli wydaje się, że jest dość miejsca?",
+    "correct_answer": "NIE",
+    "media_notes": "Rozdzielanie kolumn pieszych jest zawsze zakazane, niezależnie od dostępnej przestrzeni. Przerwanie zwartej grupy grozi paniką, zwłaszcza wśród dzieci i starszych. Grafika: kolumna pieszych na drodze.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.158.jpeg",
+    "media_title": "Zakaz rozdzielania kolumny pieszych",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_023",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 57 ust. 2",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca musi się zatrzymać, gdy kierowca autobusu szkolnego pokazuje tarczę ze znakiem STOP?",
+    "correct_answer": "TAK",
+    "media_notes": "Tarcza z symbolem STOP dawana przez kierowcę autobusu szkolnego zobowiązuje inne pojazdy do zatrzymania się — zarówno z przodu, jak i z tyłu autobusu. Grafika: autobus szkolny z tarczą STOP.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.151.jpeg",
+    "media_title": "Tarcza STOP autobusu szkolnego",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_024",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 57 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca musi umożliwić włączenie się do ruchu autobusowi szkolnemu, który sygnalizuje taki zamiar?",
+    "correct_answer": "TAK",
+    "media_notes": "Autobus szkolny sygnalizujący chęć wjazdu na jezdnię ma pierwszeństwo — kierowca musi zwolnić lub zatrzymać się. Bezpieczeństwo dzieci jest priorytetem. Grafika: autobus szkolny sygnalizuje włączenie do ruchu.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.152.jpeg",
+    "media_title": "Autobus szkolny włącza się do ruchu",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_025",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 57 ust. 2",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy przejeżdżając obok zatrzymanego autobusu szkolnego po wyjeździe dzieci, należy zachować szczególną ostrożność?",
+    "correct_answer": "TAK",
+    "media_notes": "Nawet gdy dzieci już wysiadły, mogą jeszcze przechodzić przez jezdnię — gwałtownie i bez oglądania się. Kierowca musi być gotowy do hamowania. Grafika: autobus szkolny, dziecko przechodzi za nim.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.150.jpeg",
+    "media_title": "Dziecko przechodzi za autobusem szkolnym",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_026",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 57 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy autokar przewożący dzieci musi mieć żółtą tablicę z symbolem dzieci z przodu i z tyłu?",
+    "correct_answer": "TAK",
+    "media_notes": "Przepisy wymagają oznaczenia pojazdu przewożącego dzieci żółtą tablicą zarówno z przodu, jak i z tyłu. W warunkach słabej widoczności tablica musi być podświetlona lub odblaskowa. Grafika: autokar z żółtą tablicą.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.145.jpeg",
+    "media_title": "Oznaczenie pojazdu przewożącego dzieci",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_027",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 3 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy rowerzysta jadący środkiem pasa ruchu na skrzyżowaniu narusza przepisy?",
+    "correct_answer": "NIE",
+    "media_notes": "Rowerzyści mają prawo jechać środkiem pasa — szczególnie zbliżając się do skrzyżowania. Kierowca musi to uwzględnić i zachować bezpieczny odstęp. Grafika: rowerzysta na środku pasa na skrzyżowaniu.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.123.jpeg",
+    "media_title": "Rowerzysta na środku pasa ruchu",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_028",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 24 ust. 2",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy rowerzysta może wyprzedzić samochód stojący w korku z prawej strony?",
+    "correct_answer": "TAK",
+    "media_notes": "Rowerzysta może wyprzedzać powoli jadące lub stojące pojazdy z prawej strony. Kierowca musi być świadomy tej możliwości — zwłaszcza przy skrętach, żeby nie zepchnąć rowerzysty. Grafika: rowerzysta jadący prawą stroną przy stojących samochodach.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.127.jpeg",
+    "media_title": "Rowerzysta wyprzedzający z prawej strony",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_029",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 27 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy skręcając w prawo, kierowca musi ustąpić rowerzyście jadącemu wzdłuż jezdni?",
+    "correct_answer": "TAK",
+    "media_notes": "Rowerzysta jadący na wprost przy prawej krawędzi jezdni ma pierwszeństwo przed samochodem skręcającym w prawo. Kierowca musi go przepuścić. Grafika: animacja skrętu w prawo z rowerzystą. Usunąć strzałkę czerwoną bo sugeruje odpowiedź.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.126.jpeg",
+    "media_title": "Skręt w prawo a rowerzysta jadący wzdłuż jezdni",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_030",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 27 ust. 2",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy wolno wyprzedzać na przejeździe dla rowerzystów i bezpośrednio przed nim?",
+    "correct_answer": "NIE",
+    "media_notes": "Zakaz jest identyczny jak przy przejściu dla pieszych — rowerzysta może pojawić się nagle i ma tam pierwszeństwo. Wyjątek: ruch kierowany sygnalizacją. Grafika: przejazd rowerowy, samochód za nim.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.128.jpeg",
+    "media_title": "Zakaz wyprzedzania na przejeździe dla rowerzystów",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_031",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 24 ust. 7",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy w sytuacji na zdjęciu kierowca może wyprzedzić rowerzystę na skrzyżowaniu?",
+    "correct_answer": "TAK",
+    "media_notes": "Zakaz wyprzedzania na skrzyżowaniu dotyczy pojazdu silnikowego. Rowerzysta nie jest pojazdem silnikowym, więc wyprzedzanie go na skrzyżowaniu jest dozwolone — pod warunkiem zachowania szczególnej ostrożności. Grafika: rowerzysta na skrzyżowaniu.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.101.jpeg",
+    "media_title": "Wyprzedzanie rowerzysty na skrzyżowaniu",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_032",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 22 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy przed zmianą pasa ruchu wystarczy sprawdzić tylko lusterka wsteczne i boczne?",
+    "correct_answer": "NIE",
+    "media_notes": "Lusterka nie eliminują martwego pola. Bezpieczna zmiana pasa wymaga także spojrzenia przez boczną szybę lub lekkiego odwrócenia głowy. Grafika: widok wnętrza samochodu z zaznaczonym martwym polem przy lusterku bocznym.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.139.jpeg",
+    "media_title": "Martwe pole — widok z lusterek nie wystarczy",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_033",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 22 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy martwe pole jest strefą obok pojazdu, której kierowca nie widzi ani w lusterku bocznym, ani wstecznym?",
+    "correct_answer": "TAK",
+    "media_notes": "Martwe pole to dokładnie ta strefa — niewidoczna w lusterkach. Rowerzysta lub motocyklista w tym miejscu jest niewidzialny dla kierowcy. Grafika: schemat samochodu z zaznaczonym martwym polem.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.140.jpeg",
+    "media_title": "Schemat martwego pola — strefa niewidoczna",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_034",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 22 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy aby zminimalizować martwe pole, należy przed zmianą pasa spojrzeć przez boczną szybę lub wychylić głowę?",
+    "correct_answer": "TAK",
+    "media_notes": "Spojrzenie przez boczną szybę i lekkie wychylenie głowy pozwala zobaczyć to, czego lusterka nie pokazują. To prosty ruch, który może zapobiec poważnemu wypadkowi. Grafika: kierowca odwracający głowę przed zmianą pasa.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.140.jpeg",
+    "media_title": "Kontrola martwego pola — spojrzenie przez szybę",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_035",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 3 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy zachowanie kierowcy na nagraniu jest bezpieczne, jeśli wyprzedza bez wcześniejszego sprawdzenia martwego pola?",
+    "correct_answer": "NIE",
+    "media_notes": "Wyprzedzanie bez sprawdzenia martwego pola jest niebezpieczne — w tej strefie może znajdować się rowerzysta lub motocyklista. To jedna z najczęstszych przyczyn zderzeń podczas zmiany pasa. Grafika: animacja — samochód zmienia pas bez sprawdzenia martwego pola.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_10.103.jpeg",
+    "media_title": "Zmiana pasa bez sprawdzenia martwego pola (animacja)",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_036",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 3 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy otwierając drzwi samochodu, kierowca powinien użyć prawej ręki, by automatycznie odwrócić głowę w stronę nadjeżdżających rowerzystów?",
+    "correct_answer": "TAK",
+    "media_notes": "Technika 'Dutch Reach' polega na otwieraniu drzwi daleką ręką, co zmusza do obrotu ciała i sprawdzenia, czy nie nadjeżdża rowerzysta lub inny uczestnik ruchu. Grafika: schemat Dutch Reach — lewa ręka otwiera prawe drzwi.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.140.jpeg",
+    "media_title": "Dutch Reach — otwieranie drzwi daleką ręką",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_037",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 3 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy otwarcie drzwi bez sprawdzenia drogi rowerowej grozi poważnym wypadkiem?",
+    "correct_answer": "TAK",
+    "media_notes": "Nagłe otwarcie drzwi na rowerzyście lub hulajnogiście może spowodować poważne obrażenia. Każde otwieranie drzwi wymaga uprzedniego sprawdzenia lusterek i spojrzenia na boki. Grafika: animacja otwarcia drzwi w stronę rowerzysty.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.139.jpeg",
+    "media_title": "Otwarcie drzwi a rowerzysta — ryzyko wypadku",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_038",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 5 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy na jezdni bez przejścia piesi mogą przekraczać ulicę tylko wtedy, gdy nie stworzą zagrożenia?",
+    "correct_answer": "TAK",
+    "media_notes": "Pieszy wchodzący na jezdnię poza przejściem nie może wymusić pierwszeństwa i musi upewnić się, że nie spowoduje zagrożenia ruchu. W takim miejscu pierwszeństwo mają pojazdy. Grafika: pieszy patrzący na ruch przed przejściem przez jezdnię.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.101.jpeg",
+    "media_title": "Pieszy na jezdni — zasada ustąpienia pierwszeństwa",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_039",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 5",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca musi ustąpić pieszemu podczas przejeżdżania przez chodnik?",
+    "correct_answer": "TAK",
+    "media_notes": "Podczas przejeżdżania przez chodnik (np. wjazdem do posesji) kierowca jest zobowiązany ustąpić pieszym na chodniku, a następnie pieszym na przejściu. Grafika: samochód wyjeżdżający z posesji przez chodnik.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.108.jpeg",
+    "media_title": "Przejeżdżanie przez chodnik — ustąpienie pieszemu",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_040",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca ma prawo przejechać przez przejście, jeśli pieszy wciąż ma czas na dojście do krawężnika?",
+    "correct_answer": "NIE",
+    "media_notes": "Kierowca nie może oceniać, czy pieszy zdąży. Pieszemu wchodzącemu na przejście należy bezwarunkowo ustąpić. Takie zachowanie jest traktowane przez egzaminatora jako błąd kwalifikacyjny. Grafika: pieszy wchodzi na pasy, samochód przyspiesza.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.114.jpeg",
+    "media_title": "Pieszy na przejściu — bezwarunkowe pierwszeństwo",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_041",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 3 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Roboczy",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy przy widoku pieszego na poboczu kierowca może zachować stałą prędkość?",
+    "correct_answer": "NIE",
+    "media_notes": "Widoczny pieszy przy jezdni oznacza ryzyko — należy zwolnić i mieć nogę nad hamulcem, bo pieszy może nagle zmienić kierunek lub wejść na jezdnię. Grafika: pieszy przy krawędzi, samochód jedzie z pełną prędkością.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.115.jpeg",
+    "media_title": "Pieszy na poboczu — gotowość do hamowania",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_042",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 3 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy pieszy używający telefonu może stanowić większe zagrożenie drogowe niż pieszy bez telefonu?",
+    "correct_answer": "TAK",
+    "media_notes": "Korzystanie z telefonu ogranicza obserwację drogi przez pieszego. Przepisy zabraniają pieszemu korzystania z urządzenia w sposób ograniczający obserwację — ale kierowca musi liczyć się z takim zachowaniem. Grafika: pieszy z telefonem przy przejściu.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.112.jpeg",
+    "media_title": "Pieszy z telefonem przy przejściu",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_043",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 3 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy w rejonie osiedlowym kierowca powinien zakładać, że piesi uważają się za uprzywilejowanych na całej szerokości drogi?",
+    "correct_answer": "TAK",
+    "media_notes": "Na drogach osiedlowych piesi często zachowują się jak w strefie zamieszkania. Kierowca musi liczyć się z tym błędem poznawczym i jechać wolno z gotowością do hamowania. Grafika: droga osiedlowa, piesi przechodzący przez jezdnię.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.116.jpeg",
+    "media_title": "Droga osiedlowa — piesi na jezdni",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_044",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 3 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy kierowca cofający bez widocznych pieszych może zrezygnować ze sprawdzania otoczenia?",
+    "correct_answer": "NIE",
+    "media_notes": "Podczas cofania pieszy może się pojawić w każdej chwili — szczególnie dziecko. Brak widocznych pieszych nie zwalnia z obowiązku obserwacji i gotowości do zatrzymania. Grafika: pojazd cofający, dziecko za nim niewidoczne.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_10.069.jpeg",
+    "media_title": "Cofanie a pieszy — obowiązek ustąpienia",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_045",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy włączając się do ruchu z parkingu, kierowca może wjechać na chodnik bez zatrzymania, jeśli żaden pieszy nie jest widoczny?",
+    "correct_answer": "NIE",
+    "media_notes": "Pieszy może się pojawić nagle, np. za samochodem. Przy każdym wjeździe na chodnik obowiązuje zatrzymanie i ustąpienie pieszym, bez względu na ich widoczność. Grafika: samochód wyjeżdżający z parkingu przez chodnik.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_10.069.jpeg",
+    "media_title": "Włączanie do ruchu — ustąpienie pieszemu",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_046",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Rozumienie",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 2 pkt 23",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy rowerzysta wjeżdżający z drogi rowerowej na jezdnię jest zobowiązany ustąpić pierwszeństwa pojazdom na jezdni?",
+    "correct_answer": "TAK",
+    "media_notes": "Rowerzysta kontynuujący jazdę po ścieżce nie włącza się do ruchu, ale gdy skręca na jezdnię — włącza się i musi ustąpić pierwszeństwa. Grafika: animacja rowerzysty skręcającego z drogi rowerowej na jezdnię. Usunąć strzałkę czerwoną bo sugeruje odpowiedź.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/video/Wykład_2.028.mp4",
+    "media_title": "Rowerzysta wjeżdżający na jezdnię (animacja)",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_047",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 3",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy omijanie ciężarówki zatrzymanej przed przejściem dla pieszych jest zawsze zabronione?",
+    "correct_answer": "TAK",
+    "media_notes": "Zakaz omijania pojazdu stojącego przed przejściem obowiązuje bez względu na rodzaj pojazdu i bez względu na to, czy pieszy jest akurat widoczny — może się właśnie wyłonić zza ciężarówki. Grafika: ciężarówka stojąca przed przejściem, ukryta strefa.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_10.064.jpeg",
+    "media_title": "Ciężarówka przed przejściem — zakaz omijania",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_048",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Zatwierdzone",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy zatrzymanie się i przepuszczenie pieszego wchodzącego na przejście jest wymagane nawet na zielonym świetle dla kierowcy?",
+    "correct_answer": "TAK",
+    "media_notes": "Zielone światło dla kierowcy nie zwalnia go z obowiązku ustąpienia pieszemu, który jest już na przejściu lub wchodzi na nie. Zielone oznacza, że można jechać — nie że pieszy nie ma pierwszeństwa. Grafika: sygnalizator zielony, pieszy na pasach.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.102.jpeg",
+    "media_title": "Zielone światło — pieszy wciąż ma pierwszeństwo",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_049",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 24 ust. 8",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy na nagraniu zachowanie kierowcy jest prawidłowe, jeśli przed wyjściem z auta sprawdza tylko lusterko, a potem otwiera drzwi prawą ręką?",
+    "correct_answer": "NIE",
+    "media_notes": "Sama kontrola lusterka nie eliminuje martwego pola przy drzwiach. Technika Dutch Reach (otwieranie daleką ręką) zmusza do naturalnego obrotu ciała i sprawdzenia drogi dla rowerzystów. Sama prawa ręka — bez obrotu ciała — nie zapewnia bezpieczeństwa. Grafika: animacja otwierania drzwi.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.139.jpeg",
+    "media_title": "Dutch Reach vs. otwieranie bliską ręką",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  },
+  {
+    "id": "P1_050",
+    "wersja": 1,
+    "data_zatwierdzenia": "2026-05-25",
+    "kategoria_prawa_jazdy": "B",
+    "group": "P1",
+    "cel_dydaktyczny": "Ocena ryzyka",
+    "weight": 3,
+    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
+    "data_obowiazywania_przepisu": "2022-06-01",
+    "status": "Śmietnik",
+    "jezyki_tlumaczen": [
+      "pl"
+    ],
+    "type": "yn",
+    "part": "podstawowa",
+    "question": "Czy wjazd za linię sygnalizatora, który utrudniłby pieszym zejście z jezdni, jest zakazany?",
+    "correct_answer": "TAK",
+    "media_notes": "Nawet gdy świeci się zielone, kierowca nie może wjechać na skrzyżowanie, jeśli zatrzymanie się za sygnalizatorem utrudniłoby pieszym bezpieczne zejście z jezdni. Grafika: skrzyżowanie z pieszymi kończącymi przejście.",
+    "material_wizualny": "tak",
+    "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.102.jpeg",
+    "media_title": "Zakaz wjazdu utrudniającego zejście pieszym",
+    "group_label": "Niechronieni uczestnicy ruchu"
+  }
+]
