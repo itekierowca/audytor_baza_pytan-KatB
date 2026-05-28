@@ -1,1137 +1,831 @@
-{
-  "metadane_banku": {
-    "data_generowania": "2026-05-25",
-    "kategoria": "B",
-    "opis": "Probka pytan — po 3 na kazdy obszar P1-P9 i S1-S6 (45 pytan), z analiza grafik i animacji z pliku XLS",
-    "liczba_pytan_tak_nie": 27,
-    "liczba_pytan_abc": 18
-  },
-  "pytania": [
-    {
-      "id": "P1_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P1",
-      "group_label": "Niechronieni uczestnicy ruchu",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy pieszy przechodzący przez pierwszą połowę przejścia rozdzielonego wysepką ma już ustąpione pierwszeństwo do przejścia przez drugą połowę?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd W3.097 (IMAGE): każda połowa przejścia traktowana jest jako odrębne. Pieszy, który minął wysepkę, nie ma automatycznie pierwszeństwa na drugiej połowie — kierowca z drugiej nitki jezdni musi ustąpić oddzielnie. Grafika: dwa oddzielne przejścia z wysepką, pojazd po lewej zatrzymał się, pojazd po prawej jedzie — pieszy dopiero zbliża się do drugiej połowy.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.097.jpeg",
-      "media_title": "Przejście dla pieszych rozdzielone wysepką"
-    },
-    {
-      "id": "P1_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P1",
-      "group_label": "Niechronieni uczestnicy ruchu",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 27 ust. 1a",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy zbliżając się do przejazdu dla rowerzystów, kierowca ma obowiązek ustąpić pierwszeństwa osobie jadącej hulajnogą elektryczną?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd W3.123 (IMAGE): opis mówi wprost: ustąp pierwszeństwa osobie jadącej rowerem, hulajnogą elektryczną czy innym urządzeniem transportu osobistego. Grafika powinna pokazywać przejazd dla rowerzystów, na którym jedzie hulajnoga elektryczna (nie rower) — to kluczowy szczegół odróżniający pytanie. Dorysować hulajnogę elektryczną obok roweru lub zamiast niego.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_3.123.jpeg",
-      "media_title": "Zasady zachowania wobec rowerzystów i hulajnogi elektrycznej"
-    },
-    {
-      "id": "P1_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P1",
-      "group_label": "Niechronieni uczestnicy ruchu",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 2",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy przeglądając wyłącznie lusterka wsteczne i boczne, kierowca widzi wszystkie pojazdy jadące obok jego auta?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajdy W2.139–W2.140 (IMAGE): martwe pole to obszar obok pojazdu niewidoczny w żadnym z lusterek. Grafika: widok z góry pojazdu z zaznaczoną strefą martwego pola po bokach karoserii — obszary ciemne, niewidoczne w lusterkach. Kierowca przy kole — lusterka widoczne, strefa boczna pusta. Usunąć strzałkę sugerującą odpowiedź.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.140.jpeg",
-      "media_title": "Minimalizowanie efektu martwego pola"
-    },
-    {
-      "id": "P2_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P2",
-      "group_label": "Pierwszeństwo przejazdu i interakcja z ruchem",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 25 ust. 4",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy na skrzyżowaniu równorzędnym tramwaj nadjeżdżający z lewej strony ma pierwszeństwo przed samochodem jadącym z prawej?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd W3.036 (VIDEO): animacja — tramwaj wjeżdżający na skrzyżowanie niezależnie od strony ma bezwzględne pierwszeństwo przed samochodami. Animacja powinna wyraźnie pokazywać, że tramwaj jedzie z lewej (gdzie normalnie by nie miał pierwszeństwa), a samochód po prawej musi się zatrzymać. Nie sugerować odpowiedzi kolorem — nie zaznaczać czerwonym strzałki tramwaju.",
-      "media_url": "https://cdn.e-kierowca.pl/media/video/Wykład_3.036.mp4",
-      "media_title": "Pierwszeństwo pojazdów szynowych"
-    },
-    {
-      "id": "P2_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P2",
-      "group_label": "Pierwszeństwo przejazdu i interakcja z ruchem",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 25 ust. 3",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy wjeżdżając na rondo oznakowane znakiem A-7 (ustąp pierwszeństwa), masz obowiązek ustąpić wszystkim pojazdom jadącym już po rondzie?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd W3 video (VIDEO): animacja z rondem — pojazdy na rondzie mają pierwszeństwo przed wjeżdżającymi. Animacja pokazuje: pojazd zatrzymujący się przy wjeździe na rondo ze znakiem A-7, przepuszczający kolejno dwa samochody jadące po rondzie. Znak A-7 wyraźnie widoczny przy wjeździe.",
-      "media_url": "https://cdn.e-kierowca.pl/media/video/Slajd_49.mp4",
-      "media_title": "Pierwszeństwo przejazdu na skrzyżowaniu o ruchu okrężnym"
-    },
-    {
-      "id": "P2_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P2",
-      "group_label": "Pierwszeństwo przejazdu i interakcja z ruchem",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 25 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy posiadając pierwszeństwo na skrzyżowaniu równorzędnym, kierowca może bezpiecznie wjechać bez upewnienia się, że pojazd z lewej faktycznie ustępuje?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd W1.156 (VIDEO): zasada ograniczonego zaufania na skrzyżowaniu — pojazd z lewej nie respektuje zasad. Animacja: pojazd z prawej wjeżdża pewnie, pojazd z lewej nie zatrzymuje się. Nie kolorować który ma rację — pokazać sytuację neutralnie.",
-      "media_url": "https://cdn.e-kierowca.pl/media/video/Wykład_1.156.mp4",
-      "media_title": "Zasada ograniczonego zaufania na skrzyżowaniu"
-    },
-    {
-      "id": "P3_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P3",
-      "group_label": "Prędkość, odległość i ryzyko",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy zwiększenie prędkości o 10 km/h może wydłużyć drogę zatrzymania pojazdu o kilkanaście metrów?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd W4.082 (IMAGE): grafika ilustruje konkretny przykład — wzrost z 60 do 70 km/h wydłuża drogę zatrzymania o ok. 11 metrów. Grafika powinna porównywać dwie drogi zatrzymania: przy 60 km/h i 70 km/h — wyraźna różnica zaznaczona na skali. Opis ze slajdu mówi wprost o tych liczbach — można je pokazać. Nie dodawać strzałki czerwonej wskazującej odpowiedź.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_4.082.jpeg",
-      "media_title": "Wydłużenie drogi zatrzymania przy wzroście prędkości"
-    },
-    {
-      "id": "P3_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P3",
-      "group_label": "Prędkość, odległość i ryzyko",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy na oblodzonej nawierzchni droga hamowania może być kilkakrotnie dłuższa niż na suchej?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd W4.086 (IMAGE): grafika przedstawia wpływ warunków atmosferycznych na drogę hamowania — oblodzenie dramatycznie zmniejsza przyczepność. Opis slajdu mówi: na oblodzonej nawierzchni nie masz przyczepności — choćbyś miał nowe opony i dobre hamulce. Grafika: porównanie pasów hamowania na suchej, mokrej i oblodzonej jezdni — trzy wyraźnie różne długości. Nie oznaczać konkretnych metrów — pokazać proporcje.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_4.086.jpeg",
-      "media_title": "Wpływ warunków atmosferycznych na długość drogi hamowania"
-    },
-    {
-      "id": "P3_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P3",
-      "group_label": "Prędkość, odległość i ryzyko",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 2 pkt 3",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy prędkość bezpieczna zależy wyłącznie od ograniczeń wynikających ze znaków i przepisów?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd W4.028 (IMAGE): prędkość bezpieczna to nie liczba na znaku, lecz taka, przy której kierowca ma pełną kontrolę — zależy od warunków, widoczności, innych uczestników. Grafika: ta sama droga ze znakiem 90 — w słońcu i we mgle. Pojazd jedzie wolniej we mgle mimo identycznego znaku.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_4.079.jpeg",
-      "media_title": "Czas reakcji psychomotorycznej"
-    },
-    {
-      "id": "P4_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P4",
-      "group_label": "Pierwsza pomoc przedmedyczna",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 3,
-      "przepis_zrodlowy": "Wytyczne ERC 2015 — RKO",
-      "data_obowiazywania_przepisu": "2015-10-15",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy podczas resuscytacji krążeniowo-oddechowej (RKO) uciskanie klatki piersiowej wykonuje się z prostymi, prostopadłymi ramionami?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd 1593 (IMAGE): opis dokładnie instruuje: pochyl się nad poszkodowanym tak, by górna część tułowia znajdowała się nad klatką; ramiona wyprostuj, ustaw prostopadle do klatki piersiowej. Grafika: widok z boku — ratownik z wyprostowanymi ramionami, dłonie ułożone na środku klatki piersiowej poszkodowanego. Nie pokazywać błędnego ułożenia rąk ani ugiętych łokci.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/CD3_L11T1_093_uciski.jpg",
-      "media_title": "Uciskanie klatki piersiowej — technika RKO"
-    },
-    {
-      "id": "P4_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P4",
-      "group_label": "Pierwsza pomoc przedmedyczna",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 3,
-      "przepis_zrodlowy": "Wytyczne ERC 2015 — pozycja bezpieczna",
-      "data_obowiazywania_przepisu": "2015-10-15",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy nieprzytomny poszkodowany, który nie oddycha, powinien zostać ułożony w pozycji bocznej bezpiecznej?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd 1581 (IMAGE): RKO — jeśli poszkodowany NIE oddycha, konieczna jest resuscytacja. Pozycja boczna dotyczy TYLKO oddychających. Grafika: dwa schematy — (1) poszkodowany oddycha → pozycja boczna, (2) poszkodowany nie oddycha → RKO. Wyraźny podział bez wskazania odpowiedzi kolorem.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/CD3_L11T1_103_pozycja_bezpieczna.jpg",
-      "media_title": "Ułożenie poszkodowanego w pozycji bocznej bezpiecznej"
-    },
-    {
-      "id": "P4_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P4",
-      "group_label": "Pierwsza pomoc przedmedyczna",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Wytyczne ERC 2015 — wezwanie pomocy",
-      "data_obowiazywania_przepisu": "2015-10-15",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy wezwanie pogotowia na miejscu wypadku drogowego zwalnia kierowcę z obowiązku udzielenia pierwszej pomocy poszkodowanym?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd 1533 (IMAGE): opis mówi: działania pierwszej pomocy należy podejmować DO MOMENTU przybycia ZRM lub przejęcia przez inne osoby. Samo wezwanie nie zwalnia. Grafika: osoba dzwoniąca 112 i równocześnie wykonująca uciskanie klatki piersiowej. Oba działania jednocześnie.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/v3_SPSB_pierwsza_pomoc_004.jpg",
-      "media_title": "Podanie najistotniejszych informacji dyspozytorom"
-    },
-    {
-      "id": "P5_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P5",
-      "group_label": "Czynniki ryzyka — alkohol, zmęczenie, telefon",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 45 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy alkohol pogarsza koordynację ruchową, zawęża pole widzenia i wydłuża czas reakcji — nawet przy niskim stężeniu?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd 1410 (IMAGE): slajd wprost wymienia: koordynacja spada, czas reakcji się wydłuża, pole widzenia się zawęża, zdolność oceny odległości i prędkości się pogarsza — i to nie tylko po przekroczeniu progu. Grafika: schematyczny widok kierowcy z zaznaczonymi zawężonymi bocznymi strefami widzenia (tunelowy wzrok) oraz wydłużoną strzałką symbolizującą czas reakcji.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w10t1s14.jpg",
-      "media_title": "Zaburzenia wpływające na bezpieczeństwo jazdy — alkohol"
-    },
-    {
-      "id": "P5_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P5",
-      "group_label": "Czynniki ryzyka — alkohol, zmęczenie, telefon",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 45 ust. 2 pkt 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy jadąc z prędkością 130 km/h i patrząc na telefon przez 4 sekundy, kierowca przejedzie ponad 140 metrów bez kontroli wzroku nad drogą?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd 1168 (IMAGE): opis mówi dokładnie: na autostradzie przy 130 km/h w ciągu 4 sekund pokonujesz 150 metrów — dystans, w którym mieści się 7 samochodów. Grafika: prosta droga z zaznaczonym odcinkiem 150 m pokonanym w czasie spojrzenia na telefon, silhouetki 7 pojazdów zmieszczonych na tym odcinku. Nie pokazywać twarzy kierowcy z telefonem.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w7t1s32.jpg",
-      "media_title": "Telefon podczas jazdy — 150 metrów bez kontroli wzroku"
-    },
-    {
-      "id": "P5_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P5",
-      "group_label": "Czynniki ryzyka — alkohol, zmęczenie, telefon",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 45 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy zmęczenie i senność za kierownicą są mniej niebezpieczne niż jazda pod wpływem alkoholu?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd 1437 (IMAGE): zmęczenie i senność są tak samo niebezpieczne jak alkohol — odpowiadają za równie wysoką liczbę wypadków. Grafika: dwa równoległe słupki — alkohol i zmęczenie — zbliżone wartości. Nie używać symbolu alkoholu.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_10_T1_05_1920x1080.jpg",
-      "media_title": "Zagrożenia ze zmęczenia i senności"
-    },
-    {
-      "id": "P6_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P6",
-      "group_label": "Znaki i sygnalizacja — kontekst sytuacyjny",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 92 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy sygnał żółty na sygnalizatorze bezwzględnie zakazuje wjazdu za sygnalizator w każdej sytuacji?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd W5 VIDEO v3_L5T1_003.mp4: żółte = zakaz wjazdu, CHYBA ŻE zatrzymanie byłoby niemożliwe bez gwałtownego hamowania. Animacja: pojazd blisko linii gdy zapala się żółte — kontynuuje przejazd legalnie. Pokazać tę sytuację bez strzałki sugerującej odpowiedź.",
-      "media_url": "https://cdn.e-kierowca.pl/media/video/v3_L5T1_003.mp4",
-      "media_title": "Sygnał żółty nadawany przez sygnalizator"
-    },
-    {
-      "id": "P6_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P6",
-      "group_label": "Znaki i sygnalizacja — kontekst sytuacyjny",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 92 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy zielone światło na sygnalizatorze zezwala na wjazd za sygnalizator, gdy utrudniłoby to pieszym opuszczenie jezdni?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd W5 — IMAGE v3_L5T5_New001.jpg: specjalny slajd z ostrzeżeniem: sygnał zielony NIE zezwala na wjazd za sygnalizator, jeżeli ruch pojazdu utrudniłby pieszym opuszczenie jezdni. Grafika: skrzyżowanie z zielonym sygnałem, piesi kończący przejście (jeszcze na jezdni), samochód stojący przed linią mimo zielonego. Usuąć strzałkę sugerującą zakaz wjazdu — pokazać neutralnie sytuację i pozwolić kandydatowi ocenić.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/v3_L5T5_New001.jpg",
-      "media_title": "Sygnał zielony a obowiązek ustąpienia pieszym"
-    },
-    {
-      "id": "P6_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P6",
-      "group_label": "Znaki i sygnalizacja — kontekst sytuacyjny",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 5 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy widząc znak ostrzegawczy ze strzałką niebezpiecznego zakrętu w prawo, kierowca powinien zmniejszyć prędkość przed zakrętem, a nie podczas skręcania?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd W5.068 (IMAGE): znak ostrzegawczy — niebezpieczny zakręt w prawo. Grafika: droga z tym znakiem, zaznaczona strzałka wskazująca moment hamowania przed zakrętem (nie w trakcie). Obok zakrętnika umieścić pojazd zmniejszający prędkość przed wejściem w łuk. Nie rysować pojazdu hamującego w zakręcie — to błędne zachowanie.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_5.068.jpeg",
-      "media_title": "Znak ostrzegawczy — niebezpieczny zakręt w prawo"
-    },
-    {
-      "id": "P7_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P7",
-      "group_label": "Warunki drogowe i atmosferyczne",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy jadąc nocą za pojazdem poruszającym się z naprzeciwka, kierowca ma obowiązek wyłączyć światła drogowe, gdy tamten wyłączy swoje?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd W7.173 (IMAGE): opis mówi wprost: gdy wymija Cię pojazd z przeciwka i wyłączy światła drogowe, Ty również musisz to zrobić. Grafika: droga nocna, dwa pojazdy zbliżające się naprzeciw — widać moment przełączenia świateł przez oba pojazdy. Pojazdy powinny być w centrum kadru, bez silnych reflektorów oślepiających — neutralna nocna scena.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_7.173.jpeg",
-      "media_title": "Gdy mija Cię pojazd z naprzeciwka — obowiązek wyłączenia świateł drogowych"
-    },
-    {
-      "id": "P7_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P7",
-      "group_label": "Warunki drogowe i atmosferyczne",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy w trudnych warunkach atmosferycznych (deszcz, śnieg) należy zwiększyć odstęp od poprzedzającego pojazdu?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd W4.066 (IMAGE): opis mówi: deszcz, śnieg, błoto, mokre liście — wszystko to wydłuża drogę hamowania, w takich warunkach obowiązkowo zwiększ odstęp. Grafika: dwa pojazdy jadące w deszczu lub śniegu, między nimi wyraźnie zaznaczony zwiększony odstęp. Pogoda widoczna: krople deszczu lub płatki śniegu na jezdni. Nie pokazywać kolizji — pytanie jest o profilaktykę.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_4.066.jpeg",
-      "media_title": "Zwiększenie odstępu w trudnych warunkach atmosferycznych"
-    },
-    {
-      "id": "P7_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P7",
-      "group_label": "Warunki drogowe i atmosferyczne",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy prędkość bezpieczna zależy wyłącznie od znaków i przepisów, bez uwzględniania aktualnych warunków drogowych?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd W4.028 (IMAGE): prędkość bezpieczna to nie liczba na znaku. Grafika: ta sama droga z identycznym znakiem 90 — w słońcu i we mgle — pojazd jedzie wolniej we mgle. Nie zaznaczać odpowiedzi strzałką.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_4.028.jpeg",
-      "media_title": "Prędkość bezpieczna — więcej niż liczba na znaku"
-    },
-    {
-      "id": "P8_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P8",
-      "group_label": "Systemy ADAS i pojazdy elektryczne",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 3,
-      "przepis_zrodlowy": "Dyrektywa 2025/2205 UE — systemy ADAS",
-      "data_obowiazywania_przepisu": "2025-01-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy niesprawność kierunkowskazu może być sygnalizowana przez inny rytm migania kontrolki w desce rozdzielczej niż przy sprawnym układzie?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd w4t3s09.jpg: opis mówi: kontrolka może nie świecić lub świecić z inną częstotliwością — to sygnał usterki. Grafika: deska rozdzielcza z kontrolką kierunkowskazu — dwie częstotliwości migania: normalna (wolna) i awaryjna (szybka). Podpis: inny rytm = usterka.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w4t3s09.jpg",
-      "media_title": "Niesprawność działania kierunkowskazu — sygnalizacja usterki"
-    },
-    {
-      "id": "P8_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P8",
-      "group_label": "Systemy ADAS i pojazdy elektryczne",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Dyrektywa 2025/2205 UE — systemy ADAS",
-      "data_obowiazywania_przepisu": "2025-01-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "nie",
-      "part": "podstawowa",
-      "question": "Czy system ABS (zapobiegający blokowaniu kół) skraca drogę hamowania na każdym rodzaju nawierzchni?",
-      "correct_answer": "NIE",
-      "media_notes": "Brak dedykowanego slajdu o ABS w XLS — pytanie bez materiału wizualnego (material_wizualny: nie). ABS zapobiega blokowaniu kół i zachowuje kierowalność, ale na luźnej nawierzchni (żwir, głęboki śnieg) droga hamowania z ABS może być dłuższa niż bez niego. Główna zaleta ABS to utrzymanie sterowności, nie zawsze skrócenie drogi."
-    },
-    {
-      "id": "P8_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P8",
-      "group_label": "Systemy ADAS i pojazdy elektryczne",
-      "cel_dydaktyczny": "Wiedza",
-      "weight": 2,
-      "przepis_zrodlowy": "Dyrektywa 2025/2205 UE — EV do 4250 kg",
-      "data_obowiazywania_przepisu": "2026-01-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "nie",
-      "part": "podstawowa",
-      "question": "Czy od 2026 roku pojazdy elektryczne o dopuszczalnej masie całkowitej do 4250 kg można prowadzić na prawo jazdy kategorii B?",
-      "correct_answer": "TAK",
-      "media_notes": "Brak dedykowanego slajdu w XLS — pytanie bez materiału wizualnego. Przepis wynika z dyrektywy 2025/2205 — wyjątek dla EV uzasadniony wagą akumulatora. Standardowy limit kat. B to 3500 kg."
-    },
-    {
-      "id": "P9_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P9",
-      "group_label": "Pozostałe przepisy ogólne",
-      "cel_dydaktyczny": "Wiedza",
-      "weight": 1,
-      "przepis_zrodlowy": "Ustawa PoRD art. 38 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy od 2023 roku kierowca może okazać tymczasowe prawo jazdy w aplikacji mObywatel zamiast fizycznego dokumentu?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd w6t1s09.jpg: tymczasowe prawo jazdy w mObywatelu jest równoważne. Grafika: ekran smartfona z aplikacją — po zdanym egzaminie, bez czekania na fizyczną kartę.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w6t1s09.jpg",
-      "media_title": "Tymczasowe prawo jazdy w aplikacji mObywatel"
-    },
-    {
-      "id": "P9_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P9",
-      "group_label": "Pozostałe przepisy ogólne",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 1,
-      "przepis_zrodlowy": "Ustawa PoRD art. 39 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy obowiązek zapinania pasów bezpieczeństwa dotyczy wyłącznie jazdy poza obszarem zabudowanym?",
-      "correct_answer": "NIE",
-      "media_notes": "Slajd w7t1s04.jpg: pasy obowiązkowe bez wyjątku na wszystkich drogach publicznych. Grafika: dwa kadry — poza miastem i w centrum — w obu zapięty pas. Nie zaznaczać znaków miejscowości — neutralna kompozycja.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w7t1s04.jpg",
-      "media_title": "Obowiązek korzystania z pasów bezpieczeństwa"
-    },
-    {
-      "id": "P9_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "P9",
-      "group_label": "Pozostałe przepisy ogólne",
-      "cel_dydaktyczny": "Wiedza",
-      "weight": 1,
-      "przepis_zrodlowy": "Ustawa PoRD art. 39 ust. 3",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "yn",
-      "material_wizualny": "tak",
-      "part": "podstawowa",
-      "question": "Czy dziecko poniżej 150 cm wzrostu nie może zajmować siedzenia przedniego bez zainstalowanego fotelika lub urządzenia przytrzymującego?",
-      "correct_answer": "TAK",
-      "media_notes": "Slajd W7 (IMAGE) w7t1s21.jpg: opis wprost: dziecko poniżej 150 cm wzrostu nie może siedzieć z przodu, jeśli nie ma zainstalowanego fotelika. Grafika: widok wnętrza samochodu od strony pasażera — fotel przedni z prawidłowo zamontowanym fotelikiem dziecięcym. Nie pokazywać dziecka bez fotelika na przodzie — to błędna sytuacja i mogłaby sugerować odpowiedź.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w7t1s21.jpg",
-      "media_title": "Zasady przewożenia dzieci — fotel przedni"
-    },
-    {
-      "id": "S1_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S1",
-      "group_label": "Dynamika jazdy i ocena ryzyka",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 1 — fizyka jazdy",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Jadąc mokrą jezdnią z prędkością 80 km/h, tracisz nagle przyczepność i pojazd zaczyna się ślizgać (aquaplaning). Jak powinieneś zareagować?",
-      "opcja_a": "Trzymać kierownicę prosto, nie hamować gwałtownie ani nie skręcać — stopniowo zwalniać gazem",
-      "opcja_b": "Gwałtownie zahamować, by jak najszybciej zwolnić i odzyskać kontakt kół z nawierzchnią",
-      "opcja_c": "Skręcić gwałtownie w kierunku poślizgu, by wyrównać tor jazdy pojazdu",
-      "correct_answer": "A",
-      "media_notes": "Slajdy W4.085–.086 (IMAGE): aquaplaning — opona traci kontakt z nawierzchnią przez warstwę wody; gwałtowne hamowanie lub skręt pogłębiają utratę kontroli. Animacja: przekrój opony unoszącej się na wodzie + strzałki pokazujące błędne (A i C) i prawidłowe (B) zachowanie. Błędne strzałki zaznaczone X, prawidłowa strzałka zaznaczona checkmarkiem. Tło: mokra jezdnia z widocznymi kałużami.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_4.086.jpeg",
-      "media_title": "Wpływ warunków atmosferycznych — aquaplaning"
-    },
-    {
-      "id": "S1_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S1",
-      "group_label": "Dynamika jazdy i ocena ryzyka",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 1 — fizyka jazdy",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Jak zmieni się droga hamowania Twojego pojazdu, jeśli prędkość wzrośnie z 50 do 100 km/h (dwukrotnie)?",
-      "opcja_a": "Droga hamowania będzie dwukrotnie dłuższa — rośnie proporcjonalnie do prędkości",
-      "opcja_b": "Droga hamowania będzie czterokrotnie dłuższa — rośnie proporcjonalnie do kwadratu prędkości",
-      "opcja_c": "Droga hamowania będzie trzykrotnie dłuższa — efekt potęgowania prędkości jest częściowy",
-      "correct_answer": "B",
-      "media_notes": "Slajd W4.077 (IMAGE): definicja drogi hamowania i zasada fizyczna. Slajd W4.088 (IMAGE): wzrost prędkości i wzrost drogi hamowania — grafika z proporcjami. Animacja: oś prędkości z dwoma zaznaczonymi punktami (50 i 100 km/h), obok oś drogi hamowania z pokazaną czterokrotnością. Nie pokazywać konkretnych metrów — skupić się na proporcji 1:4.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_4.077.jpeg",
-      "media_title": "Droga hamowania — definicja i zależność od prędkości"
-    },
-    {
-      "id": "S1_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S1",
-      "group_label": "Dynamika jazdy i ocena ryzyka",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 1 — fizyka jazdy",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "nie",
-      "part": "specjalistyczna",
-      "question": "Jadąc autostradą pęka przednia prawa opona. Jak powinieneś zareagować?",
-      "opcja_a": "Natychmiast zaciągnąć hamulec postojowy, by szybko zmniejszyć prędkość i zjechać na pobocze",
-      "opcja_b": "Trzymać mocno kierownicę, nie hamować gwałtownie, stopniowo zwalniać przepustnicą i zjechać na pobocze",
-      "opcja_c": "Mocno skręcić w prawo, by natychmiast opuścić pas ruchu i uniknąć dalszej jazdy na uszkodzonej oponie",
-      "media_notes": "Slajdy W9 (IMAGE): postępowanie w przypadku uszkodzenia opony — seria slajdów 1241–1254. Gwałtowne hamowanie lub skręt przy pęknięciu opony prowadzi do utraty kontroli. Prawidłowa reakcja: utrzymanie kierownicy, stopniowe hamowanie silnikiem, spokojna zmiana na pobocze. Brak konkretnego slajdu pasującego do pytania autostrady — pytanie bez materiału wizualnego.",
-      "correct_answer": "B"
-    },
-    {
-      "id": "S2_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S2",
-      "group_label": "Manewry i technika jazdy",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 22 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Przed zmianą pasa ruchu w lewo na drodze trójpasmowej, jaką kolejność czynności powinieneś zachować?",
-      "opcja_a": "Sprawdzić lusterko tylne i boczne lewe, spojrzeć przez ramię w lewo (martwe pole), włączyć kierunkowskaz, poczekać na bezpieczny odstęp, zmienić pas",
-      "opcja_b": "Włączyć kierunkowskaz i natychmiast zmienić pas — sygnalizacja wystarczy, by poinformować innych",
-      "opcja_c": "Sprawdzić tylko lusterko boczne lewe, włączyć kierunkowskaz i zmienić pas — martwe pole jest nieistotne",
-      "correct_answer": "A",
-      "media_notes": "Slajdy W2.133 (IMAGE) zmiana pasa + W2.139 (IMAGE) martwe pole: oba slajdy razem tworzą pełną procedurę. Grafika: widok z góry pojazdu — sekwencja czterech kroków: (1) sprawdzenie lusterka tylnego, (2) lusterka bocznego lewego, (3) obrót głowy w lewo — zaznaczone martwe pole, (4) włączony kierunkowskaz, (5) zmiana pasa. Strzałki ponumerowane, bez kolorowania błędnych opcji.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.139.jpeg",
-      "media_title": "Zjawisko martwego pola przy zmianie pasa ruchu"
-    },
-    {
-      "id": "S2_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S2",
-      "group_label": "Manewry i technika jazdy",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 22 ust. 5",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Każdy manewr, który wykonujesz na drodze — zmiana kierunku, zmiana pasa, zawracanie — musi być sygnalizowany kierunkowskazem:",
-      "opcja_a": "Tylko gdy w pobliżu są inni uczestnicy ruchu — gdy droga jest pusta, sygnalizacja nie jest potrzebna",
-      "opcja_b": "Zawsze i odpowiednio wcześniej, niezależnie od tego, czy widzisz innych uczestników ruchu",
-      "opcja_c": "Tylko przy zmianie kierunku jazdy — zmiana pasa na autostradzie nie wymaga sygnalizacji",
-      "correct_answer": "B",
-      "media_notes": "Slajd W2.159 (IMAGE): tytuł i opis mówią wprost: każdy manewr musi być wyraźnie i odpowiednio wcześnie zasygnalizowany — nie chodzi tylko o przepis, ale o bezpieczeństwo. Grafika: trzy miniaturowe sceny — (1) zmiana pasa z włączonym kierunkowskazem, (2) skręt w lewo z kierunkowskazem, (3) zawracanie z kierunkowskazem. Każda scena z włączonym kierunkowskazem widocznym z tyłu pojazdu.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.159.jpeg",
-      "media_title": "Sygnalizowanie wykonywanych manewrów"
-    },
-    {
-      "id": "S2_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S2",
-      "group_label": "Manewry i technika jazdy",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 3,
-      "przepis_zrodlowy": "Ustawa PoRD art. 23 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Jedziesz lewym pasem drogi dwujezdniowej i nie wyprzedzasz. Jak powinieneś postąpić?",
-      "opcja_a": "Kontynuować jazdę lewym pasem — ruch jest płynny i zmiana pasa byłaby niepotrzebną przeszkodą dla ruchu",
-      "opcja_b": "Zjechać na prawy pas — lewy pas służy do wyprzedzania i skrętu w lewo, nie do jazdy ciągłej",
-      "opcja_c": "Zjechać na prawy pas, ale tylko wtedy, gdy za Tobą jedzie pojazd chcący wyprzedzać",
-      "correct_answer": "B",
-      "media_notes": "Slajd W2.009 (IMAGE): tytuł: Jazda lewym pasem — opis mówi: częsty błąd: jazda lewym pasem gdy prawy jest pusty. Lewy pas przeznaczony jest do wyprzedzania. Grafika: widok z góry drogi dwujezdniowej — samochód jedzie lewym pasem, prawy pas pusty, strzałka wskazuje: zjechaj na prawy. Nie rysować samochodu z tyłu jako powodu do zmiany pasa — zmiana wynika z zasady, nie z obecności innego pojazdu.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.009.jpeg",
-      "media_title": "Jazda lewym pasem — błąd i prawidłowe zachowanie"
-    },
-    {
-      "id": "S3_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S3",
-      "group_label": "Układy bezpieczeństwa pojazdu",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 2,
-      "przepis_zrodlowy": "Dyrektywa 2025/2205 UE — systemy bezpieczeństwa",
-      "data_obowiazywania_przepisu": "2025-01-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Poduszka powietrzna chroni skutecznie tylko wtedy, gdy pasażer ma zapięty pas bezpieczeństwa. Dlaczego?",
-      "opcja_a": "Pas i poduszka to niezależne systemy — razem podwajają ochronę, lecz każdy z osobna jest wystarczający",
-      "opcja_b": "Bez zapiętego pasa napełniająca się poduszka może uderzyć w lecącą ku niej sylwetkę i spowodować dodatkowe obrażenia",
-      "opcja_c": "Bez zapiętego pasa poduszka nie zadziała — czujnik pasa blokuje jej wyzwolenie",
-      "correct_answer": "B",
-      "media_notes": "Slajd W7 (IMAGE) w7t1s16.jpg: opis mówi wprost: poduszki chronią skutecznie tylko z zapiętymi pasami. Bez pasów poduszka może nawet zaszkodzić — wywołując dodatkowe obrażenia. W czasie kolizji niezapięty pasażer staje się zagrożeniem. Grafika: schemat — dwie sytuacje: (1) pasażer z pasem — poduszka napełnia się, głowa ląduje miękko, (2) pasażer bez pasa — ciało leci ku napełniającej się poduszce — czerwony X (ale nie sugerować odpowiedzi — pokazać neutralnie).",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w7t1s16.jpg",
-      "media_title": "Poduszki powietrzne działają dobrze tylko z zapiętymi pasami"
-    },
-    {
-      "id": "S3_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S3",
-      "group_label": "Układy bezpieczeństwa pojazdu",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 39 ust. 3",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Fotelik dziecięcy montowany tyłem do kierunku jazdy zainstalowany jest na fotelu pasażera z aktywną poduszką powietrzną. Jak to wpłynie na bezpieczeństwo dziecka w razie wypadku?",
-      "opcja_a": "Poduszka zadziała prawidłowo i ochroni dziecko — jest zaprojektowana do pracy z fotelikiem",
-      "opcja_b": "Poduszka uderzy z ogromną siłą w tył fotelika zwróconego ku niej i może spowodować śmiertelne obrażenia głowy dziecka",
-      "opcja_c": "Poduszka nie zadziała — czujnik wagowy na siedzeniu wykryje fotelik i zablokuje jej wyzwolenie",
-      "correct_answer": "B",
-      "media_notes": "Slajd W7 (IMAGE) w7t1s21.jpg: zakaz umieszczania dziecka z przodu bez fotelika, powiązany z ryzykiem poduszki. Grafika: schemat boczny — fotelik tyłem, poduszka napełnia się w kierunku fotelikowego zaglówka — strzałka siły uderzenia. Podpis: NIE instaluj fotelika tyłem przy aktywnej poduszce. Nie pokazywać dziecka — tylko fotelik (ochrona prywatności i wrażliwości treści).",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w7t1s21.jpg",
-      "media_title": "Zasady przewożenia dzieci — fotelik a poduszka powietrzna"
-    },
-    {
-      "id": "S3_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S3",
-      "group_label": "Układy bezpieczeństwa pojazdu",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 2,
-      "przepis_zrodlowy": "Dyrektywa 2025/2205 UE — systemy bezpieczeństwa",
-      "data_obowiazywania_przepisu": "2025-01-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "nie",
-      "part": "specjalistyczna",
-      "question": "Podczas nagłego hamowania na suchej jezdni bez ABS koła pojazdu blokują się. Jaka jest główna konsekwencja dla kierowcy?",
-      "opcja_a": "Zablokowane koła nie mają istotnego wpływu na kierowalność — pojazd reaguje normalnie",
-      "opcja_b": "Pojazd zatrzymuje się szybciej — zablokowane koła generują większy opór tarcia",
-      "opcja_c": "Pojazd traci kierowalność — skręcanie kierownicą nie zmienia toru jazdy, dopóki koła są zablokowane",
-      "correct_answer": "C",
-      "media_notes": "Brak dedykowanego slajdu ABS w XLS. Zasada fizyczna: zablokowane koło ślizga się po nawierzchni — siła boczna (niezbędna do zmiany toru) spada prawie do zera. Kierownica nie działa. ABS zapobiega blokowaniu, zachowując kierowalność. Pytanie bez materiału wizualnego."
-    },
-    {
-      "id": "S4_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S4",
-      "group_label": "Obsługa i eksploatacja pojazdu",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 66 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Podczas jazdy zapala się czerwona kontrolka oleju silnikowego. Co powinieneś zrobić?",
-      "opcja_a": "Natychmiast bezpiecznie zatrzymać pojazd i wyłączyć silnik — jazda grozi nieodwracalnym uszkodzeniem silnika",
-      "opcja_b": "Kontynuować jazdę ostrożnie i sprawdzić poziom oleju przy najbliższej stacji",
-      "opcja_c": "Zmniejszyć prędkość i dotrzeć do warsztatu — olej zapewne tylko lekko spada",
-      "correct_answer": "A",
-      "media_notes": "Slajd W9 (IMAGE) w9t6s32.jpg: opis mówi: olej silnikowy to nie tylko smar — to ochrona. Za niski poziom oznacza ryzyko zatarcia silnika. Slajd W9 (IMAGE) w9t6s08.jpg: reakcja na nieprawidłowości — natychmiastowe zatrzymanie. Grafika: deska rozdzielcza z widoczną czerwoną lampką oleju, obok ikona silnika z ostrzeżeniem. Strzałka wskazuje: zatrzymaj pojazd. Nie pokazywać mechanika — tylko lampkę i decyzję.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w9t6s08.jpg",
-      "media_title": "Reakcja na nieprawidłowości w układach pojazdu"
-    },
-    {
-      "id": "S4_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S4",
-      "group_label": "Obsługa i eksploatacja pojazdu",
-      "cel_dydaktyczny": "Wiedza",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 66 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Opony na jednej osi muszą spełniać określony wymóg jednorodności. Jaki?",
-      "opcja_a": "Muszą być tej samej marki — mieszanie marek na jednej osi jest niedopuszczalne",
-      "opcja_b": "Muszą być tego samego typu i mieć taką samą rzeźbę bieżnika — to kluczowe dla przyczepności i stabilności",
-      "opcja_c": "Wymagana jest jedynie taka sama szerokość opony — typ i bieżnik mogą być różne",
-      "correct_answer": "B",
-      "media_notes": "Slajd W6 (IMAGE) w6t2s21.jpg: opis mówi: na jednej osi muszą znajdować się opony tego samego typu i z taką samą rzeźbą bieżnika — kluczowe dla przyczepności i stabilności podczas hamowania. Grafika: oś pojazdu z dwoma oponami — oba koła z identycznym bieżnikiem. Obok kontrprzykład: dwa koła z różnym bieżnikiem — oznaczone jako niedopuszczalne (czerwony X subtelny, nie dominujący).",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w6t2s21.jpg",
-      "media_title": "Ogumienie pneumatyczne — jednorodność na osi"
-    },
-    {
-      "id": "S4_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S4",
-      "group_label": "Obsługa i eksploatacja pojazdu",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 66 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Jaka jest minimalna dopuszczalna głębokość bieżnika letnich opon samochodu osobowego i co oznacza, gdy zbliżamy się do tej granicy?",
-      "opcja_a": "Minimum wynosi 1,6 mm — po osiągnięciu tej granicy opona jest bezpieczna, bo projektanci przewidzieli tę wartość jako margines",
-      "opcja_b": "Minimum wynosi 1,6 mm — przy granicy zużycia ryzyko aquaplaningu i wydłużona droga hamowania na mokrym wyraźnie rosną",
-      "opcja_c": "Minimum wynosi 3 mm — opona z bieżnikiem 1,6 mm jest prawnie niedopuszczalna do użytku",
-      "correct_answer": "B",
-      "media_notes": "Slajd W6 (IMAGE) w6t2s22.jpg: opis mówi: minimum 1,6 mm — jeśli brak wskaźnika zużycia, należy regularnie sprawdzać. Slajd W9 (IMAGE) w9t6s53.jpg: zbyt płytki bieżnik to większe ryzyko aquaplaningu. Grafika: przekrój opony z zaznaczoną głębokością bieżnika: jedna opona ma 5 mm (bezpieczna), druga 1,6 mm (granica) — widoczna różnica w rowkach odprowadzających wodę. Pod oponami: mokra jezdnia.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/w6t2s22.jpg",
-      "media_title": "Zużycie bieżnika w oponach — minimum i konsekwencje"
-    },
-    {
-      "id": "S5_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S5",
-      "group_label": "Sygnalizacja między uczestnikami ruchu",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 29 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Zbliżasz się do przystanku autobusowego w obszarze zabudowanym. Autobus stoi i zamierza wjechać na jezdnię. Jak powinieneś postąpić?",
-      "opcja_a": "Kontynuować jazdę z niezmienioną prędkością — autobus musi czekać aż przejadą wszystkie pojazdy",
-      "opcja_b": "Zwolnić i jeśli trzeba zatrzymać się, aby umożliwić autobusowi wyjazd z zatoki — autobus ma pierwszeństwo po sygnalizacji",
-      "opcja_c": "Wyprzedzić autobus szybko po lewej, zanim zdąży wyjeżdżać — wyprzedzanie postoju jest bezpieczne",
-      "correct_answer": "B",
-      "media_notes": "Slajd W2.032 (IMAGE): tytuł: Wjazd autobusu z oznakowanego przystanku w obszarze zabudowanym — opis mówi: gdy zbliżasz się do przystanku autobusowego w obszarze zabudowanym, zwolnij, a jeśli trzeba — zatrzymaj się. Grafika: autobus przy przystanku z włączonym prawym kierunkowskazem, samochód zwalniający za autobusem. Wyraźny kierunkowskaz autobusu jako sygnał wyjazdu — nie sugerować odpowiedzi strzałką.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.032.jpeg",
-      "media_title": "Wjazd autobusu z oznakowanego przystanku"
-    },
-    {
-      "id": "S5_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S5",
-      "group_label": "Sygnalizacja między uczestnikami ruchu",
-      "cel_dydaktyczny": "Wiedza",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 29 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Osoba kierująca ruchem stoi bokiem i wykonuje gest ręką w Twoją stronę. Co to oznacza?",
-      "opcja_a": "Nakaz zatrzymania się — gest boczny zawsze oznacza stop dla kierujących naprzeciw",
-      "opcja_b": "Zmiana kierunku ruchu — gest boczny nakazuje skręcenie",
-      "opcja_c": "Otwarcie kierunku ruchu — kierunek, w którym stoi bokiem, jest dozwolony do jazdy",
-      "correct_answer": "C",
-      "media_notes": "Slajd W5 (VIDEO) v3_SPSB_L6T3_031_2.mp4: animacja — osoba kierująca ruchem stojąca bokiem z gestem ręką otwiera kierunek ruchu dla pojazdów z tej strony. Klatka zatrzymana lub sekwencja: osoba stoi bokiem, pojazdy z odpowiadającego kierunku przejeżdżają. Opis mówi: gest boczny = otwarty kierunek ruchu. Nie używać napisów opisujących odpowiedź.",
-      "media_url": "https://cdn.e-kierowca.pl/media/video/v3_SPSB_L6T3_031_2.mp4",
-      "media_title": "Postawa kierującego ruchem — otwarcie kierunku ruchu"
-    },
-    {
-      "id": "S5_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S5",
-      "group_label": "Sygnalizacja między uczestnikami ruchu",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 22 ust. 5",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Kierowca omija wolno jadący pojazd, ale nie musi zmieniać pasa ruchu. Czy powinien włączyć kierunkowskaz?",
-      "opcja_a": "Tak — każde omijanie wymaga sygnalizacji kierunkowskazem, niezależnie od zmiany pasa",
-      "opcja_b": "Nie — jeśli omijanie nie wymaga zmiany pasa ruchu, nie sygnalizujemy go kierunkowskazem",
-      "opcja_c": "Tak — kierunkowskaz jest wymagany zawsze, gdy zbliżamy się bliżej niż 1 metr do innego pojazdu",
-      "correct_answer": "B",
-      "media_notes": "Slajd W2.050 (IMAGE): tytuł: Sygnalizowanie manewru omijania — opis mówi wyraźnie: jeżeli podczas omijania nie zmieniamy pasa ruchu, wówczas manewru tego nie sygnalizujemy. Grafika: widok z góry — pojazd omijający pieszą przeszkodę na tym samym pasie, kierunkowskaz wyłączony. Obok: kontrprzykład — omijanie z wyjazdem na sąsiedni pas — kierunkowskaz włączony. Dwa wyraźnie rozróżnione przypadki.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_2.050.jpeg",
-      "media_title": "Sygnalizowanie manewru omijania — kiedy nie jest wymagane"
-    },
-    {
-      "id": "S6_201",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S6",
-      "group_label": "Przepisy szczegółowe kat. B",
-      "cel_dydaktyczny": "Rozumienie",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 88 ust. 1 pkt 1 — przyczepa",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Masz prawo jazdy kat. B i chcesz holować przyczepę. Łączna masa zestawu (pojazd + przyczepa) ma wynieść 4200 kg. Czy to możliwe bez dodatkowych uprawnień?",
-      "opcja_a": "Tak — kat. B pozwala holować przyczepę jeśli DMC zestawu nie przekracza 3500 kg",
-      "opcja_b": "Tak, pod warunkiem że przyczepa jest lekka i ma hamulec najazdowy",
-      "opcja_c": "Nie — łączna masa zestawu przekracza 3500 kg DMC, wymagana jest kat. B+E lub kod 96",
-      "correct_answer": "C",
-      "media_notes": "Slajd W8.076 (IMAGE): opis: jeśli łączna DMC przekracza 3,5 tony, nie wystarczy zwykła kat. B — potrzebna kat. E lub kod 96. Grafika: schemat zestawu pojazd-przyczepa z zaznaczonymi masami: pojazd 1900 kg + przyczepa 2300 kg = 4200 kg > 3500 kg. Czerwona strzałka przy limicie 3500 kg. Nie sugerować odpowiedzi przez układ graficzny.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_8.076.jpg",
-      "media_title": "Różnice w prowadzeniu zespołu pojazdów — limit DMC"
-    },
-    {
-      "id": "S6_202",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S6",
-      "group_label": "Przepisy szczegółowe kat. B",
-      "cel_dydaktyczny": "Wiedza",
-      "weight": 2,
-      "przepis_zrodlowy": "Ustawa PoRD art. 88 ust. 1 — prędkość podczas holowania",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Holujesz uszkodzony pojazd poza obszarem zabudowanym. Jaka jest maksymalna dopuszczalna prędkość?",
-      "opcja_a": "50 km/h — taki sam limit jak w obszarze zabudowanym",
-      "opcja_b": "60 km/h — zarówno poza obszarem zabudowanym, jak i na drodze ekspresowej i autostradzie",
-      "opcja_c": "80 km/h poza obszarem zabudowanym, 60 km/h na autostradzie",
-      "correct_answer": "B",
-      "media_notes": "Slajdy W4.054–.056 (IMAGE): seria slajdów o prędkości podczas holowania: poza obszarem zabudowanym — 60 km/h; droga ekspresowa — 60 km/h; autostrada — 60 km/h. Grafika: trzy drogi z różnymi znakami obszaru (obszar zabudowany, droga ekspresowa, autostrada) — nad każdą ten sam licznik: 60 km/h. Podkreślić jednolitość limitu we wszystkich trzech sytuacjach.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_4.054.jpeg",
-      "media_title": "Prędkość podczas holowania pojazdu poza obszarem zabudowanym"
-    },
-    {
-      "id": "S6_203",
-      "wersja": 1,
-      "data_zatwierdzenia": "2026-05-25",
-      "kategoria_prawa_jazdy": "B",
-      "group": "S6",
-      "group_label": "Przepisy szczegółowe kat. B",
-      "cel_dydaktyczny": "Ocena ryzyka",
-      "weight": 1,
-      "przepis_zrodlowy": "Ustawa PoRD art. 57 ust. 1",
-      "data_obowiazywania_przepisu": "2022-06-01",
-      "status": "Roboczy",
-      "jezyki_tlumaczen": [
-        "pl"
-      ],
-      "type": "abc",
-      "material_wizualny": "tak",
-      "part": "specjalistyczna",
-      "question": "Holując przyczepę na autostradzie zauważasz, że zaczyna ona wężykować (oscylować boczne). Jak powinieneś zareagować?",
-      "opcja_a": "Gwałtownie zahamować — zatrzymanie oscylacji wymaga szybkiego zmniejszenia prędkości",
-      "opcja_b": "Mocno skręcić w kierunku wężykowania, by wyrównać ruch przyczepy względem pojazdu ciągnącego",
-      "opcja_c": "Stopniowo zwalniać bez gwałtownego hamowania, trzymać kierownicę prosto i nie wykonywać gwałtownych manewrów",
-      "correct_answer": "C",
-      "media_notes": "Slajd W8.076 (IMAGE): różnice w prowadzeniu zespołu pojazdów — opis wspomina o trudniejszym prowadzeniu zestawu. Grafika: widok z góry pojazdu z przyczepą — przyczepa oscyluje boczne (zaznaczone strzałkami). Trzy scenariusze: A — gwałtowne hamowanie (X), B — gwałtowny skręt (X), C — stopniowe zwalnianie, prosta kierownica (check). Nie kolorować wyraźnie prawidłowego.",
-      "media_url": "https://cdn.e-kierowca.pl/media/image/Wykład_8.076.jpg",
-      "media_title": "Prowadzenie zespołu pojazdów — wężykowanie przyczepy"
-    }
-  ]
-}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDE-Auditor - Baza Pytań Kat. B</title>
+    <!-- Tailwind CSS do szybkiej i responsywnej stylizacji -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .transition-all-300 {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Customowy scrollbar dla ciemnego motywu */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        /* Styl dla aktywnej strefy upuszczania pliku */
+        .drag-over-zone {
+            border: 3px dashed #10b981 !important;
+            background-color: rgba(16, 185, 129, 0.08) !important;
+        }
+    </style>
+</head>
+<body id="app-body" class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- ASYNCHRONICZNY EKRAN ŁADOWANIA DLA DUŻYCH BAZ -->
+    <div id="loading-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center hidden p-4 text-center">
+        <div class="relative w-20 h-20 mb-6">
+            <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-t-emerald-500 animate-spin"></div>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Przetwarzanie i optymalizacja bazy pytań...</h3>
+        <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
+            Nasz inteligentny silnik naprawia strukturę bazy, koryguje cudzysłowy drukarskie, uzupełnia brakujące przecinki i optymalizuje układ pytań, aby Safari i Chrome działały niezwykle płynnie.
+        </p>
+    </div>
+
+    <!-- SYSTEM POWIADOMIEŃ TOAST -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none"></div>
+
+    <!-- OKNO DIALOGOWE KOMUNIKATÓW I BŁĘDÓW -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl transform scale-95 transition-all duration-300" id="modal-box">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div id="modal-icon-container" class="p-3 rounded-xl bg-slate-800 text-emerald-400 border border-slate-750 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 id="modal-title" class="text-lg font-bold text-white">Komunikat systemowy</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="mt-4 space-y-3">
+                <p id="modal-message" class="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap"></p>
+                <div id="modal-debug-container" class="hidden">
+                    <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Miejsce błędu w strukturze:</span>
+                    <pre id="modal-debug-content" class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-rose-400 overflow-x-auto whitespace-pre-wrap leading-relaxed"></pre>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="closeModal()" class="bg-slate-850 hover:bg-slate-800 text-slate-200 px-5 py-2.5 rounded-xl text-sm font-semibold border border-slate-755 transition">
+                    Zamknij okno
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP BAR / NAGŁÓWEK -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-emerald-500 to-teal-400 p-2.5 rounded-xl shadow-lg shadow-emerald-500/10 text-slate-950 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-white flex items-center gap-2">
+                        GDE-Auditor <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded border border-emerald-500/20 font-mono">MATRYCA GDE</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400">Kompatybilność: Przepisy źródłowe i podstawy prawne GDE</p>
+                </div>
+            </div>
+
+            <!-- AKTUALNY PROFIL I WYBÓR BAZY -->
+            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end text-xs">
+                
+                <!-- SELECTOR AKTYWNEJ BAZY -->
+                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5">
+                    <span class="text-slate-400 font-semibold flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                        Baza:
+                    </span>
+                    <select id="db-selector" onchange="switchDatabase(this.value)" class="bg-transparent text-white font-bold outline-none cursor-pointer">
+                        <option value="demo" class="bg-slate-900">Baza demonstracyjna</option>
+                    </select>
+                </div>
+
+                <!-- PROFIL AUDYTERA -->
+                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5">
+                    <span class="text-slate-400 font-semibold flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Użytkownik:
+                    </span>
+                    <input type="text" id="username-input" value="rafalmatuszak" oninput="updateUsername(this.value)" class="bg-transparent text-emerald-400 font-bold outline-none border-b border-transparent hover:border-slate-500 focus:border-emerald-500 w-28 text-center transition">
+                </div>
+
+                <!-- MENU EKSPORTU (DROPDOWN GROUP) -->
+                <div class="relative inline-block text-left w-full sm:w-auto" id="export-dropdown-container">
+                    <button onclick="toggleExportDropdown()" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold px-4 py-2 rounded-xl border border-slate-700 transition-all-300 flex items-center justify-center gap-2 w-full" id="export-menu-button">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <span>Eksportuj bazę...</span>
+                        <svg class="w-3 h-3 text-slate-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+
+                    <div id="export-dropdown-menu" class="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-2xl bg-slate-900 border border-slate-800 focus:outline-none hidden z-50 p-1.5">
+                        <button onclick="triggerExport('all')" class="text-slate-200 hover:bg-slate-800 hover:text-white group flex items-center w-full px-3 py-2.5 text-xs font-medium rounded-lg transition text-left">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-400 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Eksportuj wszystko (JSON)
+                        </button>
+                        <button onclick="triggerExport('approved')" class="text-slate-200 hover:bg-slate-800 hover:text-white group flex items-center w-full px-3 py-2.5 text-xs font-medium rounded-lg transition text-left">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-400 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Eksportuj zatwierdzone
+                        </button>
+                        <button onclick="triggerExport('review')" class="text-slate-200 hover:bg-slate-800 hover:text-white group flex items-center w-full px-3 py-2.5 text-xs font-medium rounded-lg transition text-left">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-rose-400 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            Eksportuj do poprawy
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- UKŁAD GŁÓWNY -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row gap-6">
+        
+        <!-- PANEL LEWY: NAWIGACJA, STATYSTYKI I IMPORT -->
+        <aside class="w-full lg:w-80 shrink-0 flex flex-col gap-5">
+            
+            <!-- PRZEŁĄCZNIK ZAKŁADEK -->
+            <div class="bg-slate-900 p-1.5 rounded-2xl border border-slate-800 flex flex-col gap-1">
+                <button id="btn-tab-browse" onclick="switchTab('browse')" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 bg-emerald-600 text-slate-950 shadow-md">
+                    <span class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        Przegląd Działów i Pytań
+                    </span>
+                    <span id="badge-total-count" class="bg-slate-950 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">0</span>
+                </button>
+                <button id="btn-tab-exam" onclick="switchTab('exam')" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all-300 text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <span class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        Generator Zestawów GDE
+                    </span>
+                    <span class="bg-slate-800 text-slate-400 text-[9px] px-2 py-0.5 rounded uppercase font-bold">32 pyt.</span>
+                </button>
+            </div>
+
+            <!-- PANEL INTERAKTYWNEGO IMPORTU -->
+            <div id="drop-zone" class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-sm transition-all duration-200">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    Załaduj lub dodaj bazę pytań
+                </h3>
+                <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                    Przeciągnij i upuść plik z bazą, wgraj plik z dysku lub wklej bezpośrednio tekst poniżej. Obsługuje format standardowy oraz nowy zagnieżdżony.
+                </p>
+
+                <!-- METODA IMPORTU: ZASTĄP / SCAL -->
+                <div class="bg-slate-950 p-2 rounded-xl border border-slate-850 flex items-center justify-around mb-3 text-xs">
+                    <span class="text-slate-500 font-bold text-[10px] uppercase">Metoda:</span>
+                    <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-300 select-none">
+                        <input type="radio" name="import-mode" value="replace" checked class="accent-emerald-500 h-3.5 w-3.5 bg-slate-950 border-slate-800 rounded">
+                        <span>Zastąp</span>
+                    </label>
+                    <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-300 select-none">
+                        <input type="radio" name="import-mode" value="append" class="accent-emerald-500 h-3.5 w-3.5 bg-slate-950 border-slate-800 rounded">
+                        <span class="text-emerald-400 font-semibold">Scal (Dodaj)</span>
+                    </label>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Wybór pliku -->
+                    <label class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-700 transition cursor-pointer flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Wgraj plik (.txt / .json)
+                        <input type="file" id="file-input" accept=".txt,.json" class="hidden" onchange="handleFileSelect(event)">
+                    </label>
+
+                    <!-- Wklejanie bezpośrednie -->
+                    <div class="space-y-1.5">
+                        <textarea id="direct-textarea" placeholder="Wklej tutaj skopiowaną treść bazy (JSON)..." class="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-[10px] font-mono focus:ring-1 focus:ring-emerald-500 outline-none resize-none placeholder:text-slate-700"></textarea>
+                        <button onclick="handleDirectPaste()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Zatwierdź i importuj
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PODSUMOWANIE STATYSTYK AUDYTU -->
+            <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.003 9.003 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                    Postęp Weryfikacji
+                </h3>
+                <div class="space-y-3.5 text-xs">
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
+                        <span class="text-slate-400 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-slate-600"></span> Wszystkich pytań:
+                        </span>
+                        <span id="stat-total" class="font-mono font-bold text-slate-200">0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
+                        <span class="text-emerald-400 font-medium flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Zatwierdzone:
+                        </span>
+                        <span id="stat-approved" class="font-mono font-bold text-emerald-400">0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
+                        <span class="text-rose-400 font-medium flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-rose-500"></span> Do poprawy:
+                        </span>
+                        <span id="stat-review" class="font-mono font-bold text-rose-400">0</span>
+                    </div>
+                    <!-- ŚMIETNIK W STATYSTYKACH -->
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
+                        <span class="text-slate-500 font-medium flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-slate-500"></span> Śmietnik:
+                        </span>
+                        <span id="stat-trash" class="font-mono font-bold text-slate-400">0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-800">
+                        <span class="text-amber-400 font-medium flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span> Nienaruszone:
+                        </span>
+                        <span id="stat-untouched" class="font-mono font-bold text-amber-400">0</span>
+                    </div>
+                </div>
+
+                <!-- PROGRESS BAR 1: ZAŁADOWANA BAZA -->
+                <div class="mt-5 pt-4 border-t border-slate-800">
+                    <div class="flex justify-between text-[11px] text-slate-400 mb-1.5 font-bold">
+                        <span>WERYFIKACJA ZAŁADOWANYCH:</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                        <div id="progress-bar-fill" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- PROGRESS BAR 2: MACRO 1500 TARGET -->
+                <div class="mt-4 pt-3 border-t border-slate-800/50">
+                    <div class="flex justify-between text-[11px] text-emerald-400 mb-1.5 font-bold">
+                        <span>CEL BAZY (ZATWIERDZONE / 1500):</span>
+                        <span id="macro-progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                        <div id="macro-progress-bar-fill" class="bg-gradient-to-r from-emerald-500 to-emerald-300 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POSTĘP W POSZCZEGÓLNYCH DZIAŁACH (CEL: 1500) -->
+            <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-sm flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Cel działów (Wariant 1500)
+                    </span>
+                    <span id="active-groups-count" class="text-[10px] text-slate-500 font-mono font-bold">0 działów</span>
+                </h3>
+                
+                <div id="groups-progress-container" class="space-y-4 max-h-72 overflow-y-auto pr-1">
+                    <!-- Wygenerowane dynamicznie przez JS -->
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- PANEL PRAWY: WYŚWIETLANIE PYTAŃ I FILTROWANIE -->
+        <section class="flex-1 min-w-0">
+            
+            <!-- OKNO KOMUNIKATÓW I DIAGNOSTYKI SYSTEMOWEJ -->
+            <div id="info-box" class="bg-indigo-950/20 border border-indigo-900/60 text-indigo-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4">
+                <div class="bg-indigo-500/10 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/20 shrink-0 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div class="flex-1">
+                    <h4 id="info-title" class="font-bold text-indigo-300 text-xs uppercase tracking-wider mb-1">Inicjalizacja systemu...</h4>
+                    <p id="info-message" class="text-xs text-slate-300 leading-relaxed">
+                        Załadowaliśmy startową pulę przykładowych pytań. Możesz bez przeszkód testować oznaczanie statusów, pobieranie bazy oraz losowanie zestawów! Zmień tryb importu na <strong class="text-emerald-400">"Scal"</strong>, aby dodawać nowe JSON-y bez utraty obecnych pytań.
+                    </p>
+                    <pre id="info-debug" class="hidden mt-3 bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-[10px] text-rose-400 overflow-x-auto whitespace-pre-wrap leading-relaxed"></pre>
+                </div>
+            </div>
+
+            <!-- TAB 1: PRZEGLĄDANIE BAZY (FILTROWANIE I LISTA) -->
+            <div id="tab-browse" class="space-y-5">
+                
+                <!-- PASEK FILTRÓW -->
+                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-md flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex flex-wrap gap-3 items-center w-full md:w-auto">
+                        
+                        <!-- FILTR GRUPY -->
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kategoria / Dział</label>
+                            <select id="filter-group" onchange="resetPaginationAndRender()" class="bg-slate-950 text-slate-100 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-emerald-500 border border-slate-800 outline-none">
+                                <option value="ALL">Wszystkie grupy (P1-P9, S1-S6)</option>
+                                <optgroup label="Część Podstawowa">
+                                    <option value="P1">P1 - Niechronieni uczestnicy ruchu</option>
+                                    <option value="P2">P2 - Pierwszeństwo przejazdu</option>
+                                    <option value="P3">P3 - Prędkość i odległość</option>
+                                    <option value="P4">P4 - Pierwsza pomoc</option>
+                                    <option value="P5">P5 - Czynniki ryzyka (Alkohol, Rozproszenie)</option>
+                                    <option value="P6">P6 - Znaki drogowe i sygnalizacja</option>
+                                    <option value="P7">P7 - Warunki drogowe i atmosferyczne</option>
+                                    <option value="P8">P8 - Systemy ADAS & EV</option>
+                                    <option value="P9">P9 - Przepisy ogólne i definicje</option>
+                                </optgroup>
+                                <optgroup label="Część Specjalistyczna">
+                                    <option value="S1">S1 - Dynamika jazdy i ocena ryzyka</option>
+                                    <option value="S2">S2 - Manewrowanie i technika jazdy</option>
+                                    <option value="S3">S3 - Układy bezpieczeństwa</option>
+                                    <option value="S4">S4 - Obsługa i eksploatacja podzespołów</option>
+                                    <option value="S5">S5 - Sygnalizacja i komunikacja</option>
+                                    <option value="S6">S6 - Przepisy szczegółowe kat. B</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <!-- FILTR STATUSU -->
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Status weryfikacji</label>
+                            <select id="filter-status" onchange="resetPaginationAndRender()" class="bg-slate-950 text-slate-100 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-emerald-500 border border-slate-800 outline-none">
+                                <option value="ALL">Wszystkie statusy</option>
+                                <option value="untouched">⏳ Nienaruszone (Do sprawdzenia)</option>
+                                <option value="Zatwierdzone">✔️ Zatwierdzone (OK)</option>
+                                <option value="Do poprawy">❌ Do poprawy (Korekta)</option>
+                                <option value="Śmietnik">🗑️ Śmietnik (Odrzucone)</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- WYSZUKIWARKA FRAZY -->
+                    <div class="flex flex-col gap-1 w-full md:w-64">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Szukaj frazy lub ID</label>
+                        <input type="text" id="search-input" oninput="resetPaginationAndRender()" placeholder="Wpisz treść pytania lub ID..." class="bg-slate-950 text-slate-100 rounded-xl text-xs px-3 py-2.5 focus:ring-1 focus:ring-emerald-500 border border-slate-800 outline-none placeholder:text-slate-700">
+                    </div>
+                </div>
+
+                <!-- INFO O KRYTERIACH -->
+                <div class="text-xs text-slate-400 flex justify-between items-center px-2">
+                    <div>
+                        Znaleziono: <span id="visible-count" class="font-bold text-emerald-400">0</span> pytań spełniających filtry
+                    </div>
+                </div>
+
+                <!-- LISTA PYTAŃ -->
+                <div id="browse-questions-list" class="space-y-4"></div>
+
+                <!-- PRZYCISK WCZYTAJ WIĘCEJ -->
+                <div id="load-more-container" class="flex justify-center pt-2 hidden">
+                    <button onclick="loadMoreQuestions()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold px-6 py-3 rounded-xl border border-slate-800 transition-all-300 text-xs flex items-center gap-2">
+                        Pokaż więcej pytań
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- TAB 2: SYMULATOR ZESTAWÓW EGZAMINACYJNYCH -->
+            <div id="tab-exam" class="hidden space-y-5">
+                
+                <!-- KARTA GENERATORA -->
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="space-y-1">
+                        <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Oficjalny algorytm losujący zestaw egzaminacyjny
+                        </h2>
+                        <p class="text-xs text-slate-400 max-w-xl leading-relaxed">
+                            Aplikacja buduje zestaw merytoryczny o sumie 74 punktów według matrycy merytorycznej określonej w Rozdziale 6 PDF (dokładnie 32 pytania z podziałem na część podstawową i specjalistyczną oraz precyzyjnie przypisaną wagą). Pytania odrzucone (Śmietnik) są wykluczone.
+                        </p>
+                    </div>
+                    <button onclick="generateExamSet()" class="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-black px-6 py-3.5 rounded-xl shadow-lg transition-all-300 transform hover:-translate-y-0.5 whitespace-nowrap text-xs flex items-center gap-2">
+                        🎲 Generuj Losowy Zestaw
+                    </button>
+                </div>
+
+                <!-- STATYSTYKI WYGENEROWANEGO ZESTAWU -->
+                <div id="exam-stats-bar" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
+                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Struktura testu</span>
+                        <span id="exam-total-questions" class="text-base font-bold text-emerald-400">32 / 32 pyt.</span>
+                    </div>
+                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
+                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Wartość punktowa</span>
+                        <span id="exam-total-points" class="text-base font-bold text-emerald-400">74 / 74 pkt</span>
+                    </div>
+                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
+                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Zatwierdzone w zestawie</span>
+                        <span id="exam-approved-count" class="text-base font-bold text-slate-200">0</span>
+                    </div>
+                    <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-850 text-center">
+                        <span class="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Do poprawy w zestawie</span>
+                        <span id="exam-review-count" class="text-base font-bold text-rose-400">0</span>
+                    </div>
+                </div>
+
+                <!-- LISTA PYTAŃ WYGENEROWANEGO TESTU -->
+                <div id="exam-questions-list" class="space-y-4"></div>
+
+            </div>
+
+        </section>
+    </main>
+
+    <!-- ROZPISKA I WYJAŚNIENIE -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-500">
+        Wsparcie merytoryczne i optymalizacja bazy pytań egzaminacyjnych w oparciu o projekt podstawy programowej Stowarzyszenia Kierowca.pl z 2026 r.
+    </footer>
+
+    <!-- SKRYPT LOGICZNY -->
+    <script>
+        // Słownik zrzutów merytorycznych baz danych (obsługuje autostart i wielobazowość)
+        let loadedDatabases = {
+            "demo": [
+                {
+                    "id": "P1_001",
+                    "group": "P1",
+                    "group_label": "Niechronieni uczestnicy ruchu",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy mijając zatrzymany autobus szkolny musisz zachować szczególną ostrożność?",
+                    "correct_answer": "TAK",
+                    "media_type": "video",
+                    "media_url": "https://cdn.e-kierowca.pl/media/video/Wyk%C5%82ad_1.147.mp4",
+                    "media_title": "Szczególna ostrożność- autobus szkolny",
+                    "media_notes": "Wideo demonstracyjne. Sprawdzić jakość i czytelność napisów bocznych na autobusie.",
+                    "przepis_zrodlowy": "Ustawa PoRD art. 57a ust. 1"
+                },
+                {
+                    "id": "P1_002",
+                    "group": "P1",
+                    "group_label": "Niechronieni uczestnicy ruchu",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy możesz wyprzedzać pojazd na przejściu dla pieszych?",
+                    "correct_answer": "NIE",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_2.104.jpeg",
+                    "media_title": "Sytuacje zabraniające wyprzedzania- przejście dla piesz",
+                    "przepis_zrodlowy": "Ustawa PoRD art. 26 ust. 3 pkt 1"
+                },
+                {
+                    "id": "P1_003",
+                    "group": "P1",
+                    "group_label": "Niechronieni uczestnicy ruchu",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy zbliżając się do kolumny pieszych musisz zmniejszyć prędkość?",
+                    "correct_answer": "TAK",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_7.171.jpeg",
+                    "media_title": "Jeśli zbliżasz się do kolumny pieszych",
+                    "przepis_zrodlowy": "Ustawa PoRD art. 19 ust. 2 pkt 2"
+                },
+                {
+                    "id": "P2_001",
+                    "group": "P2",
+                    "group_label": "Pierwszeństwo przejazdu",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy na skrzyżowaniu równorzędnym ustępujesz pierwszeństwa pojazdowi nadjeżdżającemu z prawej strony?",
+                    "correct_answer": "TAK",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_1.024.jpeg",
+                    "media_title": "Przykład skrzyżowania",
+                    "przepis_zrodlowy": "Ustawa PoRD art. 25 ust. 1"
+                },
+                {
+                    "id": "P3_001",
+                    "group": "P3",
+                    "group_label": "Prędkość i odległość",
+                    "part": "podstawowa",
+                    "type": "yn",
+                    "weight": 3,
+                    "question": "Czy droga hamowania przy 60 km/h jest czterokrotnie dłuższa niż przy 30 km/h?",
+                    "correct_answer": "TAK",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_4.088.jpeg",
+                    "media_title": "Wzrost prędkości i wzrost drogi hamowania",
+                    "przepis_zrodlowy": "Zasady fizyki ruchu drogowego / BHP"
+                },
+                {
+                    "id": "S1_001",
+                    "group": "S1",
+                    "group_label": "Dynamika jazdy",
+                    "part": "specjalistyczna",
+                    "type": "abc",
+                    "weight": 3,
+                    "question": "Jaka jest różnica między drogą hamowania a drogą zatrzymania?",
+                    "correct_answer": "A",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_4.083.jpeg",
+                    "media_title": "Różnica między drogą hamowania a drogą zatrzymania",
+                    "options": {
+                        "A": "Droga zatrzymania to droga hamowania plus droga reakcji.",
+                        "B": "Droga hamowania to droga reakcji plus droga zatrzymania.",
+                        "C": "Obie drogi są takie same przy dobrej nawierzchni."
+                    },
+                    "przepis_zrodlowy": "Teoria fizyki jazdy pojazdem"
+                },
+                {
+                    "id": "S1_002",
+                    "group": "S1",
+                    "group_label": "Dynamika jazdy",
+                    "part": "specjalistyczna",
+                    "type": "abc",
+                    "weight": 3,
+                    "question": "Hamulce bębnowe grzeją się podczas długiego zjazdu. Jakie ryzyko to stwarza?",
+                    "correct_answer": "A",
+                    "media_type": "video",
+                    "media_url": "https://cdn.e-kierowca.pl/media/video/v3_L10T3_04_hamulce_bebnowe.mp4",
+                    "media_title": "Hamulce bębnowe",
+                    "options": {
+                        "A": "Mogą całkowicie stracić skuteczność przez przegrzanie.",
+                        "B": "Auto przyspiesza, bo zmniejsza się opór toczenia.",
+                        "C": "Hamowanie staje się gwałtowniejsze niż normalnie."
+                    },
+                    "przepis_zrodlowy": "Budowa i eksploatacja pojazdów"
+                },
+                {
+                    "id": "S2_001",
+                    "group": "S2",
+                    "group_label": "Manewry i technika",
+                    "part": "specjalistyczna",
+                    "type": "abc",
+                    "weight": 3,
+                    "question": "Chcesz wyprzedzić samochód. Kiedy musisz włączyć kierunkowskaz?",
+                    "correct_answer": "A",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_2.159.jpeg",
+                    "media_title": "Sygnalizowanie wykonywanych manewrów",
+                    "options": {
+                        "A": "Zanim zaczniesz zmieniać pas",
+                        "B": "W chwili gdy zaczynasz skręcać",
+                        "C": "Dopiero gdy jesteś obok wyprzedzanego"
+                    },
+                    "przepis_zrodlowy": "Ustawa PoRD art. 22 ust. 5"
+                },
+                {
+                    "id": "S6_078",
+                    "group": "S6",
+                    "group_label": "Przepisy kat. B",
+                    "part": "specjalistyczna",
+                    "type": "abc",
+                    "weight": 2,
+                    "question": "Gdy policjant wyciągnie rękę poziomo, kierowca powinien:",
+                    "correct_answer": "A",
+                    "media_type": "image",
+                    "media_url": "https://cdn.e-kierowca.pl/media/image/Wyk%C5%82ad_5.055.jpeg",
+                    "media_title": "Sygnały dawane przez osoby uprawnione",
+                    "options": {
+                        "A": "zatrzymać się przed policjantem",
+                        "B": "przyspieszyć i przejechać jak najszybciej",
+                        "C": "zjechać na pobocze i zgasić silnik"
+                    },
+                    "przepis_zrodlowy": "Rozporządzenie MSWiA w sprawie kierowania ruchem drogowym"
+                }
+            ]
+        };
+
+        let globalMetadata = null; // Zachowanie nagłówka metadanych banku przy imporcie i eksporcie
+        let currentDbKey = "demo";
+        let globalQuestions = loadedDatabases["demo"];
+        let currentUsername = "rafalmatuszak"; // Domyślna symulowana nazwa profilu
+
+        let currentTab = 'browse';
+        let examSet = [];
+        let currentPage = 1;
+        const questionsPerPage = 15;
+
+        // Cel ilościowy dla Variant A (1500 pytań łącznie) na podstawie Rozdziału 7
+        const groupTargets = {
+            "P1": 176,
+            "P2": 195,
+            "P3": 147,
+            "P4": 78,
+            "P5": 98,
+            "P6": 117,
+            "P7": 78,
+            "P8": 49,
+            "P9": 39,
+            "S1": 131,
+            "S2": 105,
+            "S3": 79,
+            "S4": 79,
+            "S5": 53,
+            "S6": 79
+        };
+
+        // Słownik opisów działów GDE
+        const groupLabels = {
+            "P1": "Niechronieni uczestnicy ruchu",
+            "P2": "Pierwszeństwo przejazdu",
+            "P3": "Prędkość i odległość",
+            "P4": "Pierwsza pomoc",
+            "P5": "Czynniki ryzyka (Alkohol, Rozproszenie)",
+            "P6": "Znaki drogowe i sygnalizacja",
+            "P7": "Warunki drogowe i atmosferyczne",
+            "P8": "Systemy ADAS & EV",
+            "P9": "Przepisy ogólne i definicje",
+            "S1": "Dynamika jazdy i ocena ryzyka",
+            "S2": "Manewrowanie i technika jazdy",
+            "S3": "Układy bezpieczeństwa",
+            "S4": "Obsługa i eksploatacja podzespołów",
+            "S5": "Sygnalizacja i komunikacja",
+            "S6": "Przepisy szczegółowe kat. B"
+        };
+
+        // --- AKTUALIZACJA PROFILU ---
+        function updateUsername(val) {
+            currentUsername = val.trim() || "Anonimowy";
+            showToast("Zmień profil na: " + currentUsername, "info");
+        }
+
+        // Pomocniczy generator daty w formacie YYYY-MM-DD HH:MM
+        function getFormattedCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+
+        // --- OBSŁUGA WIELU BAZ DANYCH ---
+        function addDatabaseOption(name) {
+            const selector = document.getElementById('db-selector');
+            if (!selector) return;
+            
+            // Sprawdzenie czy opcja już istnieje
+            for (let i = 0; i < selector.options.length; i++) {
+                if (selector.options[i].value === name) return;
+            }
+
+            const option = document.createElement('option');
+            option.value = name;
+            option.className = "bg-slate-900";
+            option.innerText = name;
+            selector.appendChild(option);
+        }
+
+        function selectDatabase(name) {
+            if (!loadedDatabases[name]) return;
+            currentDbKey = name;
+            globalQuestions = loadedDatabases[name];
+            
+            const selector = document.getElementById('db-selector');
+            if (selector) selector.value = name;
+
+            initializeStatuses();
+            recalculateStats();
+            resetPaginationAndRender();
+
+            // Aktualizacja okienka informacyjnego
+            const infoTitle = document.getElementById('info-title');
+            const infoMsg = document.getElementById('info-message');
+            if (infoTitle && infoMsg) {
+                infoTitle.innerText = `Aktywna Baza: ${name}`;
+                infoMsg.innerText = `Przeglądasz aktualnie bazę pytań o nazwie "${name}". Liczba pytań w pamięci podręcznej: ${globalQuestions.length}. Wybierz metodę "Scal" po lewej stronie, aby dołączyć kolejny plik do tej listy baz.`;
+            }
+        }
+
+        window.switchDatabase = function(name) {
+            selectDatabase(name);
+            showToast(`Przełączono na bazę: ${name}`, "success");
+        };
+
+        // Autostart z pliku bazab.json na serwerze z diagnostyką CORS/błędów sieciowych
+        function tryAutostartBazaB() {
+            const loader = document.getElementById('loading-overlay');
+            if (loader) loader.classList.remove('hidden');
+
+            fetch('bazab.json')
+                .then(response => {
+                    if (!response.ok) throw new Error("Plik bazab.json nie został znaleziony w tym samym folderze.");
+                    return response.text();
+                })
+                .then(text => {
+                    const parsed = tryInterpretJSON(text);
+                    if (parsed && parsed.length > 0) {
+                        loadedDatabases["bazab.json"] = parsed;
+                        addDatabaseOption("bazab.json");
+                        selectDatabase("bazab.json");
+                        
+                        showToast("Pomyślnie zaimportowano plik bazab.json!", "success");
+                    } else {
+                        throw new Error("Plik bazab.json nie zawiera poprawnych pytań.");
+                    }
+                })
+                .catch(err => {
+                    console.warn("Autostart 'bazab.json' nie powiódł się:", err);
+                    
+                    // Wyświetl czytelną instrukcję i diagnostykę w panelu informacyjnym
+                    const infoTitle = document.getElementById('info-title');
+                    const infoMsg = document.getElementById('info-message');
+                    const infoBox = document.getElementById('info-box');
+                    
+                    if (infoBox && infoTitle && infoMsg) {
+                        infoBox.className = "bg-amber-950/20 border border-amber-900/60 text-amber-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4 transition-all-300";
+                        infoTitle.innerText = "Nie załadowano automatycznie pliku bazab.json";
+                        
+                        let reason = "";
+                        if (window.location.protocol === 'file:') {
+                            reason = "Uruchamiasz aplikację bezpośrednio z dysku (protokół <code>file://</code>). Przeglądarki (Safari, Chrome) blokują automatyczne odczytywanie plików lokalnych ze względów bezpieczeństwa (błąd CORS).";
+                        } else {
+                            reason = `Serwer zwrócił błąd podczas próby pobrania pliku. Upewnij się, że plik o nazwie <code class="text-emerald-400 font-mono font-bold">bazab.json</code> znajduje sich dokładnie w tym samym katalogu co ta aplikacja na serwerze. <br><span class="text-rose-400 font-mono text-[11px] block mt-1">Szczegóły: ${err.message}</span>`;
+                        }
+                        
+                        infoMsg.innerHTML = `
+                            <div class="space-y-3">
+                                <p class="text-xs text-slate-300 leading-relaxed">${reason}</p>
+                                <div class="border-t border-amber-900/40 pt-3">
+                                    <p class="font-bold text-white text-xs mb-1.5">Co możesz teraz zrobić?</p>
+                                    <ul class="list-none space-y-1.5 text-xs text-slate-300">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-emerald-400 mt-0.5">✔</span>
+                                            <span><strong>Przeciągnij i upuść:</strong> Chwyć plik <code class="text-emerald-400 font-bold font-mono">bazab.json</code> ze swojego pulpitu i upuść go w dowolnym miejscu na tę stronę.</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-emerald-400 mt-0.5">✔</span>
+                                            <span><strong>Wgraj ręcznie:</strong> Kliknij przycisk <strong class="text-emerald-400">"Wgraj plik (.txt / .json)"</strong> w panelu po lewej stronie i wskaż go na swoim dysku.</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-emerald-400 mt-0.5">✔</span>
+                                            <span><strong>Użyj serwera lokalnego:</strong> Jeśli programujesz, uruchom lokalny serwer HTTP (np. Live Server w VS Code lub <code>python -m http.server</code>) — wtedy plik załaduje się automatycznie.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Fallback do demonstracyjnej bazy, aby użytkownik miał na czym pracować
+                    selectDatabase("demo");
+                })
+                .finally(() => {
+                    if (loader) loader.classList.add('hidden');
+                });
+        }
+
+        // Definiowanie wszystkich funkcji pomocniczych jako deklaracje globalne (zapobieganie błędom w Safari)
+        function initializeStatuses() {
+            globalQuestions.forEach(q => {
+                if (!q.status) {
+                    q.status = 'untouched';
+                }
+            });
+        }
+
+        function recalculateStats() {
+            const total = globalQuestions.length;
+            const approved = globalQuestions.filter(q => q.status === 'Zatwierdzone').length;
+            const review = globalQuestions.filter(q => q.status === 'Do poprawy').length;
+            const trash = globalQuestions.filter(q => q.status === 'Śmietnik').length;
+            const untouched = globalQuestions.filter(q => !q.status || q.status === 'untouched').length;
+
+            const totalEl = document.getElementById('stat-total');
+            const approvedEl = document.getElementById('stat-approved');
+            const reviewEl = document.getElementById('stat-review');
+            const trashEl = document.getElementById('stat-trash');
+            const untouchedEl = document.getElementById('stat-untouched');
+            const progressPercentEl = document.getElementById('progress-percent');
+            const progressBarFillEl = document.getElementById('progress-bar-fill');
+            const badgeTotalCountEl = document.getElementById('badge-total-count');
+
+            // Nowe elementy globalnego postępu (cel 1500)
+            const macroProgressPercentEl = document.getElementById('macro-progress-percent');
+            const macroProgressBarFillEl = document.getElementById('macro-progress-bar-fill');
+
+            if (totalEl) totalEl.innerText = total;
+            if (approvedEl) approvedEl.innerText = approved;
+            if (reviewEl) reviewEl.innerText = review;
+            if (trashEl) trashEl.innerText = trash;
+            if (untouchedEl) untouchedEl.innerText = untouched;
+            if (badgeTotalCountEl) badgeTotalCountEl.innerText = total;
+
+            const verified = approved + review + trash;
+            const percent = total > 0 ? Math.round((verified / total) * 100) : 0;
+            if (progressPercentEl) progressPercentEl.innerText = percent + "%";
+            if (progressBarFillEl) progressBarFillEl.style.width = percent + "%";
+
+            // Wyliczanie globalnego celu 1500 zatwierdzonych pytań
+            const targetTotal = 1500;
+            const macroPercent = Math.min(100, Math.
