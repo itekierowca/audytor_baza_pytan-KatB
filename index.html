@@ -1233,6 +1233,39 @@
             return str;
         }
 
+        // Inicjalizacja statusów: pytania bez statusu otrzymują 'untouched'
+        function initializeStatuses() {
+            if (!globalQuestions) return;
+            globalQuestions.forEach(q => {
+                if (!q.status || q.status === '') {
+                    q.status = 'untouched';
+                }
+            });
+        }
+
+        // Luźne wyodrębnianie pytań z częściowo uszkodzonego JSON
+        // Zwraca tablicę tylko gdy JSON jest CAŁKOWICIE niepoprawny i nie da się go sparsować normalnie
+        function extractQuestionsLoose(str) {
+            // Ta metoda jest ostatnią deską ratunku - używamy jej tylko gdy normalny JSON.parse zawiedzie
+            // Staramy się wyodrębnić obiekty pytań z tekstu metodą regex
+            try {
+                const matches = str.match(/\{[^{}]*"(?:question|pytanie|tresc)[^{}]*\}/g);
+                if (matches && matches.length > 0) {
+                    const results = [];
+                    matches.forEach(m => {
+                        try {
+                            const obj = JSON.parse(m);
+                            if (obj) results.push(normalizeQuestion(obj));
+                        } catch(e) { /* pomiń uszkodzony obiekt */ }
+                    });
+                    if (results.length > 0) return results;
+                }
+            } catch(e) {
+                console.warn("extractQuestionsLoose nie powiodło się:", e);
+            }
+            return null;
+        }
+
         function tryInterpretJSON(raw) {
             let cleaned = sanitizeJSONString(raw.trim());
             if (cleaned.startsWith("```")) {
@@ -1243,35 +1276,29 @@
                 cleaned = cleaned.replace(regexEnd, "").trim();
             }
 
-            // Najpierw spróbujmy wyodrębnić pytania bezpośrednio z tekstu (metoda odporna na błędy składni)
-            let result = extractQuestionsLoose(cleaned);
-            if (result && result.length > 0) {
-                return result;
-            }
-
-            // Próba 1: Wyodrębnienie zagnieżdżonego klucza "pytania" przed parsowaniem luźnym
+            // Próba 1 (PRIORYTET): poprawny JSON z zagnieżdżonym kluczem "pytania"
+            // To jest format używany przez bazab.json i P2_pytania_TAK_NIE.json
             try {
                 let parsed = JSON.parse(cleaned);
-                if (parsed && typeof parsed === 'object') {
-                    if (Array.isArray(parsed.pytania)) {
+                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                    if (Array.isArray(parsed.pytania) && parsed.pytania.length > 0) {
                         globalMetadata = parsed.metadane_banku || null;
-                        let list = parsed.pytania.map(q => normalizeQuestion(q));
-                        if (list.length > 0) return list;
+                        return parsed.pytania.map(q => normalizeQuestion(q));
                     }
                 }
-            } catch(e) {
-                console.warn("Wstępne parsowanie zagnieżdżone nie powiodło się, przechodzenie do standardowego JSON.parse.");
-            }
-
-            // Próba 2: Tradycyjne parsowanie JSON.parse
-            try {
-                const parsed = JSON.parse(cleaned);
-                if (Array.isArray(parsed)) {
+                // Próba 2: tablica pytań bezpośrednio
+                if (Array.isArray(parsed) && parsed.length > 0) {
                     globalMetadata = null;
                     return parsed.map(q => normalizeQuestion(q));
                 }
             } catch (e) {
-                console.warn("Parsowanie standardowe nie powiodło się.");
+                console.warn("Standardowe JSON.parse nie powiodło się, próbuję metody luźnej:", e.message);
+            }
+
+            // Próba 3 (FALLBACK): luźne wyodrębnianie z uszkodzonego JSON
+            let result = extractQuestionsLoose(cleaned);
+            if (result && result.length > 0) {
+                return result;
             }
 
             throw new Error("Nie udało się rozpoznać obiektów pytań. Upewnij się, że plik zawiera pytania (powinny mieć treść pytania oraz identyfikator).");
@@ -2267,6 +2294,14 @@
                 }
             });
         }
+
+        // --- INICJALIZACJA PRZY STARCIE STRONY ---
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeStatuses();
+            recalculateStats();
+            resetPaginationAndRender();
+            tryAutostartBazaB();
+        });
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
