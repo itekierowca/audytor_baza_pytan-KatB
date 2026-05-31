@@ -1,7 +1,7 @@
 {
   "metadane_banku": {
     "data_generowania": "2026-05-30",
-    "kategoria": "B",
+    "kategoria": "A",
     "obszar_tematyczny": "WSZYSTKIE",
     "opis": "Zestaw demonstracyjny — 5 pytań dla każdej z 15 grup tematycznych (P1–P9 TAK/NIE, S1–S6 ABC)",
     "liczba_pytan_tak_nie": 45,
@@ -14,7 +14,7 @@
       "group_label": "Niechronieni uczestnicy ruchu",
       "wersja": 1,
       "data_zatwierdzenia": "2026-05-30",
-      "kategoria_prawa_jazdy": "B",
+      "kategoria_prawa_jazdy": "A",
       "weight": 3,
       "przepis_zrodlowy": "Ustawa PoRD art. 13 ust. 1",
       "type": "yn",
