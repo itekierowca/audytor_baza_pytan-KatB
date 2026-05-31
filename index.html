@@ -122,6 +122,13 @@
                     <input type="text" id="username-input" value="rafalmatuszak" oninput="updateUsername(this.value)" class="bg-transparent text-emerald-400 font-bold outline-none border-b border-transparent hover:border-slate-500 focus:border-emerald-500 w-28 text-center transition">
                 </div>
 
+                <!-- PRZYCISK ZAPISZ DO GITHUB -->
+                <button onclick="openGitHubPanel()" id="github-save-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition-all-300 flex items-center justify-center gap-2 w-full sm:w-auto">
+                    <i class="fa-brands fa-github text-white"></i>
+                    <span id="github-btn-label">Zapisz do GitHub</span>
+                    <span id="github-status-dot" class="w-2 h-2 rounded-full bg-slate-600"></span>
+                </button>
+
                 <!-- MENU EKSPORTU (DROPDOWN GROUP) -->
                 <div class="relative inline-block text-left w-full sm:w-auto" id="export-dropdown-container">
                     <button onclick="toggleExportDropdown()" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition-all-300 flex items-center justify-center gap-2 w-full" id="export-menu-button">
@@ -411,6 +418,87 @@
     <footer class="bg-slate-900 border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-500">
         Wsparcie merytoryczne i optymalizacja bazy pytań egzaminacyjnych w oparciu o projekt podstawy programowej Stowarzyszenia Kierowca.pl z 2026 r.
     </footer>
+
+
+    <!-- PANEL GITHUB: KONFIGURACJA I ZAPIS -->
+    <div id="github-panel" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <div class="flex items-start justify-between gap-4 mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 rounded-xl bg-slate-800 border border-slate-700">
+                        <i class="fa-brands fa-github text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Zapis do GitHub</h3>
+                        <p class="text-[11px] text-slate-400">Nadpisuje plik bazy bezpośrednio w repozytorium</p>
+                    </div>
+                </div>
+                <button onclick="closeGitHubPanel()" class="text-slate-400 hover:text-white transition text-lg">&times;</button>
+            </div>
+
+            <!-- STATUS POŁĄCZENIA -->
+            <div id="gh-connection-status" class="hidden mb-4 p-3 rounded-xl text-xs font-semibold flex items-center gap-2"></div>
+
+            <!-- POLA KONFIGURACJI -->
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Owner (użytkownik/org)</label>
+                        <input type="text" id="gh-owner" placeholder="np. rafalmatuszak" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Repozytorium</label>
+                        <input type="text" id="gh-repo" placeholder="np. gde-baza" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Branch</label>
+                        <input type="text" id="gh-branch" placeholder="main" value="main" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Plik docelowy</label>
+                        <input type="text" id="gh-filepath" placeholder="bazy/bazab.json" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                        Personal Access Token (PAT)
+                        <a href="https://github.com/settings/tokens/new?scopes=repo&description=GDE-Auditor" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline normal-case">Wygeneruj token →</a>
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none pr-20">
+                        <button onclick="toggleTokenVisibility()" class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-slate-200 font-bold px-2 py-1 bg-slate-800 rounded-lg transition">Pokaż</button>
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed mt-0.5">Token jest przechowywany tylko lokalnie w Twojej przeglądarce (localStorage). Nie jest wysyłany nigdzie poza api.github.com.</p>
+                </div>
+
+                <!-- COMMIT MESSAGE -->
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Opis commita</label>
+                    <input type="text" id="gh-commit-msg" placeholder="Audyt GDE: aktualizacja statusów pytań" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                </div>
+            </div>
+
+            <!-- PRZYCISKI AKCJI -->
+            <div class="flex gap-3 mt-5 pt-4 border-t border-slate-800">
+                <button onclick="testGitHubConnection()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plug"></i> Testuj połączenie
+                </button>
+                <button onclick="saveGitHubConfig()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition">
+                    💾 Zapamiętaj
+                </button>
+                <button onclick="pushToGitHub()" id="gh-push-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-github"></i> Zapisz do repo
+                </button>
+            </div>
+
+            <!-- INFORMACJA O BEZPIECZEŃSTWIE -->
+            <div class="mt-4 p-3 bg-amber-950/20 border border-amber-900/30 rounded-xl text-[10px] text-amber-300 leading-relaxed">
+                <strong>Bezpieczeństwo:</strong> Token PAT z uprawnieniem <code class="text-emerald-400">repo</code> daje dostęp do zapisu w repozytorium. Używaj tylko na zaufanym komputerze. Token możesz unieważnić w dowolnej chwili na <a href="https://github.com/settings/tokens" target="_blank" class="underline text-amber-200">github.com/settings/tokens</a>.
+            </div>
+        </div>
+    </div>
 
     <!-- SKRYPT LOGICZNY -->
     <script>
@@ -778,44 +866,111 @@
             if (loader) loader.classList.remove('hidden');
 
             let bazabLoaded = false;
+            let firstDbKey = null; // Pierwsza załadowana baza — zostanie aktywna
 
-            // 1. Próba bezpośredniego pobrania ze względnej ścieżki bazy/bazab.json
-            try {
-                const response = await fetch('bazy/bazab.json');
-                if (response.ok) {
-                    const text = await response.text();
+            // Helper: załaduj plik bazy i zarejestruj go w selektorze bez przełączania aktywnej bazy
+            async function fetchAndRegisterDb(name, url) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) return false;
+                    const text = await res.text();
                     const parsed = tryInterpretJSON(text);
                     if (parsed && parsed.length > 0) {
-                        loadedDatabases["bazab.json"] = parsed;
-                        addDatabaseOption("bazab.json", "bazy/bazab.json");
-                        selectDatabase("bazab.json");
-                        bazabLoaded = true;
-                        showToast("Pomyślnie zaimportowano plik bazy/bazab.json!", "success");
+                        loadedDatabases[name] = parsed;
+                        addDatabaseOption(name, url);
+                        return true;
                     }
+                } catch (e) {
+                    console.warn(`Nie udało się załadować bazy ${name}:`, e);
                 }
-            } catch (err) {
-                console.warn("Autostart względny bazy/bazab.json nie powiódł się:", err);
+                return false;
             }
 
-            // 2. Skanowanie katalogu /bazy w repozytorium GitHub przy użyciu API
+            // 1. Próba wczytania pliku manifest.json z katalogu /bazy
+            //    Format: ["bazab.json", "baza2.json", ...] lub [{"name":"bazab.json"}, ...]
+            let manifestFiles = [];
+            try {
+                const manifestRes = await fetch('bazy/manifest.json');
+                if (manifestRes.ok) {
+                    const manifestData = await manifestRes.json();
+                    if (Array.isArray(manifestData)) {
+                        manifestFiles = manifestData.map(entry =>
+                            typeof entry === 'string' ? entry : entry.name
+                        ).filter(Boolean);
+                        console.log("Wykryto manifest.json z bazami:", manifestFiles);
+                    }
+                }
+            } catch (e) {
+                console.info("Brak pliku manifest.json lub błąd parsowania — kontynuuję bez manifestu.");
+            }
+
+            // Wczytaj wszystkie bazy z manifestu
+            for (const filename of manifestFiles) {
+                const url = `bazy/${filename}`;
+                const loaded = await fetchAndRegisterDb(filename, url);
+                if (loaded) {
+                    if (!firstDbKey) firstDbKey = filename;
+                    if (filename === "bazab.json") bazabLoaded = true;
+                    showToast(`Załadowano bazę: ${filename}`, "success");
+                }
+            }
+
+            // 2. Jeśli nie było manifestu lub bazab.json nie był na liście — spróbuj bezpośrednio
+            if (!bazabLoaded) {
+                try {
+                    const response = await fetch('bazy/bazab.json');
+                    if (response.ok) {
+                        const text = await response.text();
+                        const parsed = tryInterpretJSON(text);
+                        if (parsed && parsed.length > 0) {
+                            loadedDatabases["bazab.json"] = parsed;
+                            addDatabaseOption("bazab.json", "bazy/bazab.json");
+                            if (!firstDbKey) firstDbKey = "bazab.json";
+                            bazabLoaded = true;
+                            showToast("Pomyślnie zaimportowano plik bazy/bazab.json!", "success");
+                        }
+                    }
+                } catch (err) {
+                    console.warn("Autostart względny bazy/bazab.json nie powiódł się:", err);
+                }
+            }
+
+            // Przełącz na pierwszą załadowaną bazę
+            if (firstDbKey) selectDatabase(firstDbKey);
+
+            // 3. Skanowanie katalogu /bazy w repozytorium GitHub przy użyciu API
+            //    Rejestruje WSZYSTKIE pliki z /bazy jako opcje w selektorze
+            //    i od razu pobiera te, które nie były jeszcze załadowane przez manifest
             try {
                 const githubFiles = await scanGitHubBazyFolder();
                 if (githubFiles && githubFiles.length > 0) {
-                    githubFiles.forEach(file => {
+                    let newFilesFound = 0;
+                    for (const file of githubFiles) {
+                        if (file.name === "manifest.json") continue; // Pomiń sam manifest
+                        // Zarejestruj w selektorze (URL do leniowego pobrania po kliknięciu)
                         addDatabaseOption(file.name, file.download_url);
-                        // Jeśli to plik bazab.json i nie został wcześniej załadowany, pobierz go
-                        if (file.name === "bazab.json" && !bazabLoaded) {
-                            fetchDatabaseFromUrl(file.name, file.download_url);
-                            bazabLoaded = true;
+                        // Jeśli baza nie została już załadowana przez manifest — pobierz ją teraz
+                        if (!loadedDatabases[file.name]) {
+                            const loaded = await fetchAndRegisterDb(file.name, file.download_url);
+                            if (loaded) {
+                                newFilesFound++;
+                                // Jeśli to bazab.json i nie był załadowany wcześniej — przełącz na nią
+                                if (file.name === "bazab.json" && !bazabLoaded) {
+                                    selectDatabase(file.name);
+                                    bazabLoaded = true;
+                                }
+                            }
                         }
-                    });
-                    showToast("Wykryto dodatkowe bazy danych w folderze /bazy w GitHub!", "info");
+                    }
+                    if (newFilesFound > 0) {
+                        showToast(`Wykryto i załadowano ${newFilesFound} baz z folderu /bazy w GitHub!`, "info");
+                    }
                 }
             } catch (githubErr) {
                 console.warn("Skanowanie folderu GitHub nie powiodło się:", githubErr);
             }
 
-            // 3. Fallback: Jeśli plik bazab.json nie został załadowany, wyświetl diagnostykę i przełącz na demo
+            // 4. Fallback: Jeśli plik bazab.json nie został załadowany, wyświetl diagnostykę i przełącz na demo
             if (!bazabLoaded) {
                 const infoTitle = document.getElementById('info-title');
                 const infoMsg = document.getElementById('info-message');
@@ -1160,8 +1315,12 @@
                     } else {
                         normalized.part = partStr;
                     }
-                } else if (lowKey === 'media_notes' || lowKey === 'uwagi_do_grafiki' || lowKey === 'uwagi' || lowKey === 'uwagi_grafika' || lowKey === 'wyjasnienie') {
+                } else if (lowKey === 'media_notes' || lowKey === 'uwagi_do_grafiki' || lowKey === 'uwagi' || lowKey === 'uwagi_grafika') {
                     normalized.media_notes = String(val);
+                } else if (lowKey === 'wyjasnienie' || lowKey === 'wyjaśnienie' || lowKey === 'wyjasnienie_kursanta' || lowKey === 'explanation' || lowKey === 'opis') {
+                    normalized.wyjasnienie = String(val);
+                } else if (lowKey === 'przepis_tekst' || lowKey === 'tekst_przepisu' || lowKey === 'przepis_cytat' || lowKey === 'cytat_przepisu') {
+                    normalized.przepis_tekst = String(val);
                 } else if (lowKey === 'przepis_zrodlowy' || lowKey === 'przepis' || lowKey === 'podstawa_prawna' || lowKey === 'podstawa' || lowKey === 'przepis_źródłowy') {
                     normalized.przepis_zrodlowy = String(val);
                 } else if (lowKey === 'media_url' || lowKey === 'url') {
@@ -1172,22 +1331,6 @@
                     normalized.media_type = String(val);
                 } else if (lowKey === 'status') {
                     normalized.status = String(val);
-                } else if (lowKey === 'cel_dydaktyczny') {
-                    normalized.cel_dydaktyczny = String(val);
-                } else if (lowKey === 'zrodlo_opis_vademecum') {
-                    normalized.zrodlo_opis_vademecum = String(val);
-                } else if (lowKey === 'zrodlo_opis_kursant') {
-                    normalized.zrodlo_opis_kursant = String(val);
-                } else if (lowKey === 'zrodlo_wiersze_xlsx') {
-                    normalized.zrodlo_wiersze_xlsx = val;
-                } else if (lowKey === 'wersja') {
-                    normalized.wersja = Number(val) || 1;
-                } else if (lowKey === 'data_zatwierdzenia') {
-                    normalized.data_zatwierdzenia = String(val);
-                } else if (lowKey === 'kategoria_prawa_jazdy') {
-                    normalized.kategoria_prawa_jazdy = String(val);
-                } else if (lowKey === 'material_wizualny') {
-                    normalized.material_wizualny = String(val);
                 } else if (lowKey === 'audited_by' || lowKey === 'audytor' || lowKey === 'modyfikacja_autor') {
                     normalized.audited_by = String(val);
                 } else if (lowKey === 'audit_date' || lowKey === 'data_audytu' || lowKey === 'modyfikacja_data') {
@@ -1249,35 +1392,19 @@
             return str;
         }
 
-        // Inicjalizacja statusów: pytania bez statusu lub ze statusem 'Roboczy' otrzymują 'untouched'
-        function initializeStatuses() {
-            if (!globalQuestions) return;
-            globalQuestions.forEach(q => {
-                if (!q.status || q.status === '' || q.status === 'Roboczy') {
-                    q.status = 'untouched';
-                }
-            });
-        }
-
-        // Luźne wyodrębnianie pytań z częściowo uszkodzonego JSON
-        // Zwraca tablicę tylko gdy JSON jest CAŁKOWICIE niepoprawny i nie da się go sparsować normalnie
+        // Luźne wyodrębnianie pytań z częściowo uszkodzonego JSON (fallback)
         function extractQuestionsLoose(str) {
-            // Ta metoda jest ostatnią deską ratunku - używamy jej tylko gdy normalny JSON.parse zawiedzie
-            // Staramy się wyodrębnić obiekty pytań z tekstu metodą regex
             try {
-                const matches = str.match(/\{[^{}]*"(?:question|pytanie|tresc)[^{}]*\}/g);
-                if (matches && matches.length > 0) {
-                    const results = [];
-                    matches.forEach(m => {
-                        try {
-                            const obj = JSON.parse(m);
-                            if (obj) results.push(normalizeQuestion(obj));
-                        } catch(e) { /* pomiń uszkodzony obiekt */ }
-                    });
-                    if (results.length > 0) return results;
+                // Spróbuj znaleźć tablicę JSON i ją zparsować
+                const arrayMatch = str.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                if (arrayMatch) {
+                    const parsed = JSON.parse(arrayMatch[0]);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed.map(q => normalizeQuestion(q));
+                    }
                 }
-            } catch(e) {
-                console.warn("extractQuestionsLoose nie powiodło się:", e);
+            } catch (e) {
+                // Nieudane — zwróć null, żeby tryInterpretJSON kontynuował kolejne metody
             }
             return null;
         }
@@ -1292,29 +1419,35 @@
                 cleaned = cleaned.replace(regexEnd, "").trim();
             }
 
-            // Próba 1 (PRIORYTET): poprawny JSON z zagnieżdżonym kluczem "pytania"
-            // To jest format używany przez bazab.json i P2_pytania_TAK_NIE.json
+            // Najpierw spróbujmy wyodrębnić pytania bezpośrednio z tekstu (metoda odporna na błędy składni)
+            let result = extractQuestionsLoose(cleaned);
+            if (result && result.length > 0) {
+                return result;
+            }
+
+            // Próba 1: Wyodrębnienie zagnieżdżonego klucza "pytania" przed parsowaniem luźnym
             try {
                 let parsed = JSON.parse(cleaned);
-                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-                    if (Array.isArray(parsed.pytania) && parsed.pytania.length > 0) {
+                if (parsed && typeof parsed === 'object') {
+                    if (Array.isArray(parsed.pytania)) {
                         globalMetadata = parsed.metadane_banku || null;
-                        return parsed.pytania.map(q => normalizeQuestion(q));
+                        let list = parsed.pytania.map(q => normalizeQuestion(q));
+                        if (list.length > 0) return list;
                     }
                 }
-                // Próba 2: tablica pytań bezpośrednio
-                if (Array.isArray(parsed) && parsed.length > 0) {
+            } catch(e) {
+                console.warn("Wstępne parsowanie zagnieżdżone nie powiodło się, przechodzenie do standardowego JSON.parse.");
+            }
+
+            // Próba 2: Tradycyjne parsowanie JSON.parse
+            try {
+                const parsed = JSON.parse(cleaned);
+                if (Array.isArray(parsed)) {
                     globalMetadata = null;
                     return parsed.map(q => normalizeQuestion(q));
                 }
             } catch (e) {
-                console.warn("Standardowe JSON.parse nie powiodło się, próbuję metody luźnej:", e.message);
-            }
-
-            // Próba 3 (FALLBACK): luźne wyodrębnianie z uszkodzonego JSON
-            let result = extractQuestionsLoose(cleaned);
-            if (result && result.length > 0) {
-                return result;
+                console.warn("Parsowanie standardowe nie powiodło się.");
             }
 
             throw new Error("Nie udało się rozpoznać obiektów pytań. Upewnij się, że plik zawiera pytania (powinny mieć treść pytania oraz identyfikator).");
@@ -1509,37 +1642,29 @@
 
                     <!-- UWAGI DO GRAFIKI -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                        <label class="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
                             <i class="fa-solid fa-comment-dots text-amber-400"></i>
-                            Uwagi do grafiki / wyjasnienie merytoryczne
+                            📝 Uwagi do grafiki
                         </label>
-                        <textarea id="edit-media-notes-${q.id}" placeholder="Wpisz ewentualne uwagi, korekty lub wyjaśnienia..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none resize-y min-h-[50px]">${q.media_notes || ''}</textarea>
+                        <textarea id="edit-media-notes-${q.id}" placeholder="Uwagi do grafiki, korekty ilustracji..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-amber-500 outline-none resize-y min-h-[50px]">${q.media_notes || ''}</textarea>
                     </div>
 
-                    <!-- ŹRÓDŁA MERYTORYCZNE -->
-                    <div class="space-y-3 border-t border-slate-800/60 pt-3">
-                        <span class="block text-[9px] font-extrabold text-slate-500 uppercase tracking-wider">Źródła merytoryczne (nowy format)</span>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                                <i class="fa-solid fa-book text-purple-400"></i>
-                                Tekst przepisu (Vademecum)
-                            </label>
-                            <textarea id="edit-vademecum-${q.id}" placeholder="Pełny tekst przepisu prawnego..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-purple-500 outline-none resize-y min-h-[60px]">${q.zrodlo_opis_vademecum || ''}</textarea>
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                                <i class="fa-solid fa-graduation-cap text-teal-400"></i>
-                                Wyjaśnienie dla kursanta
-                            </label>
-                            <textarea id="edit-kursant-${q.id}" placeholder="Wyjaśnienie prostym językiem dla kursanta..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-teal-500 outline-none resize-y min-h-[60px]">${q.zrodlo_opis_kursant || ''}</textarea>
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                                <i class="fa-solid fa-bullseye text-teal-400"></i>
-                                Cel dydaktyczny
-                            </label>
-                            <input type="text" id="edit-cel-${q.id}" value="${q.cel_dydaktyczny || ''}" placeholder="np. Ocena ryzyka" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-teal-500 outline-none">
-                        </div>
+                    <!-- TEKST PRZEPISU -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[10px] text-purple-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-scale-balanced text-purple-400"></i>
+                            ⚖️ Podstawa — pełny tekst przepisu
+                        </label>
+                        <textarea id="edit-przepis-tekst-${q.id}" placeholder="Pełne brzmienie przepisu (cytat z ustawy)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-purple-500 outline-none resize-y min-h-[50px]">${q.przepis_tekst || ''}</textarea>
+                    </div>
+
+                    <!-- WYJAŚNIENIE DLA KURSANTA -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+                            🎓 Wyjaśnienie dla kursanta
+                        </label>
+                        <textarea id="edit-wyjasnienie-${q.id}" placeholder="Proste wyjaśnienie merytoryczne dla osoby uczącej się..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none resize-y min-h-[50px]">${q.wyjasnienie || ''}</textarea>
                     </div>
 
                     <!-- MULTIMEDIA -->
@@ -1632,9 +1757,6 @@
             const mediaTitleVal = document.getElementById(`edit-media-title-${id}`).value.trim();
             const mediaNotesVal = document.getElementById(`edit-media-notes-${id}`).value.trim();
             const przepisVal = document.getElementById(`edit-przepis-${id}`).value.trim();
-            const vademecumEl = document.getElementById(`edit-vademecum-${id}`);
-            const kursantEl = document.getElementById(`edit-kursant-${id}`);
-            const celEl = document.getElementById(`edit-cel-${id}`);
 
             if (!textVal) {
                 showToast("Treść pytania nie może być pusta!", "error");
@@ -1647,13 +1769,15 @@
             q.weight = weightVal;
             q.type = typeVal;
             q.correct_answer = correctVal;
+            const przepisTekstVal = document.getElementById(`edit-przepis-tekst-${id}`)?.value.trim();
+            const wyjasnienieVal = document.getElementById(`edit-wyjasnienie-${id}`)?.value.trim();
+
             q.media_url = mediaUrlVal || null;
             q.media_title = mediaTitleVal || null;
             q.media_notes = mediaNotesVal || null;
             q.przepis_zrodlowy = przepisVal || null;
-            if (vademecumEl) q.zrodlo_opis_vademecum = vademecumEl.value.trim() || null;
-            if (kursantEl) q.zrodlo_opis_kursant = kursantEl.value.trim() || null;
-            if (celEl) q.cel_dydaktyczny = celEl.value.trim() || null;
+            q.przepis_tekst = przepisTekstVal || null;
+            q.wyjasnienie = wyjasnienieVal || null;
 
             // Zapis audytora
             q.audited_by = currentUsername;
@@ -2041,11 +2165,7 @@
                     const inId = q.id.toLowerCase().includes(searchQuery);
                     const inQuestion = q.question.toLowerCase().includes(searchQuery);
                     const inMedia = q.media_title ? q.media_title.toLowerCase().includes(searchQuery) : false;
-                    const inPrzepis = q.przepis_zrodlowy ? q.przepis_zrodlowy.toLowerCase().includes(searchQuery) : false;
-                    const inVademecum = q.zrodlo_opis_vademecum ? q.zrodlo_opis_vademecum.toLowerCase().includes(searchQuery) : false;
-                    const inKursant = q.zrodlo_opis_kursant ? q.zrodlo_opis_kursant.toLowerCase().includes(searchQuery) : false;
-                    const inCel = q.cel_dydaktyczny ? q.cel_dydaktyczny.toLowerCase().includes(searchQuery) : false;
-                    matchesSearch = (inId || inQuestion || inMedia || inPrzepis || inVademecum || inKursant || inCel);
+                    matchesSearch = (inId || inQuestion || inMedia);
                 }
 
                 return (matchesGroup && matchesStatus && matchesSearch);
@@ -2160,40 +2280,37 @@
                 }
             }
 
-            // UWAGI DO GRAFIKI (WIZUALIZACJA NA KARCIE)
+            // UWAGI DO GRAFIKI, TEKST PRZEPISU, WYJAŚNIENIE DLA KURSANTA
             let notesMarkup = '';
+
             if (q.media_notes) {
-                notesMarkup = `
-                    <div class="mt-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200">
-                        <span class="font-extrabold uppercase text-[9px] tracking-wider block mb-1">📝 Uwagi do grafiki:</span>
+                notesMarkup += `
+                    <div class="mt-3 p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/25 text-xs text-amber-200">
+                        <span class="font-extrabold uppercase text-[9px] tracking-wider block mb-1.5 text-amber-400 flex items-center gap-1.5">📝 UWAGI DO GRAFIKI:</span>
                         <p class="leading-relaxed whitespace-pre-wrap">${q.media_notes}</p>
                     </div>
                 `;
             }
 
-            // ŹRÓDŁO: OPIS Z VADEMECUM (tekst prawny)
-            let vademecumMarkup = '';
-            if (q.zrodlo_opis_vademecum) {
-                vademecumMarkup = `
-                    <div class="mt-3 p-3 rounded-xl bg-purple-950/20 border border-purple-900/30 text-xs">
-                        <span class="font-extrabold uppercase text-[9px] tracking-wider block mb-1 text-purple-400">⚖️ Podstawa — tekst przepisu:</span>
-                        <p class="text-purple-200 leading-relaxed italic">${q.zrodlo_opis_vademecum}</p>
+            if (q.przepis_tekst) {
+                notesMarkup += `
+                    <div class="mt-3 p-3.5 rounded-xl bg-purple-950/30 border border-purple-500/25 text-xs text-purple-200">
+                        <span class="font-extrabold uppercase text-[9px] tracking-wider block mb-1.5 text-purple-400 flex items-center gap-1.5">⚖️ PODSTAWA — TEKST PRZEPISU:</span>
+                        <p class="leading-relaxed whitespace-pre-wrap italic">${q.przepis_tekst}</p>
                     </div>
                 `;
             }
 
-            // ŹRÓDŁO: WYJAŚNIENIE DLA KURSANTA
-            let kursantMarkup = '';
-            if (q.zrodlo_opis_kursant) {
-                kursantMarkup = `
-                    <div class="mt-3 p-3 rounded-xl bg-teal-950/20 border border-teal-900/30 text-xs">
-                        <span class="font-extrabold uppercase text-[9px] tracking-wider block mb-1 text-teal-400">🎓 Wyjaśnienie dla kursanta:</span>
-                        <p class="text-teal-200 leading-relaxed">${q.zrodlo_opis_kursant}</p>
+            if (q.wyjasnienie) {
+                notesMarkup += `
+                    <div class="mt-3 p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/25 text-xs text-indigo-200">
+                        <span class="font-extrabold uppercase text-[9px] tracking-wider block mb-1.5 text-indigo-400 flex items-center gap-1.5">🎓 WYJAŚNIENIE DLA KURSANTA:</span>
+                        <p class="leading-relaxed whitespace-pre-wrap">${q.wyjasnienie}</p>
                     </div>
                 `;
             }
 
-            // SYMULOWANY PODPIS AUDYTERA
+            // SYMULOWANY PODPIS AUDYTERA (DODANO)
             let auditInfoMarkup = '';
             if (q.audited_by) {
                 auditInfoMarkup = `
@@ -2215,21 +2332,13 @@
                             <span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg font-mono border border-slate-755">${q.id}</span>
                             <span class="bg-indigo-950/60 text-indigo-400 px-2.5 py-1 rounded-lg border border-indigo-900/30">${q.group_label || q.group}</span>
                             <span class="bg-amber-950/60 text-amber-400 px-2.5 py-1 rounded-lg border border-amber-900/30">${q.weight} pkt</span>
-
-                            ${q.cel_dydaktyczny ? `
-                                <span class="bg-teal-950/60 text-teal-400 px-2.5 py-1 rounded-lg border border-teal-900/30 text-[9px]">
-                                    🎯 ${q.cel_dydaktyczny}
-                                </span>
-                            ` : ''}
-
+                            
                             <!-- PODSTAWA PRAWNA -->
                             ${q.przepis_zrodlowy ? `
                                 <span class="bg-purple-950/60 text-purple-300 px-2.5 py-1 rounded-lg border border-purple-900/30 flex items-center gap-1 font-mono text-[9px]">
-                                    ⚖️ ${q.przepis_zrodlowy}
+                                    ⚖️ Art: ${q.przepis_zrodlowy}
                                 </span>
                             ` : ''}
-
-                            ${q.wersja ? `<span class="text-slate-600 text-[9px] font-mono px-1">v${q.wersja}</span>` : ''}
 
                             <!-- SYGNATURA AUDYTU -->
                             <span class="audit-info-pills flex items-center gap-1">
@@ -2242,8 +2351,6 @@
                         ${answersMarkup}
                         ${mediaMarkup}
                         ${notesMarkup}
-                        ${vademecumMarkup}
-                        ${kursantMarkup}
                     </div>
 
                     <!-- AKCJE STATUSU Z PRZYCISKIEM EDYCJI I ŚMIETNIKA -->
@@ -2379,13 +2486,255 @@
             });
         }
 
-        // --- INICJALIZACJA PRZY STARCIE STRONY ---
-        document.addEventListener('DOMContentLoaded', function() {
+        // --- INICJALIZACJA STATUSÓW (brak statusu → 'untouched') ---
+        function initializeStatuses() {
+            globalQuestions.forEach(q => {
+                if (!q.status) q.status = 'untouched';
+            });
+        }
+
+
+        // ============================================================
+        // GITHUB API — ZAPIS BAZY BEZPOŚREDNIO DO REPOZYTORIUM
+        // ============================================================
+
+        const GH_STORAGE_KEY = 'gde_auditor_github_config';
+
+        // Wczytaj zapisaną konfigurację z localStorage przy otwarciu panelu
+        window.openGitHubPanel = function() {
+            const panel = document.getElementById('github-panel');
+            if (!panel) return;
+            loadGitHubConfig();
+            // Ustaw domyślny plik na aktualną bazę
+            const filepath = document.getElementById('gh-filepath');
+            if (filepath && !filepath.value && currentDbKey && currentDbKey !== 'demo') {
+                filepath.value = `bazy/${currentDbKey}`;
+            }
+            // Ustaw domyślny opis commita
+            const msg = document.getElementById('gh-commit-msg');
+            if (msg && !msg.value) {
+                msg.value = `Audyt GDE [${currentUsername}]: aktualizacja bazy ${currentDbKey} — ${getFormattedCurrentDate()}`;
+            }
+            panel.classList.remove('hidden');
+        };
+
+        window.closeGitHubPanel = function() {
+            const panel = document.getElementById('github-panel');
+            if (panel) panel.classList.add('hidden');
+        };
+
+        window.toggleTokenVisibility = function() {
+            const input = document.getElementById('gh-token');
+            const btn = input ? input.nextElementSibling : null;
+            if (!input || !btn) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = 'Ukryj';
+            } else {
+                input.type = 'password';
+                btn.textContent = 'Pokaż';
+            }
+        };
+
+        function getGitHubFormValues() {
+            return {
+                owner: document.getElementById('gh-owner')?.value.trim() || '',
+                repo: document.getElementById('gh-repo')?.value.trim() || '',
+                branch: document.getElementById('gh-branch')?.value.trim() || 'main',
+                filepath: document.getElementById('gh-filepath')?.value.trim() || '',
+                token: document.getElementById('gh-token')?.value.trim() || '',
+                commitMsg: document.getElementById('gh-commit-msg')?.value.trim() || 'Audyt GDE: aktualizacja bazy'
+            };
+        }
+
+        window.saveGitHubConfig = function() {
+            const vals = getGitHubFormValues();
+            // Zapisz wszystko POZA tokenem — token zapisujemy osobno z ostrzeżeniem
+            const config = { owner: vals.owner, repo: vals.repo, branch: vals.branch, filepath: vals.filepath };
+            localStorage.setItem(GH_STORAGE_KEY, JSON.stringify(config));
+            // Token zapisujemy opcjonalnie — z wyraźnym oznaczeniem
+            if (vals.token) {
+                localStorage.setItem(GH_STORAGE_KEY + '_token', vals.token);
+            }
+            showToast('Konfiguracja GitHub zapisana lokalnie!', 'success');
+        };
+
+        function loadGitHubConfig() {
+            try {
+                const raw = localStorage.getItem(GH_STORAGE_KEY);
+                if (raw) {
+                    const config = JSON.parse(raw);
+                    if (config.owner) document.getElementById('gh-owner').value = config.owner;
+                    if (config.repo) document.getElementById('gh-repo').value = config.repo;
+                    if (config.branch) document.getElementById('gh-branch').value = config.branch;
+                    if (config.filepath) document.getElementById('gh-filepath').value = config.filepath;
+                }
+                const token = localStorage.getItem(GH_STORAGE_KEY + '_token');
+                if (token) document.getElementById('gh-token').value = token;
+            } catch(e) {}
+        }
+
+        function setGHStatus(msg, type = 'info') {
+            const el = document.getElementById('gh-connection-status');
+            if (!el) return;
+            el.classList.remove('hidden');
+            const styles = {
+                success: 'bg-emerald-950/40 border border-emerald-900/40 text-emerald-300',
+                error: 'bg-rose-950/40 border border-rose-900/40 text-rose-300',
+                info: 'bg-indigo-950/40 border border-indigo-900/40 text-indigo-300',
+                loading: 'bg-slate-800 border border-slate-700 text-slate-300'
+            };
+            el.className = `mb-4 p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${styles[type] || styles.info}`;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️', loading: '⏳' };
+            el.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${msg}</span>`;
+        }
+
+        // Pobiera aktualny SHA pliku (wymagany przez GitHub API do nadpisania)
+        async function getFileSHA(owner, repo, branch, filepath, token) {
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filepath}?ref=${branch}`;
+            const res = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github+json'
+                }
+            });
+            if (res.status === 404) return null; // Plik nie istnieje — będzie utworzony
+            if (!res.ok) throw new Error(`Błąd pobierania SHA: ${res.status} ${res.statusText}`);
+            const data = await res.json();
+            return data.sha || null;
+        }
+
+        window.testGitHubConnection = async function() {
+            const vals = getGitHubFormValues();
+            if (!vals.token) { setGHStatus('Podaj token PAT!', 'error'); return; }
+            if (!vals.owner || !vals.repo) { setGHStatus('Podaj owner i repozytorium!', 'error'); return; }
+
+            setGHStatus('Sprawdzam połączenie z repozytorium...', 'loading');
+            try {
+                const res = await fetch(`https://api.github.com/repos/${vals.owner}/${vals.repo}`, {
+                    headers: {
+                        'Authorization': `Bearer ${vals.token}`,
+                        'Accept': 'application/vnd.github+json'
+                    }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setGHStatus(`Połączono! Repozytorium: ${data.full_name} (${data.visibility})`, 'success');
+                    // Zaktualizuj dot statusu w headerze
+                    const dot = document.getElementById('github-status-dot');
+                    if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                } else if (res.status === 401) {
+                    setGHStatus('Token nieprawidłowy lub wygasły (401 Unauthorized)', 'error');
+                } else if (res.status === 404) {
+                    setGHStatus('Repozytorium nie znalezione lub brak dostępu (404)', 'error');
+                } else {
+                    setGHStatus(`Błąd połączenia: ${res.status} ${res.statusText}`, 'error');
+                }
+            } catch(e) {
+                setGHStatus(`Błąd sieciowy: ${e.message}`, 'error');
+            }
+        };
+
+        window.pushToGitHub = async function() {
+            const vals = getGitHubFormValues();
+
+            // Walidacja pól
+            if (!vals.token)    { setGHStatus('Podaj token PAT!', 'error'); return; }
+            if (!vals.owner)    { setGHStatus('Podaj nazwę użytkownika/organizacji (owner)!', 'error'); return; }
+            if (!vals.repo)     { setGHStatus('Podaj nazwę repozytorium!', 'error'); return; }
+            if (!vals.filepath) { setGHStatus('Podaj ścieżkę pliku docelowego (np. bazy/bazab.json)!', 'error'); return; }
+
+            const btn = document.getElementById('gh-push-btn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Zapisuję...'; }
+
+            setGHStatus('Przygotowuję dane i pobieram SHA pliku...', 'loading');
+
+            try {
+                // Serializacja aktualnej bazy do JSON
+                let exportData;
+                if (globalMetadata) {
+                    exportData = { metadane_banku: globalMetadata, pytania: globalQuestions };
+                } else {
+                    exportData = globalQuestions;
+                }
+                const jsonString = JSON.stringify(exportData, null, 2);
+                const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
+
+                // Pobierz aktualny SHA (wymagany do nadpisania istniejącego pliku)
+                const sha = await getFileSHA(vals.owner, vals.repo, vals.branch, vals.filepath, vals.token);
+
+                setGHStatus('Wysyłam dane do GitHub...', 'loading');
+
+                // Zbuduj payload dla GitHub API
+                const payload = {
+                    message: vals.commitMsg,
+                    content: base64Content,
+                    branch: vals.branch
+                };
+                if (sha) payload.sha = sha; // Wymagane przy nadpisaniu, opcjonalne przy tworzeniu
+
+                const apiUrl = `https://api.github.com/repos/${vals.owner}/${vals.repo}/contents/${vals.filepath}`;
+                const res = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${vals.token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const commitUrl = data.commit?.html_url || '#';
+                    setGHStatus(`✅ Zapisano pomyślnie! Commit: <a href="${commitUrl}" target="_blank" class="underline text-emerald-200 ml-1">Otwórz na GitHub →</a>`, 'success');
+                    showToast(`Baza zapisana do ${vals.filepath}!`, 'success');
+                    // Zaktualizuj dot w headerze
+                    const dot = document.getElementById('github-status-dot');
+                    const label = document.getElementById('github-btn-label');
+                    if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                    if (label) label.textContent = 'Zapisano ✓';
+                    setTimeout(() => { if (label) label.textContent = 'Zapisz do GitHub'; }, 4000);
+                } else {
+                    const errData = await res.json().catch(() => ({}));
+                    const errMsg = errData.message || res.statusText;
+                    setGHStatus(`Błąd zapisu: ${res.status} — ${errMsg}`, 'error');
+                    showToast('Błąd zapisu do GitHub!', 'error');
+                }
+            } catch(e) {
+                setGHStatus(`Błąd: ${e.message}`, 'error');
+                showToast('Błąd połączenia z GitHub!', 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class=\'fa-brands fa-github\'></i> Zapisz do repo'; }
+            }
+        };
+
+        // Zamknięcie panelu GitHub kliknięciem poza obszarem
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('github-panel');
+            if (panel && !panel.classList.contains('hidden')) {
+                const box = panel.querySelector('.bg-slate-900');
+                if (box && !box.contains(e.target) && e.target === panel) {
+                    closeGitHubPanel();
+                }
+            }
+        });
+
+        // Przy starcie sprawdź czy token jest zapisany i zaktualizuj dot
+        (function checkSavedToken() {
+            const token = localStorage.getItem(GH_STORAGE_KEY + '_token');
+            const dot = document.getElementById('github-status-dot');
+            if (token && dot) dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+        })();
+
+
+        // --- BOOT APLIKACJI ---
+        (async function initApp() {
             initializeStatuses();
             recalculateStats();
             resetPaginationAndRender();
-            tryAutostartBazaB();
-        });
+            await tryAutostartBazaB();
+        })();
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
