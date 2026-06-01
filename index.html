@@ -1317,9 +1317,9 @@
                     }
                 } else if (lowKey === 'media_notes' || lowKey === 'uwagi_do_grafiki' || lowKey === 'uwagi' || lowKey === 'uwagi_grafika') {
                     normalized.media_notes = String(val);
-                } else if (lowKey === 'wyjasnienie' || lowKey === 'wyjaśnienie' || lowKey === 'wyjasnienie_kursanta' || lowKey === 'explanation' || lowKey === 'opis') {
+                } else if (lowKey === 'wyjasnienie' || lowKey === 'wyjaśnienie' || lowKey === 'wyjasnienie_kursanta' || lowKey === 'explanation' || lowKey === 'zrodlo_opis_kursant') {
                     normalized.wyjasnienie = String(val);
-                } else if (lowKey === 'przepis_tekst' || lowKey === 'tekst_przepisu' || lowKey === 'przepis_cytat' || lowKey === 'cytat_przepisu') {
+                } else if (lowKey === 'przepis_tekst' || lowKey === 'tekst_przepisu' || lowKey === 'przepis_cytat' || lowKey === 'cytat_przepisu' || lowKey === 'zrodlo_opis_vademecum') {
                     normalized.przepis_tekst = String(val);
                 } else if (lowKey === 'przepis_zrodlowy' || lowKey === 'przepis' || lowKey === 'podstawa_prawna' || lowKey === 'podstawa' || lowKey === 'przepis_źródłowy') {
                     normalized.przepis_zrodlowy = String(val);
@@ -1346,6 +1346,10 @@
                 } else if (lowKey === 'opcja_c') {
                     if (!normalized.options) normalized.options = {};
                     normalized.options.C = String(val);
+                } else if (lowKey === 'cel_dydaktyczny') {
+                    normalized.cel_dydaktyczny = String(val);
+                } else if (lowKey === 'wersja') {
+                    normalized.wersja = val;
                 } else {
                     normalized[key] = val; // Zachowanie dodatkowych pol
                 }
@@ -2333,6 +2337,13 @@
                             <span class="bg-indigo-950/60 text-indigo-400 px-2.5 py-1 rounded-lg border border-indigo-900/30">${q.group_label || q.group}</span>
                             <span class="bg-amber-950/60 text-amber-400 px-2.5 py-1 rounded-lg border border-amber-900/30">${q.weight} pkt</span>
                             
+                            <!-- CEL DYDAKTYCZNY -->
+                            ${q.cel_dydaktyczny ? `
+                                <span class="bg-rose-950/50 text-rose-300 px-2.5 py-1 rounded-lg border border-rose-900/30 flex items-center gap-1 font-mono text-[9px]">
+                                    🎯 ${q.cel_dydaktyczny}
+                                </span>
+                            ` : ''}
+
                             <!-- PODSTAWA PRAWNA -->
                             ${q.przepis_zrodlowy ? `
                                 <span class="bg-purple-950/60 text-purple-300 px-2.5 py-1 rounded-lg border border-purple-900/30 flex items-center gap-1 font-mono text-[9px]">
