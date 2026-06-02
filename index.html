@@ -500,6 +500,85 @@
         </div>
     </div>
 
+
+    <!-- ============================================================ -->
+    <!-- PANEL PRZEGLĄDARKI MEDIÓW (MODAL WEWNĘTRZNY) -->
+    <!-- ============================================================ -->
+    <div id="media-panel" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[60] hidden flex flex-col">
+        <!-- HEADER PANELU -->
+        <div class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex items-center gap-4 flex-wrap shrink-0">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-400 flex items-center justify-center text-slate-950 font-black text-xs">M</div>
+                <div>
+                    <h2 class="text-xs font-bold text-white leading-none">Przeglądarka Mediów GDE</h2>
+                    <p id="mb-meta-info" class="text-[9px] text-slate-500 font-mono mt-0.5">Brak załadowanych mediów</p>
+                </div>
+            </div>
+
+            <!-- SEARCH -->
+            <div class="flex-1 max-w-xs relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 text-[10px]"></i>
+                <input type="search" id="mb-search" oninput="mbApplyFilters()" placeholder="Szukaj tytułu, tagów..." 
+                    class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:ring-1 focus:ring-teal-500 outline-none placeholder:text-slate-700">
+            </div>
+
+            <!-- FILTRY STATUSU -->
+            <div class="flex gap-1.5 flex-wrap">
+                <button onclick="mbSetFilter('status','all',this)" class="mb-filter-btn mb-filter-active text-[10px] px-3 py-1.5 rounded-lg border font-bold transition font-mono bg-slate-800 border-slate-700 text-slate-300" data-filter="status" data-val="all">Wszystkie</button>
+                <button onclick="mbSetFilter('status','gotowe',this)" class="mb-filter-btn text-[10px] px-3 py-1.5 rounded-lg border font-bold transition font-mono bg-slate-950 border-slate-800 text-slate-500" data-filter="status" data-val="gotowe">✅ Gotowe</button>
+                <button onclick="mbSetFilter('status','propozycja',this)" class="mb-filter-btn text-[10px] px-3 py-1.5 rounded-lg border font-bold transition font-mono bg-slate-950 border-slate-800 text-slate-500" data-filter="status" data-val="propozycja">💡 Propozycje</button>
+                <button onclick="mbSetFilter('status','do_zmiany',this)" class="mb-filter-btn text-[10px] px-3 py-1.5 rounded-lg border font-bold transition font-mono bg-slate-950 border-slate-800 text-slate-500" data-filter="status" data-val="do_zmiany">✏️ Do zmiany</button>
+            </div>
+
+            <!-- FILTRY GRUPY -->
+            <div class="flex gap-1 flex-wrap" id="mb-group-filters">
+                <!-- generowane dynamicznie -->
+            </div>
+
+            <!-- IMPORT + WYNIKI + ZAMKNIJ -->
+            <div class="flex items-center gap-2 ml-auto">
+                <span class="text-[10px] font-mono text-slate-500">Wyników: <strong id="mb-count" class="text-teal-400">0</strong></span>
+                <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-import text-teal-400 text-[9px]"></i> Wgraj media.json
+                    <input type="file" accept=".json" onchange="mbImportFile(event)" class="hidden">
+                </label>
+                <button onclick="closeMediaPanel()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-8 h-8 rounded-lg border border-slate-700 flex items-center justify-center transition text-sm font-bold">✕</button>
+            </div>
+        </div>
+
+        <!-- GRID MEDIÓW -->
+        <div class="flex-1 overflow-y-auto p-4">
+            <div id="mb-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-3"></div>
+            <div id="mb-load-more" class="hidden text-center py-6">
+                <button onclick="mbLoadMore()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-6 py-2.5 rounded-xl border border-slate-700 transition font-mono">Załaduj więcej</button>
+            </div>
+            <div id="mb-empty" class="hidden text-center py-20 text-slate-600">
+                <i class="fa-solid fa-photo-film text-4xl mb-3 block text-slate-800"></i>
+                <p class="text-sm font-bold text-slate-500">Brak mediów</p>
+                <p class="text-xs text-slate-700 mt-1">Wgraj plik media.json lub umieść go w folderze /bazy</p>
+            </div>
+        </div>
+
+        <!-- LIGHTBOX MEDIÓW (nakładka na panel) -->
+        <div id="mb-lightbox" class="hidden fixed inset-0 bg-slate-950/95 z-[70] flex items-center justify-center p-6 backdrop-blur-sm" onclick="mbCloseLightbox(event)">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" id="mb-lb-box" onclick="event.stopPropagation()">
+                <div id="mb-lb-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STYLE PANELU MEDIÓW -->
+    <style>
+    .mb-card { background:#0d1520; border:1px solid #1a2535; border-radius:10px; overflow:hidden; cursor:pointer; transition:all 0.15s; }
+    .mb-card:hover { border-color:#2a9d8f; transform:translateY(-2px); box-shadow:0 6px 24px rgba(42,157,143,0.12); }
+    .mb-card img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#070e1a; }
+    .mb-card .mb-placeholder { width:100%; aspect-ratio:16/9; background:linear-gradient(135deg,#0a1520,#0d1e30); display:flex; align-items:center; justify-content:center; color:#1e3a5a; font-size:1.5rem; }
+    .mb-filter-btn:hover { border-color:#2a9d8f; color:#2a9d8f; background:#071a18 !important; }
+    .mb-filter-active { background:#071a18 !important; border-color:#2a9d8f !important; color:#2a9d8f !important; }
+    #media-panel { display:flex; }
+    #media-panel.hidden { display:none !important; }
+    </style>
+
     <!-- SKRYPT LOGICZNY -->
     <script>
         // Startowy, w 100% spójny zestaw startowy pytań prosto z pliku 1500 pytań!
@@ -1674,7 +1753,12 @@
                     <!-- MULTIMEDIA -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Adres URL multimediów</label>
+                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center justify-between">
+                                Adres URL multimediów
+                                <button type="button" onclick="openMediaPanel('${q.id}')" class="text-[9px] bg-teal-900/40 hover:bg-teal-800/50 text-teal-400 border border-teal-700/40 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                                    <i class="fa-solid fa-photo-film"></i> Przeglądaj media
+                                </button>
+                            </label>
                             <input type="text" id="edit-media-url-${q.id}" value="${q.media_url || ''}" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
                         </div>
                         <div class="flex flex-col gap-1.5">
@@ -2738,6 +2822,353 @@
             if (token && dot) dot.className = 'w-2 h-2 rounded-full bg-amber-500';
         })();
 
+
+
+        window.openMediaBrowser = function(questionId) {
+            // Zapamiętaj ID pytania którego dotyczy wybór
+            window._mediaBrowserTargetId = questionId;
+            // Otwórz przeglądarkę w nowym oknie
+            const w = window.open('media_browser.html', 'MediaBrowser',
+                'width=1200,height=800,resizable=yes,scrollbars=yes');
+            if (!w) {
+                showToast('Zezwól na otwieranie okien popup dla tej strony!', 'error');
+            }
+        };
+
+        // Callback wywoływany przez Media Browser po wybraniu medium
+        window.receiveMediaAssignment = function(data) {
+            const id = window._mediaBrowserTargetId;
+            if (!id) return;
+            const urlInput = document.getElementById(`edit-media-url-${id}`);
+            const titleInput = document.getElementById(`edit-media-title-${id}`);
+            if (urlInput) urlInput.value = data.url || '';
+            if (titleInput) titleInput.value = data.title || '';
+            showToast(`Przypisano: ${data.title}`, 'success');
+            window._mediaBrowserTargetId = null;
+        };
+
+
+        // ============================================================
+        // PRZEGLĄDARKA MEDIÓW GDE — LOGIKA
+        // ============================================================
+
+        let mbAllMedia = [];       // Wszystkie załadowane media
+        let mbFiltered = [];       // Po filtracji
+        let mbShown = 0;
+        const MB_PER_PAGE = 48;
+        let mbFilters = { status: 'all', group: 'all' };
+        let mbTargetQuestionId = null;  // ID pytania które czeka na przypisanie
+
+        // --- OTWARCIE / ZAMKNIĘCIE ---
+        window.openMediaPanel = function(questionId) {
+            mbTargetQuestionId = questionId || null;
+            document.getElementById('media-panel').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            // Jeśli brak mediów — spróbuj załadować automatycznie
+            if (mbAllMedia.length === 0) mbTryAutoload();
+            else mbApplyFilters();
+        };
+
+        window.closeMediaPanel = function() {
+            document.getElementById('media-panel').classList.add('hidden');
+            document.body.style.overflow = '';
+            mbTargetQuestionId = null;
+        };
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                if (!document.getElementById('mb-lightbox').classList.contains('hidden')) {
+                    mbCloseLightbox();
+                } else if (!document.getElementById('media-panel').classList.contains('hidden')) {
+                    closeMediaPanel();
+                }
+            }
+        });
+
+        // --- AUTOLOAD z bazy/media.json ---
+        async function mbTryAutoload() {
+            const metaEl = document.getElementById('mb-meta-info');
+            if (metaEl) metaEl.textContent = 'Szukam bazy/media.json...';
+            try {
+                const res = await fetch('bazy/media.json');
+                if (res.ok) {
+                    const data = await res.json();
+                    mbLoadData(data, 'bazy/media.json');
+                    return;
+                }
+            } catch(e) {}
+            // GitHub API fallback
+            try {
+                const githubFiles = await scanGitHubBazyFolder();
+                if (githubFiles) {
+                    const mediaFile = githubFiles.find(f => f.name === 'media.json');
+                    if (mediaFile) {
+                        const res = await fetch(mediaFile.download_url);
+                        if (res.ok) {
+                            const data = await res.json();
+                            mbLoadData(data, mediaFile.name);
+                            return;
+                        }
+                    }
+                }
+            } catch(e) {}
+            // Nic nie znaleziono
+            if (metaEl) metaEl.textContent = 'Brak bazy/media.json — wgraj plik ręcznie';
+            mbApplyFilters();
+        }
+
+        // --- IMPORT PLIKU ---
+        window.mbImportFile = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    mbLoadData(data, file.name);
+                    showToast(`Załadowano media z: ${file.name}`, 'success');
+                } catch(err) {
+                    showToast('Błąd parsowania pliku media.json!', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        };
+
+        // --- ZAŁADUJ DANE ---
+        function mbLoadData(data, source) {
+            // Obsługa obu formatów: { meta, media: [...] } lub bezpośrednio [...]
+            let entries = Array.isArray(data) ? data : (data.media || []);
+            const meta = Array.isArray(data) ? null : data.meta;
+
+            // Normalizacja — zapewnij wymagane pola
+            mbAllMedia = entries.map((m, i) => ({
+                id:       m.id || `M_${i}`,
+                tytul:    m.tytul || m.title || m.t || `Media ${i}`,
+                grupa:    m.grupa || m.group || m.g || '',
+                typ:      m.typ || m.type || (m.url_video || m.v ? 'video' : 'image'),
+                url_16_9: m.url_16_9 || m.i || m.url || m.media_url || '',
+                url_1_1:  m.url_1_1 || m.i1 || '',
+                url_video:m.url_video || m.v || null,
+                url_cover:m.url_cover || m.vc || null,
+                tagi:     Array.isArray(m.tagi) ? m.tagi : (m.tagi ? [m.tagi] : []),
+                uwagi:    m.uwagi || m.media_notes || '',
+                status:   m.status || 'gotowe',
+                pyt_ids:  m.pyt_ids || m.p || '',
+                autor:    m.autor || (meta && meta.autor) || '',
+                data_mod: m.data_mod || (meta && meta.data) || ''
+            }));
+
+            const metaEl = document.getElementById('mb-meta-info');
+            if (metaEl) {
+                const autor = meta && meta.autor ? ` · autor: ${meta.autor}` : '';
+                metaEl.textContent = `${mbAllMedia.length} mediów z "${source}"${autor}`;
+            }
+
+            mbBuildGroupFilters();
+            mbFilters = { status: 'all', group: 'all' };
+            mbResetFilterButtons();
+            mbApplyFilters();
+        }
+
+        // --- BUDUJ FILTRY GRUP ---
+        function mbBuildGroupFilters() {
+            const grupy = [...new Set(mbAllMedia.map(m => m.grupa).filter(Boolean))].sort();
+            const container = document.getElementById('mb-group-filters');
+            if (!container) return;
+            let html = `<button onclick="mbSetFilter('group','all',this)" class="mb-filter-btn mb-filter-active text-[10px] px-2.5 py-1.5 rounded-lg border font-bold transition font-mono bg-slate-950 border-slate-800 text-slate-500" data-filter="group" data-val="all">Wszystkie grupy</button>`;
+            grupy.forEach(g => {
+                html += `<button onclick="mbSetFilter('group','${g}',this)" class="mb-filter-btn text-[10px] px-2.5 py-1.5 rounded-lg border font-bold transition font-mono bg-slate-950 border-slate-800 text-slate-500" data-filter="group" data-val="${g}">${g}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function mbResetFilterButtons() {
+            document.querySelectorAll('.mb-filter-btn').forEach(b => {
+                b.classList.remove('mb-filter-active');
+                if (b.dataset.val === 'all') b.classList.add('mb-filter-active');
+            });
+        }
+
+        // --- FILTRY ---
+        window.mbSetFilter = function(type, val, btn) {
+            mbFilters[type] = val;
+            document.querySelectorAll(`[data-filter="${type}"]`).forEach(b => b.classList.remove('mb-filter-active'));
+            if (btn) btn.classList.add('mb-filter-active');
+            mbApplyFilters();
+        };
+
+        window.mbApplyFilters = function() {
+            const q = (document.getElementById('mb-search')?.value || '').toLowerCase().trim();
+            mbFiltered = mbAllMedia.filter(m => {
+                if (mbFilters.status !== 'all' && m.status !== mbFilters.status) return false;
+                if (mbFilters.group !== 'all' && m.grupa !== mbFilters.group) return false;
+                if (q) {
+                    const haystack = [m.tytul, m.uwagi, ...m.tagi].join(' ').toLowerCase();
+                    if (!haystack.includes(q)) return false;
+                }
+                return true;
+            });
+            mbShown = 0;
+            mbRenderGrid(true);
+        };
+
+        // --- RENDEROWANIE SIATKI ---
+        function mbRenderGrid(reset) {
+            const grid = document.getElementById('mb-grid');
+            const empty = document.getElementById('mb-empty');
+            const more = document.getElementById('mb-load-more');
+            const countEl = document.getElementById('mb-count');
+
+            if (reset) grid.innerHTML = '';
+
+            if (mbFiltered.length === 0) {
+                empty.classList.remove('hidden');
+                more.classList.add('hidden');
+                if (countEl) countEl.textContent = '0';
+                return;
+            }
+            empty.classList.add('hidden');
+            if (countEl) countEl.textContent = mbFiltered.length;
+
+            const batch = mbFiltered.slice(mbShown, mbShown + MB_PER_PAGE);
+            mbShown += batch.length;
+
+            batch.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'mb-card';
+                div.onclick = () => mbOpenLightbox(m);
+
+                const statusColors = { gotowe:'bg-emerald-500', propozycja:'bg-amber-500', do_zmiany:'bg-rose-500' };
+                const statusDot = `<span class="absolute top-1.5 left-1.5 w-2 h-2 rounded-full ${statusColors[m.status]||'bg-slate-500'}"></span>`;
+                const vidBadge = m.url_video ? `<span class="absolute top-1.5 right-1.5 bg-red-600/85 text-white text-[8px] font-bold px-1.5 py-0.5 rounded font-mono">VID</span>` : '';
+                const thumb = m.url_16_9
+                    ? `<img src="${m.url_16_9}" loading="lazy" onerror="this.style.display='none'">`
+                    : `<div class="mb-placeholder"><i class="fa-solid fa-${m.url_video?'film':'image'}" style="opacity:.3"></i></div>`;
+
+                div.innerHTML = `
+                    <div style="position:relative">
+                        ${thumb}${statusDot}${vidBadge}
+                    </div>
+                    <div style="padding:6px 8px 7px">
+                        <p style="font-size:10px;font-weight:600;color:#cbd5e1;line-height:1.3;margin:0 0 2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${m.tytul}</p>
+                        <p style="font-size:9px;color:#334155;font-family:monospace">${m.grupa||'—'} · ${m.typ}</p>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+
+            more.classList.toggle('hidden', mbShown >= mbFiltered.length);
+        }
+
+        window.mbLoadMore = function() { mbRenderGrid(false); };
+
+        // --- LIGHTBOX SZCZEGÓŁÓW MEDIUM ---
+        window.mbOpenLightbox = function(m) {
+            const lb = document.getElementById('mb-lightbox');
+            const content = document.getElementById('mb-lb-content');
+            lb.classList.remove('hidden');
+
+            const isVideo = !!m.url_video;
+            const mediaHTML = isVideo
+                ? `<video controls class="w-full rounded-t-2xl" style="max-height:340px;background:#000" ${m.url_cover?`poster="${m.url_cover}"`:''}><source src="${m.url_video}" type="video/mp4"></video>`
+                : m.url_16_9
+                    ? `<img src="${m.url_16_9}" class="w-full rounded-t-2xl" style="max-height:340px;object-fit:cover">`
+                    : `<div style="height:200px;background:#0a0f18;display:flex;align-items:center;justify-content:center;border-radius:1rem 1rem 0 0"><i class="fa-solid fa-image-slash text-slate-700 text-4xl"></i></div>`;
+
+            const statusLabels = { gotowe:'✅ Gotowe', propozycja:'💡 Propozycja', do_zmiany:'✏️ Do zmiany' };
+            const tagiHTML = m.tagi.length ? m.tagi.map(t=>`<span style="background:#0d2a26;border:1px solid #0f3d30;color:#34d399;font-size:9px;padding:2px 8px;border-radius:4px;font-family:monospace">${t}</span>`).join('') : '';
+
+            // Rzędy URLi
+            const urlRow = (label, url, icon='image') => url ? `
+                <div style="display:flex;align-items:center;gap:8px;background:#070e1a;border:1px solid #0f1f35;border-radius:8px;padding:6px 10px;margin-bottom:4px">
+                    <i class="fa-solid fa-${icon}" style="color:#334155;font-size:10px;width:12px"></i>
+                    <span style="font-size:9px;color:#334155;font-family:monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${url}">${url.replace('https://cdn.e-kierowca.pl/media/','…/').substring(0,55)}</span>
+                    <button onclick="navigator.clipboard.writeText('${url.replace(/'/g,"\\'")}').then(()=>showToast('Skopiowano!','success'))" style="background:#0d1e3a;border:1px solid #1e3a5a;color:#60a5fa;padding:3px 8px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;font-family:monospace">Kopiuj</button>
+                    <a href="${url}" target="_blank" style="background:#0d1e3a;border:1px solid #1e3a5a;color:#60a5fa;padding:3px 8px;border-radius:5px;font-size:9px;font-weight:700;text-decoration:none">↗</a>
+                </div>` : '';
+
+            // Czy jest aktywny cel (edytowane pytanie)?
+            const assignSection = mbTargetQuestionId ? `
+                <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1a2535">
+                    <p style="font-size:10px;color:#94a3b8;font-weight:700;margin:0 0 8px;text-transform:uppercase;letter-spacing:.05em">Przypisz do pytania <span style="color:#2dd4bf;font-family:monospace">${mbTargetQuestionId}</span>:</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                        ${m.url_16_9 ? `<button onclick="mbAssignUrl('${m.url_16_9.replace(/'/g,"\\'")}','${m.tytul.replace(/'/g,"\\'")}','${isVideo?'video':'image'}')" style="background:linear-gradient(135deg,#0d7a6e,#0a6b60);border:1px solid #2a9d8f;color:#a7f3d0;padding:10px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:sans-serif">
+                            🖼️ Użyj obrazu 16:9
+                        </button>` : ''}
+                        ${m.url_video ? `<button onclick="mbAssignUrl('${m.url_video.replace(/'/g,"\\'")}','${m.tytul.replace(/'/g,"\\'")}','video')" style="background:linear-gradient(135deg,#7a0d1a,#6b0a10);border:1px solid #9d2a3a;color:#fca5a5;padding:10px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:sans-serif">
+                            🎬 Użyj wideo
+                        </button>` : ''}
+                        ${m.url_1_1 ? `<button onclick="mbAssignUrl('${m.url_1_1.replace(/'/g,"\\'")}','${m.tytul.replace(/'/g,"\\'")}','image')" style="background:#0d1a2e;border:1px solid #1e3a5a;color:#93c5fd;padding:10px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:sans-serif">
+                            📱 Użyj obrazu 1:1
+                        </button>` : ''}
+                    </div>
+                </div>` : '';
+
+            content.innerHTML = `
+                ${mediaHTML}
+                <div style="padding:16px 20px 20px">
+                    <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+                        <div style="flex:1">
+                            <p style="font-size:14px;font-weight:700;color:#f1f5f9;margin:0 0 4px">${m.tytul}</p>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                                <span style="font-size:9px;color:#475569;font-family:monospace">${m.id}</span>
+                                ${m.grupa ? `<span style="background:#0d2040;border:1px solid #1e3a5a;color:#60a5fa;font-size:9px;padding:2px 7px;border-radius:4px;font-family:monospace">${m.grupa}</span>` : ''}
+                                <span style="font-size:9px;color:#475569">${statusLabels[m.status]||m.status}</span>
+                            </div>
+                        </div>
+                        <button onclick="mbCloseLightbox()" style="background:#1e293b;border:none;color:#94a3b8;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">✕</button>
+                    </div>
+
+                    ${tagiHTML ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">${tagiHTML}</div>` : ''}
+
+                    ${m.uwagi ? `<div style="background:#1a1200;border:1px solid #3a2800;border-radius:8px;padding:8px 12px;margin-bottom:10px">
+                        <p style="font-size:9px;color:#b45309;font-weight:700;margin:0 0 3px;text-transform:uppercase;letter-spacing:.05em">📝 Uwagi eksperta:</p>
+                        <p style="font-size:11px;color:#fcd34d;margin:0;line-height:1.4">${m.uwagi}</p>
+                    </div>` : ''}
+
+                    <!-- URLe -->
+                    <div style="margin-bottom:4px">
+                        ${urlRow('Obraz 16:9', m.url_16_9, 'image')}
+                        ${urlRow('Wideo', m.url_video, 'film')}
+                        ${urlRow('Obraz 1:1', m.url_1_1, 'mobile-screen')}
+                    </div>
+
+                    ${assignSection}
+                </div>
+            `;
+        };
+
+        window.mbCloseLightbox = function(e) {
+            if (!e || e.target === document.getElementById('mb-lightbox')) {
+                document.getElementById('mb-lightbox').classList.add('hidden');
+                document.getElementById('mb-lb-content').innerHTML = '';
+            }
+        };
+
+        // --- PRZYPISZ URL DO PYTANIA ---
+        window.mbAssignUrl = function(url, title, type) {
+            if (!mbTargetQuestionId) return;
+            const id = mbTargetQuestionId;
+
+            const urlInput = document.getElementById(`edit-media-url-${id}`);
+            const titleInput = document.getElementById(`edit-media-title-${id}`);
+
+            if (urlInput) urlInput.value = url;
+            if (titleInput) titleInput.value = title;
+
+            // Zaktualizuj też obiekt pytania w pamięci od razu
+            const q = globalQuestions.find(item => item.id === id);
+            if (q) {
+                q.media_url = url;
+                q.media_title = title;
+                q.media_type = type;
+            }
+
+            showToast(`✅ Przypisano medium: "${title.substring(0,40)}"`, 'success');
+            document.getElementById('mb-lightbox').classList.add('hidden');
+            closeMediaPanel();
+        };
 
         // --- BOOT APLIKACJI ---
         (async function initApp() {
