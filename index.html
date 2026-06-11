@@ -431,7 +431,7 @@
 
             <!-- MODAL: BANK MEDIÓW -->
             <div id="media-picker-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
                     <!-- Header modalu -->
                     <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800 shrink-0">
                         <div class="flex items-center gap-3">
@@ -463,7 +463,7 @@
                     </div>
 
                     <!-- Siatka wyników -->
-                    <div id="media-picker-grid" class="flex-1 overflow-y-auto p-3 grid grid-cols-3 sm:grid-cols-4 gap-2 content-start">
+                    <div id="media-picker-grid" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 content-start">
                         <div class="col-span-full text-center py-10 text-slate-600 text-xs">
                             <i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>
                             Ładowanie banku mediów...
@@ -861,7 +861,7 @@
 
                 return `<button type="button" data-midx="${idx}" class="media-card group"
                     style="background:#0a0f1e;border:1px solid #1e293b;border-radius:10px;overflow:hidden;text-align:left;display:flex;flex-direction:column;cursor:pointer;transition:border-color 0.15s;">
-                    <div style="width:100%;height:80px;overflow:hidden;background:#020617;flex-shrink:0;position:relative;">
+                    <div style="width:100%;height:120px;overflow:hidden;background:#020617;flex-shrink:0;position:relative;">
                         ${thumbInner}
                         ${badge}
                         <div class="pick-overlay" style="position:absolute;inset:0;background:rgba(16,185,129,0);display:flex;align-items:center;justify-content:center;opacity:0;transition:all 0.15s;pointer-events:none;">
@@ -2889,7 +2889,7 @@
     </script>
             <!-- MODAL: BANK MEDIÓW -->
             <div id="media-picker-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
                     <!-- Header modalu -->
                     <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800 shrink-0">
                         <div class="flex items-center gap-3">
@@ -2921,7 +2921,7 @@
                     </div>
 
                     <!-- Siatka wyników -->
-                    <div id="media-picker-grid" class="flex-1 overflow-y-auto p-3 grid grid-cols-3 sm:grid-cols-4 gap-2 content-start">
+                    <div id="media-picker-grid" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 content-start">
                         <div class="col-span-full text-center py-10 text-slate-600 text-xs">
                             <i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>
                             Ładowanie banku mediów...
