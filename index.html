@@ -1004,8 +1004,13 @@
                 newQ.correct_answer = document.getElementById('new-q-correct-abc').value;
             }
 
-            globalQuestions.push(newQ);
+            globalQuestions.unshift(newQ);
             loadedDatabases[currentDbKey] = globalQuestions;
+
+            // Wyczyść filtry żeby nowe pytanie było widoczne na górze
+            activeStatusFilter = 'ALL';
+            activeGroupFilter = 'ALL';
+            updateActiveFiltersUI();
 
             // Reset formularza
             document.getElementById('new-q-id').value = '';
