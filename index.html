@@ -2144,7 +2144,7 @@
                         'Śmietnik': 'border-l-4 border-slate-700 opacity-60 grayscale-[25%]',
                         'untouched': 'border-l-4 border-slate-800'
                     };
-                    card.className = "bg-slate-900/40 rounded-2xl p-5 border border-slate-800/85 shadow-md transition-all-300 " + (borderColors[newStatus] || borderColors['untouched']);
+                    card.className = "bg-slate-900/40 rounded-2xl border border-slate-800/85 shadow-md overflow-hidden transition-all-300 " + (borderColors[newStatus] || borderColors['untouched']);
 
                     const btnApprove = card.querySelector('.btn-approve');
                     const btnReview = card.querySelector('.btn-review');
@@ -2487,55 +2487,44 @@
                 'Śmietnik': 'border-l-4 border-slate-700 opacity-50 shadow-none saturate-[60%] brightness-[85%]',
                 'untouched': 'border-l-4 border-slate-800'
             };
-            div.className = "bg-slate-900/40 rounded-2xl p-5 border border-slate-800/85 shadow-md transition-all-300 " + (borderColors[q.status] || borderColors['untouched']);
+            div.className = "bg-slate-900/40 rounded-2xl border border-slate-800/85 shadow-md overflow-hidden transition-all-300 " + (borderColors[q.status] || borderColors['untouched']);
 
-            // KARTA SLAJDU ŹRÓDŁOWEGO (z SLIDES_NAV via zrodlo_wiersze_xlsx)
+            // KARTA SLAJDU ŹRÓDŁOWEGO — kompaktowa dla kolumny didaskaliów
             let slideSourceMarkup = '';
             if (q.zrodlo_wiersze_xlsx && Array.isArray(q.zrodlo_wiersze_xlsx) && q.zrodlo_wiersze_xlsx.length > 0) {
+                const slideCount = q.zrodlo_wiersze_xlsx.length;
                 const slideCards = q.zrodlo_wiersze_xlsx.map(xlsxRow => {
                     const s = SLIDES_NAV[String(xlsxRow)];
-                    if (!s) return `
-                        <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-2.5 text-[10px] text-slate-600 font-mono">
-                            Wiersz xlsx ${xlsxRow} — brak w indeksie slajdów
-                        </div>`;
-
+                    if (!s) return `<div class="text-[9px] text-slate-700 font-mono">xlsx:${xlsxRow} — brak danych</div>`;
                     return `
-                        <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl overflow-hidden">
-                            <div class="p-2.5 space-y-1.5">
-                                <div class="text-[9px] font-mono text-slate-600 font-bold">xlsx: ${xlsxRow}</div>
-                                <div class="text-[10px] font-bold text-slate-200 leading-tight">${s.T || '—'}</div>
-                                <div class="text-[9px] text-slate-500 font-medium truncate" title="${s.W || ''}">
-                                    <i class="fa-solid fa-book-open mr-1 text-slate-600"></i>${s.W || '—'}
-                                </div>
-                                <div class="text-[9px] text-indigo-400 font-mono font-bold">
-                                    Slajd nr ${s.N || '?'}
-                                </div>
-                                ${s.P ? `
-                                <div class="border-t border-slate-800/60 pt-1.5 space-y-1">
-                                    <div class="text-[9px] font-extrabold text-purple-500 uppercase tracking-wider">Podstawa prawna (ustawa/rozporządzenie, artykuł, paragraf, ustęp)</div>
-                                    <div class="text-[9px] text-purple-300 leading-relaxed">${s.P}</div>
-                                </div>` : ''}
-                                ${s.C ? `
-                                <div class="space-y-1">
-                                    <div class="text-[9px] font-extrabold text-amber-500 uppercase tracking-wider">cytat z ustawy/rozporządzenia do slajdu, adekwatny</div>
-                                    <div class="text-[9px] text-amber-200 leading-relaxed italic">"${s.C}"</div>
-                                </div>` : ''}
+                        <div class="border border-slate-800/60 rounded-lg p-2 space-y-1 bg-slate-950/40">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-[8px] font-mono text-slate-600">xlsx:${xlsxRow}</span>
+                                <span class="text-[8px] font-mono text-indigo-400 font-bold">Slajd ${s.N || '?'}</span>
                             </div>
+                            <div class="text-[10px] font-bold text-slate-200 leading-tight">${s.T || '—'}</div>
+                            <div class="text-[8px] text-slate-600 truncate" title="${s.W || ''}">${(s.W || '').replace(/Wykład \d+ - /,'')}</div>
+                            ${s.P ? `
+                            <div class="pt-1 border-t border-slate-800/40">
+                                <div class="text-[8px] font-extrabold text-purple-500 uppercase tracking-wider mb-0.5">Podstawa prawna (ustawa/rozporządzenie, artykuł, paragraf, ustęp)</div>
+                                <div class="text-[9px] text-purple-300/80 leading-relaxed">${s.P}</div>
+                            </div>` : ''}
+                            ${s.C ? `
+                            <div>
+                                <div class="text-[8px] font-extrabold text-amber-500 uppercase tracking-wider mb-0.5">cytat z ustawy/rozporządzenia do slajdu, adekwatny</div>
+                                <div class="text-[9px] text-amber-200/70 italic leading-relaxed">"${s.C}"</div>
+                            </div>` : ''}
                         </div>`;
                 }).join('');
 
-                const slideCount = q.zrodlo_wiersze_xlsx.length;
                 slideSourceMarkup = `
-                    <div class="mt-4 space-y-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider">
-                                📋 Źródło — slajdy z slides_b_v3.xlsx
-                            </span>
-                            <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${slideCount} slajd${slideCount > 1 ? 'ów' : ''}</span>
+                    <div class="space-y-1.5">
+                        <div class="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-table text-slate-600"></i>
+                            Slajdy źródłowe
+                            <span class="bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${slideCount}</span>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2">
-                            ${slideCards}
-                        </div>
+                        ${slideCards}
                     </div>`;
             }
 
@@ -2649,63 +2638,84 @@
             const isUntouched = !q.status || q.status === 'untouched';
 
             div.innerHTML = `
-                <div class="flex flex-col xl:flex-row justify-between items-start gap-4">
-                    <div class="space-y-1 flex-1 w-full">
+                <div class="grid grid-cols-1 xl:grid-cols-[1fr_280px_120px] gap-0 divide-x divide-slate-800/60">
+
+                    <!-- KOLUMNA 1: TREŚĆ PYTANIA + ODPOWIEDZI + MEDIA -->
+                    <div class="space-y-1 p-5">
                         <div class="flex flex-wrap gap-2 items-center text-[10px] font-bold">
                             <span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg font-mono border border-slate-755">${q.id}</span>
                             <span class="bg-indigo-950/60 text-indigo-400 px-2.5 py-1 rounded-lg border border-indigo-900/30">${q.group_label || q.group}</span>
                             <span class="bg-amber-950/60 text-amber-400 px-2.5 py-1 rounded-lg border border-amber-900/30">${q.weight} pkt</span>
-
-                            ${q.cel_dydaktyczny ? `
-                                <span class="bg-teal-950/60 text-teal-400 px-2.5 py-1 rounded-lg border border-teal-900/30 text-[9px]">
-                                    🎯 ${q.cel_dydaktyczny}
-                                </span>
-                            ` : ''}
-
-                            <!-- PODSTAWA PRAWNA -->
-                            ${q.przepis_zrodlowy ? `
-                                <span class="bg-purple-950/60 text-purple-300 px-2.5 py-1 rounded-lg border border-purple-900/30 flex items-center gap-1 font-mono text-[9px]">
-                                    ⚖️ ${q.przepis_zrodlowy}
-                                </span>
-                            ` : ''}
-
-                            ${q.wersja ? `<span class="text-slate-600 text-[9px] font-mono px-1">v${q.wersja}</span>` : ''}
-
-                            <!-- SYGNATURA AUDYTU -->
-                            <span class="audit-info-pills flex items-center gap-1">
-                                ${auditInfoMarkup}
-                            </span>
-                            
-                            <span class="text-slate-500 uppercase font-bold text-[9px] px-1">${q.part || ''}</span>
+                            ${q.cel_dydaktyczny ? `<span class="bg-teal-950/60 text-teal-400 px-2.5 py-1 rounded-lg border border-teal-900/30 text-[9px]">🎯 ${q.cel_dydaktyczny}</span>` : ''}
+                            ${q.wersja ? `<span class="text-slate-600 text-[9px] font-mono">v${q.wersja}</span>` : ''}
+                            <span class="text-slate-500 uppercase font-bold text-[9px]">${q.part || ''}</span>
+                            <span class="audit-info-pills flex items-center gap-1">${auditInfoMarkup}</span>
                         </div>
                         <p class="text-sm font-semibold text-slate-100 mt-3 leading-relaxed">${q.question}</p>
                         ${answersMarkup}
                         ${mediaMarkup}
-                        ${notesMarkup}
-                        ${vademecumMarkup}
-                        ${kursantMarkup}
-                        ${slideSourceMarkup}
                     </div>
 
-                    <!-- AKCJE STATUSU Z PRZYCISKIEM EDYCJI I ŚMIETNIKA -->
-                    <div class="bg-slate-950/60 p-1.5 rounded-xl flex xl:flex-col gap-1 w-full xl:w-36 border border-slate-800/80 shrink-0 justify-around xl:justify-start xl:self-stretch">
-                        <button onclick="updateQuestionStatus('${q.id}', 'Zatwierdzone')" class="btn-approve px-4 py-2 text-xs font-semibold rounded-lg transition-all-300 flex items-center justify-center gap-1.5 xl:w-full ${isApproved ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 font-bold' : 'text-slate-400 hover:bg-slate-800'}">
-                            ✔️ OK
+                    <!-- KOLUMNA 2: DIDASKALIA — KONTEKST MERYTORYCZNY -->
+                    <div class="p-4 space-y-3 text-[11px] bg-slate-950/30">
+
+                        ${q.media_notes ? `
+                        <div>
+                            <div class="text-[9px] font-extrabold text-amber-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                <i class="fa-solid fa-note-sticky"></i> Uwagi do grafiki
+                            </div>
+                            <p class="text-amber-200/80 leading-relaxed">${q.media_notes}</p>
+                        </div>` : ''}
+
+                        ${q.przepis_zrodlowy ? `
+                        <div>
+                            <div class="text-[9px] font-extrabold text-purple-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                <i class="fa-solid fa-scale-balanced"></i> Przepis
+                            </div>
+                            <p class="text-purple-300/90 font-mono leading-relaxed">${q.przepis_zrodlowy}</p>
+                        </div>` : ''}
+
+                        ${q.zrodlo_opis_vademecum ? `
+                        <div>
+                            <div class="text-[9px] font-extrabold text-purple-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                <i class="fa-solid fa-book"></i> Tekst przepisu
+                            </div>
+                            <p class="text-purple-200/70 italic leading-relaxed">${q.zrodlo_opis_vademecum}</p>
+                        </div>` : ''}
+
+                        ${q.zrodlo_opis_kursant ? `
+                        <div>
+                            <div class="text-[9px] font-extrabold text-teal-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                <i class="fa-solid fa-graduation-cap"></i> Dla kursanta
+                            </div>
+                            <p class="text-teal-200/80 leading-relaxed">${q.zrodlo_opis_kursant}</p>
+                        </div>` : ''}
+
+                        ${slideSourceMarkup}
+
+                        ${!q.media_notes && !q.przepis_zrodlowy && !q.zrodlo_opis_vademecum && !q.zrodlo_opis_kursant && !q.zrodlo_wiersze_xlsx?.length ? `
+                        <p class="text-slate-700 text-[10px] italic text-center py-4">Brak didaskaliów</p>` : ''}
+                    </div>
+
+                    <!-- KOLUMNA 3: AKCJE STATUSU -->
+                    <div class="p-2 flex xl:flex-col gap-1 justify-around xl:justify-start xl:pt-4 bg-slate-950/20">
+                        <button onclick="updateQuestionStatus('${q.id}', 'Zatwierdzone')" class="btn-approve px-2 py-2 text-xs font-semibold rounded-lg transition-all-300 flex flex-col items-center justify-center gap-1 xl:w-full ${isApproved ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 font-bold' : 'text-slate-400 hover:bg-slate-800'}">
+                            <span>✔️</span><span class="text-[9px]">OK</span>
                         </button>
-                        <button onclick="updateQuestionStatus('${q.id}', 'Do poprawy')" class="btn-review px-4 py-2 text-xs font-semibold rounded-lg transition-all-300 flex items-center justify-center gap-1.5 xl:w-full ${isReview ? 'bg-rose-500/15 text-rose-400 border border-rose-500/20 font-bold' : 'text-slate-400 hover:bg-slate-800'}">
-                            ❌ Popraw
+                        <button onclick="updateQuestionStatus('${q.id}', 'Do poprawy')" class="btn-review px-2 py-2 text-xs font-semibold rounded-lg transition-all-300 flex flex-col items-center justify-center gap-1 xl:w-full ${isReview ? 'bg-rose-500/15 text-rose-400 border border-rose-500/20 font-bold' : 'text-slate-400 hover:bg-slate-800'}">
+                            <span>❌</span><span class="text-[9px]">Popraw</span>
                         </button>
-                        <button onclick="updateQuestionStatus('${q.id}', 'Śmietnik')" class="btn-trash px-4 py-2 text-xs font-semibold rounded-lg transition-all-300 flex items-center justify-center gap-1.5 xl:w-full ${isTrash ? 'bg-slate-700/40 text-slate-300 border border-slate-700/50 font-bold' : 'text-slate-500 hover:bg-slate-800'}">
-                            🗑️ Śmietnik
+                        <button onclick="updateQuestionStatus('${q.id}', 'Śmietnik')" class="btn-trash px-2 py-2 text-xs font-semibold rounded-lg transition-all-300 flex flex-col items-center justify-center gap-1 xl:w-full ${isTrash ? 'bg-slate-700/40 text-slate-300 border border-slate-700/50 font-bold' : 'text-slate-500 hover:bg-slate-800'}">
+                            <span>🗑️</span><span class="text-[9px]">Śmietnik</span>
                         </button>
-                        <!-- PRZYCISK EDYCJI TREŚCI -->
-                        <button onclick="startEditQuestion('${q.id}')" class="btn-edit px-4 py-2 text-xs font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition-all-300 flex items-center justify-center gap-1.5 xl:w-full">
-                            ✏️ Edytuj
+                        <button onclick="startEditQuestion('${q.id}')" class="btn-edit px-2 py-2 text-xs font-semibold rounded-lg text-slate-300 hover:bg-slate-800 transition-all-300 flex flex-col items-center justify-center gap-1 xl:w-full">
+                            <span>✏️</span><span class="text-[9px]">Edytuj</span>
                         </button>
-                        <button onclick="updateQuestionStatus('${q.id}', 'untouched')" class="btn-reset text-xs text-slate-500 hover:text-slate-300 py-1.5 transition text-center xl:w-full flex justify-center ${isUntouched ? 'text-amber-500 font-bold pointer-events-none' : ''}">
-                            🔄 Reset
+                        <button onclick="updateQuestionStatus('${q.id}', 'untouched')" class="btn-reset text-[9px] text-slate-600 hover:text-slate-400 py-1 transition text-center xl:w-full flex flex-col items-center gap-0.5 ${isUntouched ? 'text-amber-500 font-bold pointer-events-none' : ''}">
+                            <span>🔄</span><span>Reset</span>
                         </button>
                     </div>
+
                 </div>
             `;
             return div;
