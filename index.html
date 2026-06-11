@@ -778,20 +778,21 @@
                         uwagi:  m.uwagi || '',
                         status: m.status || '',
                     }));
-                    showToast(`Załadowano bank mediów: ${mediaPickerData.length} pozycji`, 'success');
                     return;
                 }
-            } catch(e) { /* no media.json */ }
-
-            // Fallback: buduj z SLIDES_NAV (bez blokowania — robimy async w mikro-zadaniach)
-            await new Promise(resolve => setTimeout(resolve, 0));
-            const items = [];
-            for (const [row, s] of Object.entries(SLIDES_NAV)) {
-                if (s.I) items.push({ id:'s'+row, tytul: s.T||'—', grupa: (s.W||'').split(' - ')[0] || '', typ:'image', url:s.I, url_video:null, tagi:[], uwagi:'', status:'' });
-                if (s.V) items.push({ id:'sv'+row, tytul: s.T||'—', grupa: (s.W||'').split(' - ')[0] || '', typ:'video', url:s.V, url_video:s.V, tagi:[], uwagi:'', status:'' });
+                throw new Error(`HTTP ${res.status}`);
+            } catch(e) {
+                mediaPickerData = [];
+                if (grid) grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-16 gap-3 text-center">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-3xl"></i>
+                        <div class="text-slate-300 text-sm font-bold">Nie znaleziono pliku bazy/media.json</div>
+                        <div class="text-slate-500 text-xs max-w-xs leading-relaxed">
+                            Umieść plik <code class="text-emerald-400 font-mono">media.json</code> w folderze <code class="text-slate-300 font-mono">bazy/</code> na serwerze.<br><br>
+                            Lokalnie (file://) przeglądarka blokuje fetch — użyj <code class="text-slate-300 font-mono">python -m http.server</code> lub Live Server.
+                        </div>
+                    </div>`;
             }
-            mediaPickerData = items;
-            showToast(`Bank mediów zbudowany ze slajdów: ${mediaPickerData.length} pozycji`, 'info');
         }
 
         window.setMediaTypeFilter = function(type) {
@@ -811,8 +812,9 @@
             const countEl = document.getElementById('media-picker-count');
             const search = (document.getElementById('media-picker-search')?.value || '').toLowerCase().trim();
             if (!grid) return;
-            if (!mediaPickerData) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-600 text-xs">Brak danych — spróbuj ponownie</div>`;
+            if (!mediaPickerData || mediaPickerData.length === 0) {
+                // Nie nadpisuj - komunikat błędu już wyświetlony przez loadMediaPickerData
+                if (countEl) countEl.innerText = '0 mediów';
                 return;
             }
 
