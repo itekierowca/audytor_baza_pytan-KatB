@@ -1180,88 +1180,109 @@
             return null;
         }
 
-        // Autostart z pliku bazy/bazab.json z dynamicznym logowaniem błędów CORS/lokalnych
+        // Autostart — czyta bazy/manifest.json i ładuje wszystkie wymienione pliki
         async function tryAutostartBazaB() {
             const loader = document.getElementById('loading-overlay');
             if (loader) loader.classList.remove('hidden');
 
-            let bazabLoaded = false;
+            let anyLoaded = false;
 
-            // 1. Próba bezpośredniego pobrania ze względnej ścieżki bazy/bazab.json
+            // 1. Próba wczytania manifest.json z folderu bazy/
             try {
-                const response = await fetch('bazy/bazab.json');
-                if (response.ok) {
-                    const text = await response.text();
-                    const parsed = tryInterpretJSON(text);
-                    if (parsed && parsed.length > 0) {
-                        loadedDatabases["bazab.json"] = parsed;
-                        addDatabaseOption("bazab.json", "bazy/bazab.json");
-                        selectDatabase("bazab.json");
-                        bazabLoaded = true;
-                        showToast("Pomyślnie zaimportowano plik bazy/bazab.json!", "success");
+                const manifestRes = await fetch('bazy/manifest.json');
+                if (manifestRes.ok) {
+                    const manifest = await manifestRes.json();
+                    // manifest może być tablicą nazw plików lub obiektem {files: [...]}
+                    const files = Array.isArray(manifest) ? manifest : (manifest.files || manifest.bazy || []);
+
+                    if (files.length > 0) {
+                        let firstKey = null;
+                        for (const entry of files) {
+                            const fileName = typeof entry === 'string' ? entry : entry.name || entry.plik;
+                            if (!fileName) continue;
+                            const url = `bazy/${fileName}`;
+                            try {
+                                const res = await fetch(url);
+                                if (!res.ok) continue;
+                                const text = await res.text();
+                                const parsed = tryInterpretJSON(text);
+                                if (parsed && parsed.length > 0) {
+                                    loadedDatabases[fileName] = parsed;
+                                    addDatabaseOption(fileName, url);
+                                    if (!firstKey) firstKey = fileName;
+                                    anyLoaded = true;
+                                    showToast(`Wczytano: ${fileName} (${parsed.length} pytań)`, 'success');
+                                }
+                            } catch(e) {
+                                console.warn(`Nie udało się wczytać ${fileName}:`, e);
+                            }
+                        }
+                        if (firstKey) selectDatabase(firstKey);
                     }
                 }
-            } catch (err) {
-                console.warn("Autostart względny bazy/bazab.json nie powiódł się:", err);
+            } catch(e) {
+                console.warn('Brak manifest.json lub błąd parsowania:', e);
             }
 
-            // 2. Skanowanie katalogu /bazy w repozytorium GitHub przy użyciu API
+            // 2. Fallback — próba bazab.json bezpośrednio jeśli manifest nie zadziałał
+            if (!anyLoaded) {
+                try {
+                    const response = await fetch('bazy/bazab.json');
+                    if (response.ok) {
+                        const text = await response.text();
+                        const parsed = tryInterpretJSON(text);
+                        if (parsed && parsed.length > 0) {
+                            loadedDatabases["bazab.json"] = parsed;
+                            addDatabaseOption("bazab.json", "bazy/bazab.json");
+                            selectDatabase("bazab.json");
+                            anyLoaded = true;
+                            showToast("Wczytano bazab.json!", "success");
+                        }
+                    }
+                } catch(err) {
+                    console.warn("Fallback bazab.json nie powiódł się:", err);
+                }
+            }
+
+            // 3. Skanowanie GitHub API jako dodatkowe źródło
             try {
                 const githubFiles = await scanGitHubBazyFolder();
                 if (githubFiles && githubFiles.length > 0) {
                     githubFiles.forEach(file => {
                         addDatabaseOption(file.name, file.download_url);
-                        // Jeśli to plik bazab.json i nie został wcześniej załadowany, pobierz go
-                        if (file.name === "bazab.json" && !bazabLoaded) {
-                            fetchDatabaseFromUrl(file.name, file.download_url);
-                            bazabLoaded = true;
-                        }
                     });
-                    showToast("Wykryto dodatkowe bazy danych w folderze /bazy w GitHub!", "info");
+                    if (!anyLoaded && githubFiles[0]) {
+                        await fetchDatabaseFromUrl(githubFiles[0].name, githubFiles[0].download_url);
+                        anyLoaded = true;
+                    }
+                    showToast(`GitHub: wykryto ${githubFiles.length} plików w /bazy`, 'info');
                 }
-            } catch (githubErr) {
-                console.warn("Skanowanie folderu GitHub nie powiodło się:", githubErr);
+            } catch(githubErr) {
+                console.warn("GitHub scan nie powiódł się:", githubErr);
             }
 
-            // 3. Fallback: Jeśli plik bazab.json nie został załadowany, wyświetl diagnostykę i przełącz na demo
-            if (!bazabLoaded) {
+            // 4. Komunikat błędu jeśli nic nie załadowano
+            if (!anyLoaded) {
+                const infoBox   = document.getElementById('info-box');
                 const infoTitle = document.getElementById('info-title');
-                const infoMsg = document.getElementById('info-message');
-                const infoBox = document.getElementById('info-box');
-                
+                const infoMsg   = document.getElementById('info-message');
                 if (infoBox && infoTitle && infoMsg) {
-                    infoBox.className = "bg-amber-950/20 border border-amber-900/60 text-amber-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4 transition-all-300";
-                    infoTitle.innerText = "Nie załadowano automatycznie pliku bazy/bazab.json";
-                    
-                    let reason = "";
-                    if (window.location.protocol === 'file:') {
-                        reason = "Uruchamiasz aplikację bezpośrednio z dysku (protokół <code>file://</code>). Przeglądarki (Safari, Chrome) całkowicie blokują odpytywanie plików lokalnych ze względów bezpieczeństwa (błąd CORS).";
-                    } else {
-                        reason = "Nie znaleziono pliku merytorycznego w ścieżce <code class='text-emerald-400 font-bold font-mono'>bazy/bazab.json</code> na tym serwerze. Upewnij się, że plik o nazwie <code class='text-emerald-400 font-bold font-mono'>bazab.json</code> znajduje się dokładnie w katalogu <code class='text-slate-300 font-mono'>bazy/</code>.";
-                    }
-                    
-                    infoMsg.innerHTML = `
-                        <div class="space-y-3">
-                            <p class="text-xs text-slate-300 leading-relaxed">${reason}</p>
-                            <div class="border-t border-amber-900/40 pt-3">
-                                <p class="font-bold text-white text-xs mb-1.5">Co możesz teraz zrobić?</p>
-                                <ul class="list-none space-y-1.5 text-xs text-slate-300">
-                                    <li class="flex items-start gap-2">
-                                        <span class="text-emerald-400 mt-0.5">✔</span>
-                                        <span><strong>Przeciągnij i upuść:</strong> Chwyć plik <code class="text-emerald-400 font-bold font-mono">bazab.json</code> ze swojego komputera i upuść go w dowolnym miejscu na tę stronę.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2">
-                                        <span class="text-emerald-400 mt-0.5">✔</span>
-                                        <span><strong>Wgraj ręcznie:</strong> Kliknij przycisk <strong class="text-emerald-400">"Wgraj plik"</strong> w lewym panelu i wybierz go z dysku.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2">
-                                        <span class="text-emerald-400 mt-0.5">✔</span>
-                                        <span><strong>Użyj serwera lokalnego:</strong> Uruchom dowolny lokalny serwer HTTP (np. Live Server w VS Code lub <code>python -m http.server</code>) — wtedy bazy wgrają się automatycznie.</span>
-                                    </li>
-                                </ul>
-                            </div>
+                    infoBox.className = "bg-amber-950/20 border border-amber-900/60 text-amber-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4";
+                    infoTitle.innerText = "Nie znaleziono baz w folderze bazy/";
+                    const isFile = window.location.protocol === 'file:';
+                    infoMsg.innerHTML = `<div class="space-y-3">
+                        <p class="text-xs text-slate-300 leading-relaxed">${
+                            isFile
+                            ? 'Uruchamiasz plik lokalnie (protokół <code>file://</code>). Przeglądarka blokuje fetch() dla plików lokalnych. Użyj serwera HTTP.'
+                            : 'Nie znaleziono pliku <code class="text-emerald-400 font-mono">bazy/manifest.json</code> ani <code class="text-emerald-400 font-mono">bazy/bazab.json</code>.'
+                        }</p>
+                        <div class="border-t border-amber-900/40 pt-3 text-xs text-slate-300 space-y-1.5">
+                            <p class="font-bold text-white">Co zrobić:</p>
+                            <p>✔ Utwórz plik <code class="text-emerald-400 font-mono">bazy/manifest.json</code> z listą plików: <code class="text-slate-300 font-mono">["bazab.json", "inj.json"]</code></p>
+                            <p>✔ Lub wgraj plik ręcznie przez panel importu po lewej</p>
+                            <p>✔ Lokalnie: uruchom <code class="text-slate-300 font-mono">python -m http.server</code> lub Live Server w VS Code</p>
                         </div>
-                    `;
+                    </div>`;
                 }
                 selectDatabase("demo");
             }
