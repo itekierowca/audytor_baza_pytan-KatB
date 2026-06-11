@@ -102,6 +102,41 @@
             <!-- AKTUALNY PROFIL I WYBÓR BAZY -->
             <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end text-xs">
                 
+
+                <!-- WGRAJ BAZĘ -->
+                <label class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-emerald-600 text-slate-300 hover:text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-xl transition cursor-pointer">
+                    <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i>
+                    <span>Wgraj bazę</span>
+                    <input type="file" id="file-input" accept=".txt,.json" class="hidden" onchange="handleFileSelect(event)">
+                </label>
+
+                <!-- METODA IMPORTU -->
+                <div class="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs">
+                    <span class="text-slate-500 font-bold uppercase tracking-wider text-[9px]">Metoda:</span>
+                    <label class="flex items-center gap-1 cursor-pointer select-none text-slate-400 hover:text-slate-200">
+                        <input type="radio" name="import-mode" value="replace" class="accent-slate-400 h-3 w-3">
+                        <span>Zastąp</span>
+                    </label>
+                    <label class="flex items-center gap-1 cursor-pointer select-none text-emerald-400 font-bold">
+                        <input type="radio" name="import-mode" value="append" checked class="accent-emerald-500 h-3 w-3">
+                        <span>Scal</span>
+                    </label>
+                </div>
+
+                <!-- EKSPORT -->
+                <div class="relative" id="export-dropdown-container">
+                    <button onclick="toggleExportDropdown()" id="export-menu-button" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold px-3 py-1.5 rounded-xl transition">
+                        <i class="fa-solid fa-file-export text-emerald-400"></i>
+                        <span>Eksport</span>
+                        <i class="fa-solid fa-chevron-down text-slate-500 text-[9px]"></i>
+                    </button>
+                    <div id="export-dropdown-menu" class="hidden absolute right-0 mt-1 w-52 rounded-xl shadow-2xl bg-slate-900 border border-slate-800 z-50 p-1.5 space-y-0.5">
+                        <button onclick="triggerExport('all')" class="w-full text-left text-slate-300 hover:bg-slate-800 flex items-center gap-2.5 px-3 py-2 text-xs rounded-lg transition"><i class="fa-solid fa-file-lines text-slate-500"></i> Wszystko (JSON)</button>
+                        <button onclick="triggerExport('approved')" class="w-full text-left text-slate-300 hover:bg-slate-800 flex items-center gap-2.5 px-3 py-2 text-xs rounded-lg transition"><i class="fa-solid fa-circle-check text-emerald-500"></i> Zatwierdzone</button>
+                        <button onclick="triggerExport('review')" class="w-full text-left text-slate-300 hover:bg-slate-800 flex items-center gap-2.5 px-3 py-2 text-xs rounded-lg transition"><i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Do poprawy</button>
+                    </div>
+                </div>
+
                 <!-- SELECTOR AKTYWNEJ BAZY -->
                 <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5">
                     <span class="text-slate-400 font-semibold flex items-center gap-1">
@@ -203,47 +238,62 @@
     <!-- UKŁAD GŁÓWNY -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row gap-6">
         
-        <!-- PANEL LEWY: IMPORT I ZARZĄDZANIE BAZĄ -->
-        <aside class="w-full lg:w-72 shrink-0 flex flex-col gap-4">
-
-            <!-- WGRAJ BAZĘ PYTAŃ -->
-            <div id="drop-zone" class="bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-sm transition-all duration-200">
-                <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i>
-                    Załaduj bazę pytań
-                </h3>
-
-                <!-- METODA: domyślnie Scal -->
-                <div class="bg-slate-950 rounded-xl border border-slate-800 p-2 flex items-center gap-1 mb-3 text-[11px]">
-                    <span class="text-slate-600 font-bold uppercase tracking-wider mr-1">Metoda:</span>
-                    <label class="flex-1 flex items-center justify-center gap-1.5 cursor-pointer select-none py-1.5 rounded-lg transition text-slate-400 hover:text-slate-200 has-[:checked]:bg-slate-800 has-[:checked]:text-slate-200">
-                        <input type="radio" name="import-mode" value="replace" class="accent-slate-400 h-3 w-3">
-                        <span>Zastąp</span>
-                    </label>
-                    <label class="flex-1 flex items-center justify-center gap-1.5 cursor-pointer select-none py-1.5 rounded-lg transition text-emerald-400 font-bold has-[:checked]:bg-emerald-950/40 has-[:checked]:border has-[:checked]:border-emerald-800">
-                        <input type="radio" name="import-mode" value="append" checked class="accent-emerald-500 h-3 w-3">
-                        <span>Scal (Dodaj)</span>
-                    </label>
+        <!-- PANEL GŁÓWNY: LISTA PYTAŃ -->
+        <section class="w-full min-w-0">
+            
+            <!-- OKNO KOMUNIKATÓW I DIAGNOSTYKI SYSTEMOWEJ -->
+            <div id="info-box" class="bg-indigo-950/20 border border-indigo-900/60 text-indigo-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4">
+                <div class="bg-indigo-500/10 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/20 shrink-0 flex items-center justify-center">
+                    <i class="fa-solid fa-circle-info text-lg"></i>
                 </div>
-
-                <!-- WGRAJ PLIK — drag & drop target -->
-                <label class="group w-full flex flex-col items-center justify-center gap-2 bg-slate-950/60 hover:bg-slate-800/60 border-2 border-dashed border-slate-800 hover:border-emerald-600 text-slate-400 hover:text-emerald-400 text-xs font-semibold py-6 px-3 rounded-xl transition cursor-pointer">
-                    <i class="fa-solid fa-file-arrow-up text-2xl group-hover:scale-110 transition-transform"></i>
-                    <span>Przeciągnij plik lub kliknij</span>
-                    <span class="text-[10px] text-slate-600 font-normal">.json / .txt</span>
-                    <input type="file" id="file-input" accept=".txt,.json" class="hidden" onchange="handleFileSelect(event)">
-                </label>
+                <div class="flex-1">
+                    <h4 id="info-title" class="font-bold text-indigo-300 text-xs uppercase tracking-wider mb-1">Inicjalizacja systemu GDE-Auditor...</h4>
+                    <p id="info-message" class="text-xs text-slate-300 leading-relaxed">
+                        Załadowaliśmy startową pulę przykładowych pytań. Możesz bez przeszkód testować oznaczanie statusów, pobieranie bazy oraz losowanie zestawów! Zmień tryb importu na <strong class="text-emerald-400">"Scal"</strong>, aby dodawać nowe JSON-y bez utraty obecnych pytań.
+                    </p>
+                    <pre id="info-debug" class="hidden mt-3 bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-[10px] text-rose-400 overflow-x-auto whitespace-pre-wrap leading-relaxed"></pre>
+                </div>
             </div>
 
-            <!-- DODAJ NOWE PYTANIE -->
-            <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-                <button onclick="toggleNewQuestionPanel()" class="w-full flex items-center justify-between px-5 py-4 text-xs font-bold text-slate-200 hover:bg-slate-800/50 transition">
-                    <span class="flex items-center gap-2.5">
-                        <i class="fa-solid fa-circle-plus text-emerald-400 text-base"></i>
-                        Dodaj nowe pytanie
-                    </span>
-                    <i id="new-question-chevron" class="fa-solid fa-chevron-down text-slate-500 transition-transform duration-200"></i>
-                </button>
+            <!-- TAB 1: PRZEGLĄDANIE BAZY (FILTROWANIE I LISTA) -->
+            <div id="tab-browse" class="space-y-5">
+                
+                <!-- PASEK FILTRÓW: AKTYWNE FILTRY I WYSZUKIWARKA -->
+                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <!-- Aktywne filtry w formie pillboxa -->
+                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto" id="active-filters-indicator">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Filtry:</span>
+                        <span class="text-xs bg-slate-950 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-800">
+                            Wszystkie pytania
+                        </span>
+                    </div>
+
+                    <!-- Wyszukiwarka frazy lub ID -->
+                    <div class="relative w-full sm:w-72 shrink-0">
+                        <input type="text" id="search-input" oninput="resetPaginationAndRender()" placeholder="Szukaj frazy lub ID..." class="w-full bg-slate-950 text-slate-100 rounded-xl text-xs pl-9 pr-4 py-2.5 focus:ring-1 focus:ring-emerald-500 border border-slate-800 outline-none placeholder:text-slate-700">
+                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-600">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INFO O KRYTERIACH -->
+                <div class="text-xs text-slate-400 flex justify-between items-center px-2">
+                    <div>
+                        Znaleziono: <span id="visible-count" class="font-bold text-emerald-400">0</span> pytań spełniających filtry
+                    </div>
+                </div>
+
+
+                <!-- KARTA DODAJ NOWE PYTANIE — NA GÓRZE LISTY -->
+                <div id="add-question-card" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+                    <button onclick="toggleNewQuestionPanel()" class="w-full flex items-center justify-between px-5 py-3.5 text-xs font-bold text-slate-200 hover:bg-slate-800/50 transition">
+                        <span class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-plus text-emerald-400 text-base"></i>
+                            Dodaj nowe pytanie
+                        </span>
+                        <i id="new-question-chevron" class="fa-solid fa-chevron-down text-slate-500 transition-transform duration-200"></i>
+                    </button>
 
                 <div id="new-question-panel" class="hidden border-t border-slate-800 p-5 space-y-3">
                     <!-- ID i Dział -->
@@ -406,7 +456,7 @@
                     </div>
 
                     <!-- Siatka wyników -->
-                    <div id="media-picker-grid" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 content-start">
+                    <div id="media-picker-grid" class="flex-1 overflow-y-auto p-3 grid grid-cols-3 sm:grid-cols-4 gap-2 content-start">
                         <div class="col-span-full text-center py-10 text-slate-600 text-xs">
                             <i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>
                             Ładowanie banku mediów...
@@ -415,76 +465,7 @@
                 </div>
             </div>
 
-            <!-- EKSPORT -->
-            <div class="relative" id="export-dropdown-container">
-                <button onclick="toggleExportDropdown()" class="w-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-semibold px-4 py-3 rounded-2xl transition flex items-center justify-between gap-2" id="export-menu-button">
-                    <span class="flex items-center gap-2">
-                        <i class="fa-solid fa-file-export text-emerald-400"></i>
-                        Eksportuj bazę...
-                    </span>
-                    <i class="fa-solid fa-chevron-down text-slate-500"></i>
-                </button>
-                <div id="export-dropdown-menu" class="hidden absolute left-0 right-0 mt-1 rounded-xl shadow-2xl bg-slate-900 border border-slate-800 z-50 p-1.5 space-y-0.5">
-                    <button onclick="triggerExport('all')" class="w-full text-left text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-lg transition">
-                        <i class="fa-solid fa-file-lines text-slate-500"></i> Eksportuj wszystko (JSON)
-                    </button>
-                    <button onclick="triggerExport('approved')" class="w-full text-left text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-lg transition">
-                        <i class="fa-solid fa-circle-check text-emerald-500"></i> Eksportuj zatwierdzone
-                    </button>
-                    <button onclick="triggerExport('review')" class="w-full text-left text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 px-3 py-2.5 text-xs rounded-lg transition">
-                        <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Eksportuj do poprawy
-                    </button>
                 </div>
-            </div>
-
-        </aside>
-
-        <!-- PANEL PRAWY: WYŚWIETLANIE PYTAŃ I FILTROWANIE -->
-        <section class="flex-1 min-w-0">
-            
-            <!-- OKNO KOMUNIKATÓW I DIAGNOSTYKI SYSTEMOWEJ -->
-            <div id="info-box" class="bg-indigo-950/20 border border-indigo-900/60 text-indigo-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start gap-4">
-                <div class="bg-indigo-500/10 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/20 shrink-0 flex items-center justify-center">
-                    <i class="fa-solid fa-circle-info text-lg"></i>
-                </div>
-                <div class="flex-1">
-                    <h4 id="info-title" class="font-bold text-indigo-300 text-xs uppercase tracking-wider mb-1">Inicjalizacja systemu GDE-Auditor...</h4>
-                    <p id="info-message" class="text-xs text-slate-300 leading-relaxed">
-                        Załadowaliśmy startową pulę przykładowych pytań. Możesz bez przeszkód testować oznaczanie statusów, pobieranie bazy oraz losowanie zestawów! Zmień tryb importu na <strong class="text-emerald-400">"Scal"</strong>, aby dodawać nowe JSON-y bez utraty obecnych pytań.
-                    </p>
-                    <pre id="info-debug" class="hidden mt-3 bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-[10px] text-rose-400 overflow-x-auto whitespace-pre-wrap leading-relaxed"></pre>
-                </div>
-            </div>
-
-            <!-- TAB 1: PRZEGLĄDANIE BAZY (FILTROWANIE I LISTA) -->
-            <div id="tab-browse" class="space-y-5">
-                
-                <!-- PASEK FILTRÓW: AKTYWNE FILTRY I WYSZUKIWARKA -->
-                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <!-- Aktywne filtry w formie pillboxa -->
-                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto" id="active-filters-indicator">
-                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Filtry:</span>
-                        <span class="text-xs bg-slate-950 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-800">
-                            Wszystkie pytania
-                        </span>
-                    </div>
-
-                    <!-- Wyszukiwarka frazy lub ID -->
-                    <div class="relative w-full sm:w-72 shrink-0">
-                        <input type="text" id="search-input" oninput="resetPaginationAndRender()" placeholder="Szukaj frazy lub ID..." class="w-full bg-slate-950 text-slate-100 rounded-xl text-xs pl-9 pr-4 py-2.5 focus:ring-1 focus:ring-emerald-500 border border-slate-800 outline-none placeholder:text-slate-700">
-                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-600">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- INFO O KRYTERIACH -->
-                <div class="text-xs text-slate-400 flex justify-between items-center px-2">
-                    <div>
-                        Znaleziono: <span id="visible-count" class="font-bold text-emerald-400">0</span> pytań spełniających filtry
-                    </div>
-                </div>
-
                 <!-- LISTA PYTAŃ -->
                 <div id="browse-questions-list" class="space-y-4"></div>
 
@@ -844,31 +825,33 @@
                 return;
             }
 
-            const visible = mediaPickerFiltered.slice(0, 120);
+            const visible = mediaPickerFiltered.slice(0, 150);
             grid.innerHTML = visible.map((m, idx) => {
                 const isVideo = m.typ === 'video';
+                // Fixed 16:9 thumb container using padding-top trick
                 const thumbInner = !isVideo
-                    ? `<img src="${m.url}" alt="" class="w-full h-20 object-cover" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-20 flex items-center justify-center text-slate-700\\' ><i class=\\'fa-solid fa-image-slash text-xl\\'></i></div>'">`
-                    : `<div class="w-full h-20 flex items-center justify-center bg-slate-950 text-indigo-500"><i class="fa-solid fa-film text-2xl"></i></div>`;
+                    ? `<img src="${m.url}" alt="" class="absolute inset-0 w-full h-full object-cover" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                      + `<div class="absolute inset-0 hidden items-center justify-center text-slate-700 bg-slate-950"><i class="fa-solid fa-image-slash text-lg"></i></div>`
+                    : `<div class="absolute inset-0 flex items-center justify-center bg-slate-950 text-indigo-500"><i class="fa-solid fa-film text-2xl"></i></div>`;
 
                 const badge = isVideo
-                    ? `<span class="absolute top-1 left-1 text-[8px] px-1.5 py-0.5 rounded font-bold bg-indigo-600 text-white">▶ VIDEO</span>`
-                    : `<span class="absolute top-1 left-1 text-[8px] px-1.5 py-0.5 rounded font-bold bg-slate-800/80 text-slate-300">🖼 IMG</span>`;
+                    ? `<span class="absolute top-1 right-1 text-[7px] px-1 py-0.5 rounded font-bold bg-indigo-600 text-white leading-none">VIDEO</span>`
+                    : '';
 
-                const uwagi = m.uwagi ? `<div class="text-[8px] text-amber-600 truncate mt-0.5" title="${m.uwagi.replace(/"/g,'&quot;')}">⚠ ${m.uwagi}</div>` : '';
+                const uwagi = m.uwagi ? `<div class="text-[8px] text-amber-600 truncate" title="${m.uwagi.replace(/"/g,'&quot;')}">⚠ ${m.uwagi}</div>` : '';
 
                 return `<button type="button" data-midx="${idx}"
                     class="media-card group bg-slate-950/60 border border-slate-800 hover:border-emerald-500 rounded-xl overflow-hidden text-left transition-all flex flex-col cursor-pointer">
-                    <div class="relative overflow-hidden bg-slate-900 w-full">
+                    <div class="relative w-full" style="padding-top:56.25%">
                         ${thumbInner}
                         ${badge}
                         <div class="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 transition flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-                            <span class="bg-emerald-500 text-slate-950 text-[9px] font-black px-2 py-1 rounded-lg">Wybierz</span>
+                            <span class="bg-emerald-500 text-slate-950 text-[9px] font-black px-2 py-1 rounded-lg shadow-lg">Wybierz</span>
                         </div>
                     </div>
-                    <div class="p-2 flex-1">
-                        <div class="text-[9px] font-bold text-slate-200 leading-snug line-clamp-2">${m.tytul}</div>
-                        ${m.grupa ? `<div class="text-[8px] text-slate-600 truncate mt-0.5">${m.grupa}</div>` : ''}
+                    <div class="p-1.5 flex-1">
+                        <div class="text-[9px] font-semibold text-slate-200 leading-snug line-clamp-2">${m.tytul}</div>
+                        ${m.grupa ? `<div class="text-[8px] text-slate-600 truncate mt-0.5">${m.grupa.replace(/Wykład \d+ - /,'')}</div>` : ''}
                         ${uwagi}
                     </div>
                 </button>`;
@@ -888,6 +871,20 @@
         };
 
         window.selectMedia = function(m) {
+            // Jeśli otwarto z formularza edycji — wstaw URL do pól edycji
+            if (window._mediaPickerEditTarget) {
+                const id = window._mediaPickerEditTarget;
+                const urlEl   = document.getElementById(`edit-media-url-${id}`);
+                const titleEl = document.getElementById(`edit-media-title-${id}`);
+                if (urlEl)   urlEl.value   = m.url;
+                if (titleEl) titleEl.value = m.tytul;
+                window._mediaPickerEditTarget = null;
+                closeMediaPicker();
+                showToast('Wybrano: ' + m.tytul, 'success');
+                return;
+            }
+
+            // Standardowy wybór dla formularza "Dodaj nowe pytanie"
             document.getElementById('new-q-media-url-val').value   = m.url;
             document.getElementById('new-q-media-title-val').value = m.tytul;
             document.getElementById('new-q-media-type-val').value  = m.typ;
@@ -926,6 +923,11 @@
             modal.classList.remove('hidden');
             await loadMediaPickerData();
             renderMediaPickerResults();
+        };
+
+        window.openMediaPickerForEdit = async function(questionId) {
+            window._mediaPickerEditTarget = questionId;
+            await openMediaPicker();
         };
 
         window.closeMediaPicker = function() {
@@ -1928,7 +1930,12 @@
                     <!-- MULTIMEDIA -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Adres URL multimediów</label>
+                            <div class="flex items-center justify-between">
+                                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Adres URL multimediów</label>
+                                <button type="button" onclick="openMediaPickerForEdit('${q.id}')" class="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-images"></i> Bank mediów
+                                </button>
+                            </div>
                             <input type="text" id="edit-media-url-${q.id}" value="${q.media_url || ''}" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:ring-1 focus:ring-indigo-500 outline-none">
                         </div>
                         <div class="flex flex-col gap-1.5">
@@ -2789,19 +2796,19 @@
         if (dropBody) {
             window.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                const dropZone = document.getElementById('drop-zone');
+                const dropZone = document.body;
                 if (dropZone) dropZone.classList.add('drag-over-zone');
             });
             window.addEventListener('dragleave', (e) => {
                 e.preventDefault();
                 if (e.clientX === 0 && e.clientY === 0) {
-                    const dropZone = document.getElementById('drop-zone');
+                    const dropZone = document.body;
                     if (dropZone) dropZone.classList.remove('drag-over-zone');
                 }
             });
             window.addEventListener('drop', (e) => {
                 e.preventDefault();
-                const dropZone = document.getElementById('drop-zone');
+                const dropZone = document.body;
                 if (dropZone) dropZone.classList.remove('drag-over-zone');
                 if (e.dataTransfer.files && e.dataTransfer.files[0]) {
                     const reader = new FileReader();
@@ -2851,5 +2858,47 @@
             }, 3500);
         }
     </script>
+            <!-- MODAL: BANK MEDIÓW -->
+            <div id="media-picker-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl">
+                    <!-- Header modalu -->
+                    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800 shrink-0">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-emerald-500/10 text-emerald-400 p-2 rounded-xl border border-emerald-500/20">
+                                <i class="fa-solid fa-images"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">Bank Mediów</h3>
+                                <p class="text-[10px] text-slate-500">Grafiki i animacje z bazy slajdów</p>
+                            </div>
+                        </div>
+                        <button onclick="closeMediaPicker()" class="text-slate-400 hover:text-white transition">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- Filtry -->
+                    <div class="px-5 py-3 border-b border-slate-800 flex flex-wrap gap-2 items-center shrink-0">
+                        <div class="relative flex-1 min-w-[160px]">
+                            <input type="text" id="media-picker-search" oninput="renderMediaPickerResults()" placeholder="Szukaj tytułu, wykładu, slajdu..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none placeholder:text-slate-700">
+                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600 text-[10px]"></i>
+                        </div>
+                        <div class="flex gap-1.5 text-[10px]">
+                            <button onclick="setMediaTypeFilter('all')" id="mf-all" class="px-3 py-1.5 rounded-lg border border-emerald-500 bg-emerald-950/30 text-emerald-400 font-bold transition">Wszystkie</button>
+                            <button onclick="setMediaTypeFilter('image')" id="mf-image" class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-950/40 text-slate-400 font-semibold hover:border-slate-700 transition">🖼 Grafiki</button>
+                            <button onclick="setMediaTypeFilter('video')" id="mf-video" class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-950/40 text-slate-400 font-semibold hover:border-slate-700 transition">🎥 Video</button>
+                        </div>
+                        <span id="media-picker-count" class="text-[10px] text-slate-600 font-mono whitespace-nowrap"></span>
+                    </div>
+
+                    <!-- Siatka wyników -->
+                    <div id="media-picker-grid" class="flex-1 overflow-y-auto p-3 grid grid-cols-3 sm:grid-cols-4 gap-2 content-start">
+                        <div class="col-span-full text-center py-10 text-slate-600 text-xs">
+                            <i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>
+                            Ładowanie banku mediów...
+                        </div>
+                    </div>
+                </div>
+            </div>
 </body>
 </html>
