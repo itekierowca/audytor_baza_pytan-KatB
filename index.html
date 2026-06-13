@@ -1,73 +1,118 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GDE-Auditor - Baza Pytań Kat. B</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .transition-all-300 {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        /* Customowy scrollbar dla ciemnego motywu */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #090d16;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
-        }
-        /* Styl dla aktywnej strefy upuszczania pliku */
-        .drag-over-zone {
-            border: 3px dashed #10b981 !important;
-            background-color: rgba(16, 185, 129, 0.08) !important;
-        }
-        .media-card:hover {
-            border-color: #10b981 !important;
-        }
-        .media-card:hover .pick-overlay {
-            opacity: 1 !important;
-            background: rgba(16,185,129,0.12) !important;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Diagnostyka Bank Mediów</title>
+<style>
+body { background: #0f172a; color: #e2e8f0; font-family: monospace; padding: 20px; }
+.ok { color: #10b981; }
+.err { color: #f43f5e; }
+.warn { color: #f59e0b; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+.card { background: #1e293b; border-radius: 8px; overflow: hidden; }
+.card img { width: 100%; height: 160px; object-fit: contain; display: block; background: #0f172a; }
+.card-title { padding: 6px 8px; font-size: 11px; color: #94a3b8; }
+pre { background: #1e293b; padding: 12px; border-radius: 6px; font-size: 11px; overflow-x: auto; white-space: pre-wrap; }
+button { background: #10b981; color: #020617; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 4px; }
+input { background: #1e293b; color: white; border: 1px solid #334155; padding: 6px 10px; border-radius: 6px; width: 300px; }
+</style>
 </head>
-<body id="app-body" class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
+<body>
 
-    <div id="loading-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center hidden p-4 text-center">
-        <div class="relative w-20 h-20 mb-6">
-            <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
-            <div class="absolute inset-0 rounded-full border-4 border-t-emerald-500 animate-spin"></div>
-        </div>
-        <h3 class="text-lg font-bold text-white mb-2">Przetwarzanie i optymalizacja bazy pytań...</h3>
-        <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
-            Nasz inteligentny silnik naprawia strukturę bazy, koryguje cudzysłowy drukarskie, uzupełnia brakujące przecinki i optymalizuje układ pytań, aby Safari i Chrome działały niezwykle płynnie.
-        </p>
-    </div>
+<h2>🔍 Diagnostyka Bank Mediów</h2>
 
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none"></div>
+<div id="log"></div>
 
-    <div id="custom-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl transform scale-95 transition-all duration-300" id="modal-box">
-            <div class="flex items-start justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div id="modal-icon-container" class="p-3 rounded-xl bg-slate-800 text-emerald-400 border border-slate-750 flex items-center justify-center">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 id="modal-title" class="text-lg font-bold text-white">Komunikat systemowy</h3>
-                </div>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div class="mt-4 space-y-3">
-                <p id="modal-message" class="text-sm text-slate-30
+<hr style="border-color:#334155; margin:20px 0">
+
+<h3>Krok 1 — sprawdź czy bazy/media.json jest dostępny</h3>
+<button onclick="testFetch()">Testuj fetch('bazy/media.json')</button>
+<pre id="fetch-result">Kliknij przycisk...</pre>
+
+<hr style="border-color:#334155; margin:20px 0">
+
+<h3>Krok 2 — podaj URL obrazka ręcznie i sprawdź czy się ładuje</h3>
+<input type="text" id="test-url" placeholder="Wklej URL obrazka z media.json..." value="">
+<button onclick="testImg()">Testuj obrazek</button>
+<div id="img-test" style="margin-top:10px; width:300px; height:160px; background:#1e293b; border:1px solid #334155; border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; color:#475569;">
+    tu pojawi się obrazek
+</div>
+<pre id="img-result">—</pre>
+
+<hr style="border-color:#334155; margin:20px 0">
+
+<h3>Krok 3 — renderuj siatkę z pierwszych 6 pozycji z media.json</h3>
+<button onclick="testGrid()">Renderuj siatkę testową</button>
+<div class="grid" id="test-grid"></div>
+
+<script>
+function log(msg, type='ok') {
+    const d = document.getElementById('log');
+    d.innerHTML += `<div class="${type}">${msg}</div>`;
+}
+
+async function testFetch() {
+    const el = document.getElementById('fetch-result');
+    el.textContent = 'Ładowanie...';
+    try {
+        const res = await fetch('bazy/media.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        const json = await res.json();
+        const items = json.media || json;
+        const first = items[0];
+        el.innerHTML = `<span class="ok">✓ OK — ${items.length} mediów</span>\n\nPierwszy element:\n${JSON.stringify(first, null, 2)}`;
+        // Auto-wypełnij URL do testu
+        const url = first.url_16_9 || first.url_1_1 || first.url_video || '';
+        document.getElementById('test-url').value = url;
+    } catch(e) {
+        el.innerHTML = `<span class="err">✗ BŁĄD: ${e.message}</span>\n\nMożliwe przyczyny:\n- Plik nie istnieje w bazy/media.json\n- Uruchamiasz z file:// (CORS) — użyj serwera HTTP\n- Błędna ścieżka`;
+    }
+}
+
+function testImg() {
+    const url = document.getElementById('test-url').value.trim();
+    const container = document.getElementById('img-test');
+    const result = document.getElementById('img-result');
+    if (!url) { result.textContent = 'Wpisz URL'; return; }
+    
+    container.innerHTML = '';
+    const img = document.createElement('img');
+    img.style.cssText = 'width:100%;height:160px;object-fit:contain;display:block;background:#0f172a;';
+    img.onload = () => {
+        result.innerHTML = `<span class="ok">✓ Obrazek załadowany\n  naturalWidth: ${img.naturalWidth}px\n  naturalHeight: ${img.naturalHeight}px\n  rendered: ${img.offsetWidth}x${img.offsetHeight}px</span>`;
+    };
+    img.onerror = () => {
+        result.innerHTML = `<span class="err">✗ Błąd ładowania obrazka\n  URL: ${url}\n  Możliwe: CORS, błędny URL, brak pliku</span>`;
+        container.innerHTML = '<span style="color:#f43f5e;font-size:11px;padding:8px">Błąd ładowania</span>';
+    };
+    img.src = url;
+    container.appendChild(img);
+}
+
+async function testGrid() {
+    const grid = document.getElementById('test-grid');
+    grid.innerHTML = '<div style="color:#f59e0b">Ładowanie...</div>';
+    try {
+        const res = await fetch('bazy/media.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const items = (json.media || json).slice(0, 6);
+        grid.innerHTML = items.map(m => {
+            const url = m.url_16_9 || m.url_1_1 || m.url_video || '';
+            const isVideo = m.typ === 'video' || (!url.match(/\.(jpe?g|png|gif|webp)/i) && url.match(/\.(mp4|webm)/i));
+            return `<div class="card">
+                ${isVideo 
+                    ? `<div style="height:160px;background:#020617;display:flex;align-items:center;justify-content:center;color:#6366f1;font-size:2rem;">▶</div>`
+                    : `<img src="${url}" style="width:100%;height:160px;object-fit:contain;display:block;background:#0f172a;" 
+                            onerror="this.outerHTML='<div style=height:160px;background:#1e293b;display:flex;align-items:center;justify-content:center;color:#f43f5e;font-size:11px;padding:8px>BŁĄD: ${url.substring(0,40)}...</div>'">`
+                }
+                <div class="card-title">${m.tytul || '—'}<br><span style="color:#475569;font-size:9px">${url.substring(0,50)}</span></div>
+            </div>`;
+        }).join('');
+    } catch(e) {
+        grid.innerHTML = `<div class="err">✗ ${e.message}</div>`;
+    }
+}
+</script>
+</body>
+</html>
