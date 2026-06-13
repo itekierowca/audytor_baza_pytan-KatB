@@ -710,210 +710,199 @@
         };
 
         // --- AKTUALIZACJA PROFILU ---
-        // --- BANK MEDIÓW — PICKER ---
-        let mediaPickerTypeFilter = 'all';
-        let mediaPickerData = null;      // pełna lista po załadowaniu
-        let mediaPickerFiltered = [];    // aktualna lista po filtrach (do selectMedia by index)
+        // ================================================================
+        // BANK MEDIÓW — PICKER
+        // Dane: bazy/media.json, thumbnail: url_1_1 (1080x1080)
+        // ================================================================
+        let _mediaData = null;        // cache załadowanych mediów
+        let _mediaFiltered = [];      // aktualna lista po filtrach
+        let _mediaTypeFilter = 'all'; // 'all' | 'image' | 'video'
+        let _mediaEditTarget = null;  // id pytania przy edycji
 
-        async function loadMediaPickerData() {
-            if (mediaPickerData) return;
-            const grid = document.getElementById('media-picker-grid');
-            if (grid) grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500 text-xs"><i class="fa-solid fa-spinner animate-spin text-xl mb-2 block"></i>Ładowanie bazy mediów...</div>`;
+        async function _loadMedia() {
+            if (_mediaData) return true;
             try {
                 const res = await fetch('bazy/media.json');
-                if (res.ok) {
-                    const json = await res.json();
-                    const raw = json.media || json;
-                    mediaPickerData = raw.map(m => ({
-                        id:     m.id || '',
-                        tytul:  m.tytul || '—',
-                        grupa:  m.grupa || '',
-                        typ:    m.typ || (m.url_video ? 'video' : 'image'),
-                        url:    m.url_16_9 || m.url_1_1 || m.url_video || '',
-                        url_video: m.url_video || null,
-                        tagi:   Array.isArray(m.tagi) ? m.tagi : [],
-                        uwagi:  m.uwagi || '',
-                        status: m.status || '',
-                    }));
-                    return;
-                }
-                throw new Error(`HTTP ${res.status}`);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const json = await res.json();
+                const raw = Array.isArray(json) ? json : (json.media || []);
+                _mediaData = raw.map(m => ({
+                    id:      m.id || '',
+                    tytul:   m.tytul || '—',
+                    wyklad:  m.wyklad || '',
+                    grupa:   m.grupa || '',
+                    typ:     m.typ || 'image',
+                    thumb:   m.url_1_1 || m.url_16_9 || '',
+                    url:     m.url_16_9 || m.url_1_1 || m.url_video || '',
+                    video:   m.url_video || null,
+                    tagi:    Array.isArray(m.tagi) ? m.tagi : [],
+                    uwagi:   m.uwagi || '',
+                    status:  m.status || '',
+                }));
+                return true;
             } catch(e) {
-                mediaPickerData = [];
-                if (grid) grid.innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center py-16 gap-3 text-center">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-3xl"></i>
-                        <div class="text-slate-300 text-sm font-bold">Nie znaleziono pliku bazy/media.json</div>
-                        <div class="text-slate-500 text-xs max-w-xs leading-relaxed">
-                            Umieść plik <code class="text-emerald-400 font-mono">media.json</code> w folderze <code class="text-slate-300 font-mono">bazy/</code> na serwerze.<br><br>
-                            Lokalnie (file://) przeglądarka blokuje fetch — użyj <code class="text-slate-300 font-mono">python -m http.server</code> lub Live Server.
-                        </div>
-                    </div>`;
+                console.error('media.json:', e);
+                return false;
             }
         }
 
-        window.setMediaTypeFilter = function(type) {
-            mediaPickerTypeFilter = type;
-            ['all','image','video'].forEach(t => {
-                const btn = document.getElementById('mf-' + t);
-                if (!btn) return;
-                btn.className = t === type
-                    ? 'px-3 py-1.5 rounded-lg border border-emerald-500 bg-emerald-950/30 text-emerald-400 font-bold transition'
-                    : 'px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-950/40 text-slate-400 font-semibold hover:border-slate-700 transition';
-            });
-            renderMediaPickerResults();
-        };
-
-        window.renderMediaPickerResults = function() {
-            const grid = document.getElementById('media-picker-grid');
-            const countEl = document.getElementById('media-picker-count');
-            const search = (document.getElementById('media-picker-search')?.value || '').toLowerCase().trim();
+        function _mediaRender() {
+            const grid    = document.getElementById('mp-grid');
+            const countEl = document.getElementById('mp-count');
+            const search  = (document.getElementById('mp-search')?.value || '').toLowerCase().trim();
             if (!grid) return;
-            if (!mediaPickerData || mediaPickerData.length === 0) {
-                // Nie nadpisuj - komunikat błędu już wyświetlony przez loadMediaPickerData
-                if (countEl) countEl.innerText = '0 mediów';
+
+            if (!_mediaData) {
+                grid.innerHTML = '<p style="color:#f59e0b;padding:40px;text-align:center">Nie załadowano bazy mediów.<br>Sprawdź czy plik bazy/media.json jest dostępny.</p>';
                 return;
             }
 
-            mediaPickerFiltered = mediaPickerData.filter(m => {
-                if (mediaPickerTypeFilter !== 'all' && m.typ !== mediaPickerTypeFilter) return false;
+            _mediaFiltered = _mediaData.filter(m => {
+                if (_mediaTypeFilter === 'image' && m.typ !== 'image') return false;
+                if (_mediaTypeFilter === 'video' && m.typ !== 'video') return false;
                 if (search) {
-                    const hay = [m.tytul, m.grupa, m.uwagi, ...m.tagi].join(' ').toLowerCase();
-                    return hay.includes(search);
+                    return [m.tytul, m.wyklad, m.grupa, ...m.tagi].join(' ').toLowerCase().includes(search);
                 }
                 return true;
             });
 
-            if (countEl) countEl.innerText = mediaPickerFiltered.length + ' mediów';
+            if (countEl) countEl.textContent = _mediaFiltered.length + ' mediów';
 
-            if (mediaPickerFiltered.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-600 text-xs">Brak wyników dla podanych filtrów</div>`;
+            if (_mediaFiltered.length === 0) {
+                grid.innerHTML = '<p style="color:#64748b;padding:40px;text-align:center">Brak wyników</p>';
                 return;
             }
 
-            const visible = mediaPickerFiltered.slice(0, 150);
-            grid.innerHTML = visible.map((m, idx) => {
-                const isVideo = m.typ === 'video';
+            const frag = document.createDocumentFragment();
+            _mediaFiltered.slice(0, 150).forEach((m, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.dataset.idx = idx;
+                btn.style.cssText = 'background:#0f172a;border:1px solid #1e293b;border-radius:8px;overflow:hidden;cursor:pointer;text-align:left;padding:0;display:block;width:100%;';
 
-                const thumbInner = !isVideo
-                    ? `<img src="${m.url}" alt="" loading="lazy"
-                            style="width:100%;height:160px;object-fit:contain;display:block;flex-shrink:0;background:#0f172a;"
-                            onerror="this.style.display='none'">`
-                    : `<div style="width:100%;height:160px;display:flex;align-items:center;justify-content:center;background:#020617;color:#6366f1;flex-shrink:0;">
-                           <i class="fa-solid fa-film" style="font-size:2rem"></i>
-                       </div>`;
+                if (m.typ === 'video') {
+                    const icon = document.createElement('div');
+                    icon.style.cssText = 'width:100%;height:120px;background:#020617;display:flex;align-items:center;justify-content:center;color:#6366f1;font-size:32px;';
+                    icon.textContent = '▶';
+                    btn.appendChild(icon);
+                } else {
+                    const img = document.createElement('img');
+                    img.src = m.thumb;
+                    img.alt = m.tytul;
+                    img.loading = 'lazy';
+                    img.style.cssText = 'width:100%;height:120px;object-fit:cover;display:block;';
+                    img.onerror = () => { img.style.display='none'; };
+                    btn.appendChild(img);
+                }
 
-                const badge = isVideo
-                    ? `<span style="position:absolute;top:4px;right:4px;font-size:7px;padding:2px 4px;border-radius:3px;font-weight:700;background:#4f46e5;color:white;line-height:1">VIDEO</span>`
-                    : '';
+                const label = document.createElement('div');
+                label.style.cssText = 'padding:5px 7px;font-size:10px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+                label.textContent = m.tytul;
+                btn.appendChild(label);
 
-                const uwagi = m.uwagi
-                    ? `<div style="font-size:8px;color:#d97706;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.uwagi.replace(/"/g,'&quot;')}">⚠ ${m.uwagi}</div>`
-                    : '';
+                btn.addEventListener('click', () => _mediaSelect(m));
+                frag.appendChild(btn);
+            });
 
-                const grupaShort = (m.grupa || '').replace(/Wykład \d+ - /, '');
+            grid.innerHTML = '';
+            grid.appendChild(frag);
 
-                return `<button type="button" data-midx="${idx}" class="media-card group"
-                    style="background:#0a0f1e;border:1px solid #1e293b;border-radius:10px;overflow:hidden;text-align:left;display:flex;flex-direction:column;cursor:pointer;transition:border-color 0.15s;position:relative;">
-                    ${thumbInner}
-                    ${badge}
-                    <div class="pick-overlay" style="position:absolute;top:0;left:0;right:0;height:160px;background:rgba(16,185,129,0);display:flex;align-items:center;justify-content:center;opacity:0;transition:all 0.15s;pointer-events:none;">
-                        <span style="background:#10b981;color:#020617;font-size:9px;font-weight:900;padding:3px 8px;border-radius:6px;">Wybierz</span>
-                    </div>
-                    <div style="padding:6px 8px;flex:1;">
-                        <div style="font-size:9px;font-weight:600;color:#e2e8f0;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${m.tytul}</div>
-                        ${grupaShort ? `<div style="font-size:8px;color:#475569;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${grupaShort}</div>` : ''}
-                        ${uwagi}
-                    </div>
-                </button>`;
-            }).join('');
-
-            // Jeden delegowany event listener — nie wbudowujemy danych w onclick
-            grid.onclick = function(e) {
-                const card = e.target.closest('.media-card');
-                if (!card) return;
-                const idx = parseInt(card.dataset.midx, 10);
-                if (!isNaN(idx) && mediaPickerFiltered[idx]) selectMedia(mediaPickerFiltered[idx]);
-            };
-
-            if (mediaPickerFiltered.length > 120) {
-                grid.innerHTML += `<div class="col-span-full text-center py-3 text-[10px] text-slate-600">Pokazano 120 z ${mediaPickerFiltered.length} — zawęź wyszukiwanie</div>`;
+            if (_mediaFiltered.length > 150) {
+                const more = document.createElement('div');
+                more.style.cssText = 'grid-column:1/-1;text-align:center;padding:12px;color:#475569;font-size:11px;';
+                more.textContent = 'Pokazano 150 z ' + _mediaFiltered.length + ' — zawęź wyszukiwanie';
+                grid.appendChild(more);
             }
+        }
+
+        function _mediaSelect(m) {
+            const url   = m.url;
+            const title = m.tytul;
+            const typ   = m.typ;
+
+            if (_mediaEditTarget) {
+                // Tryb edycji pytania
+                const urlEl   = document.getElementById('edit-media-url-'   + _mediaEditTarget);
+                const titleEl = document.getElementById('edit-media-title-' + _mediaEditTarget);
+                if (urlEl)   urlEl.value   = url;
+                if (titleEl) titleEl.value = title;
+                _mediaEditTarget = null;
+            } else {
+                // Tryb dodawania nowego pytania
+                document.getElementById('new-q-media-url-val').value   = url;
+                document.getElementById('new-q-media-title-val').value = title;
+                document.getElementById('new-q-media-type-val').value  = typ;
+                // Aktualizuj podgląd
+                const preview = document.getElementById('new-q-media-preview');
+                const empty   = document.getElementById('new-q-media-empty');
+                const thumb   = document.getElementById('new-q-media-thumb');
+                const tEl     = document.getElementById('new-q-media-title');
+                const typeEl  = document.getElementById('new-q-media-type-badge');
+                const urlEl2  = document.getElementById('new-q-media-url');
+                if (thumb)   thumb.innerHTML = typ !== 'video' ? `<img src="${m.thumb}" style="width:100%;height:100%;object-fit:cover;">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6366f1;font-size:1.2rem;">▶</div>';
+                if (tEl)     tEl.textContent  = title;
+                if (typeEl)  typeEl.textContent = typ === 'video' ? '▶ VIDEO' : '🖼 Grafika';
+                if (urlEl2)  urlEl2.value      = url;
+                if (preview) preview.classList.remove('hidden');
+                if (empty)   empty.classList.add('hidden');
+            }
+
+            _mediaClose();
+            showToast('Wybrano: ' + title, 'success');
+        }
+
+        function _mediaSetType(type) {
+            _mediaTypeFilter = type;
+            ['all','image','video'].forEach(t => {
+                const btn = document.getElementById('mp-type-' + t);
+                if (!btn) return;
+                btn.style.background   = t === type ? '#064e3b' : '#0f172a';
+                btn.style.borderColor  = t === type ? '#10b981' : '#1e293b';
+                btn.style.color        = t === type ? '#10b981' : '#64748b';
+                btn.style.fontWeight   = t === type ? 'bold'    : 'normal';
+            });
+            _mediaRender();
+        }
+
+        window.openMediaPicker = async function() {
+            const modal = document.getElementById('mp-modal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            const ok = await _loadMedia();
+            if (!ok) {
+                document.getElementById('mp-grid').innerHTML =
+                    '<p style="color:#f43f5e;padding:40px;text-align:center;grid-column:1/-1">Błąd ładowania bazy/media.json</p>';
+                return;
+            }
+            _mediaRender();
         };
 
-        window.selectMedia = function(m) {
-            // Jeśli otwarto z formularza edycji — wstaw URL do pól edycji
-            if (window._mediaPickerEditTarget) {
-                const id = window._mediaPickerEditTarget;
-                const urlEl   = document.getElementById(`edit-media-url-${id}`);
-                const titleEl = document.getElementById(`edit-media-title-${id}`);
-                if (urlEl)   urlEl.value   = m.url;
-                if (titleEl) titleEl.value = m.tytul;
-                window._mediaPickerEditTarget = null;
-                closeMediaPicker();
-                showToast('Wybrano: ' + m.tytul, 'success');
-                return;
-            }
+        window.openMediaPickerForEdit = async function(questionId) {
+            _mediaEditTarget = questionId;
+            await openMediaPicker();
+        };
 
-            // Standardowy wybór dla formularza "Dodaj nowe pytanie"
-            document.getElementById('new-q-media-url-val').value   = m.url;
-            document.getElementById('new-q-media-title-val').value = m.tytul;
-            document.getElementById('new-q-media-type-val').value  = m.typ;
-
-            const preview  = document.getElementById('new-q-media-preview');
-            const empty    = document.getElementById('new-q-media-empty');
-            const thumbEl  = document.getElementById('new-q-media-thumb');
-            const titleEl  = document.getElementById('new-q-media-title');
-            const typeEl   = document.getElementById('new-q-media-type-badge');
-            const urlEl    = document.getElementById('new-q-media-url');
-
-            thumbEl.innerHTML = m.typ !== 'video'
-                ? `<img src="${m.url}" class="w-full h-full object-cover" onerror="this.style.display='none'">`
-                : `<div class="w-full h-full flex items-center justify-center text-indigo-400 text-lg"><i class="fa-solid fa-film"></i></div>`;
-            titleEl.innerText = m.tytul;
-            typeEl.innerText  = m.typ === 'video' ? '▶ VIDEO' : '🖼 Grafika';
-            urlEl.value       = m.url;
-            preview.classList.remove('hidden');
-            empty.classList.add('hidden');
-
-            closeMediaPicker();
-            showToast('Wybrano: ' + m.tytul, 'success');
+        window._mediaClose = window.closeMediaPicker = function() {
+            const modal = document.getElementById('mp-modal');
+            if (modal) modal.style.display = 'none';
         };
 
         window.clearMediaSelection = function() {
             ['new-q-media-url-val','new-q-media-title-val','new-q-media-type-val'].forEach(id => {
-                document.getElementById(id).value = '';
+                const el = document.getElementById(id);
+                if (el) el.value = '';
             });
-            document.getElementById('new-q-media-preview').classList.add('hidden');
-            document.getElementById('new-q-media-empty').classList.remove('hidden');
+            const preview = document.getElementById('new-q-media-preview');
+            const empty   = document.getElementById('new-q-media-empty');
+            if (preview) preview.classList.add('hidden');
+            if (empty)   empty.classList.remove('hidden');
         };
 
-        window.openMediaPicker = async function() {
-            const modal = document.getElementById('media-picker-modal');
-            if (!modal) return;
-            modal.classList.remove('hidden');
-            // Poczekaj na paint przeglądarki zanim wyrenderujemy grid
-            // — modal musi mieć obliczone wymiary żeby obrazki się prawidłowo skalowały
-            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-            await loadMediaPickerData();
-            renderMediaPickerResults();
-        };
-
-        window.openMediaPickerForEdit = async function(questionId) {
-            window._mediaPickerEditTarget = questionId;
-            await openMediaPicker();
-        };
-
-        window.closeMediaPicker = function() {
-            const modal = document.getElementById('media-picker-modal');
-            if (modal) modal.classList.add('hidden');
-        };
-
-        document.addEventListener('click', function(e) {
-            const modal = document.getElementById('media-picker-modal');
-            if (modal && !modal.classList.contains('hidden') && e.target === modal) closeMediaPicker();
+        // Zamknij kliknięciem w tło
+        document.addEventListener('click', e => {
+            const modal = document.getElementById('mp-modal');
+            if (modal && modal.style.display !== 'none' && e.target === modal) _mediaClose();
         });
-
         // --- PANEL DODAWANIA NOWEGO PYTANIA ---
         window.toggleNewQuestionPanel = function() {
             const panel = document.getElementById('new-question-panel');
@@ -2843,45 +2832,42 @@
         }
     </script>
             <!-- MODAL: BANK MEDIÓW -->
-            <div id="media-picker-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
-                    <!-- Header modalu -->
-                    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800 shrink-0">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-emerald-500/10 text-emerald-400 p-2 rounded-xl border border-emerald-500/20">
-                                <i class="fa-solid fa-images"></i>
-                            </div>
+            <div id="mp-modal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.85);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+                <div style="background:#0f172a;border:1px solid #1e293b;border-radius:16px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 25px 50px rgba(0,0,0,0.7);">
+
+                    <!-- Nagłówek -->
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #1e293b;flex-shrink:0;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div style="background:#064e3b;padding:8px;border-radius:10px;color:#10b981;font-size:18px;">🖼</div>
                             <div>
-                                <h3 class="text-sm font-bold text-white">Bank Mediów</h3>
-                                <p class="text-[10px] text-slate-500">Grafiki i animacje z bazy slajdów</p>
+                                <div style="font-weight:bold;color:white;font-size:14px;">Bank Mediów</div>
+                                <div style="font-size:11px;color:#475569;">bazy/media.json</div>
                             </div>
                         </div>
-                        <button onclick="closeMediaPicker()" class="text-slate-400 hover:text-white transition">
-                            <i class="fa-solid fa-xmark text-lg"></i>
-                        </button>
+                        <button onclick="_mediaClose()" style="background:none;border:none;color:#475569;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;">✕</button>
                     </div>
 
                     <!-- Filtry -->
-                    <div class="px-5 py-3 border-b border-slate-800 flex flex-wrap gap-2 items-center shrink-0">
-                        <div class="relative flex-1 min-w-[160px]">
-                            <input type="text" id="media-picker-search" oninput="renderMediaPickerResults()" placeholder="Szukaj tytułu, wykładu, slajdu..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none placeholder:text-slate-700">
-                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600 text-[10px]"></i>
+                    <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid #1e293b;flex-shrink:0;flex-wrap:wrap;">
+                        <div style="position:relative;flex:1;min-width:180px;">
+                            <input id="mp-search" type="text" placeholder="Szukaj tytułu, wykładu, grupy..."
+                                oninput="_mediaRender()"
+                                style="width:100%;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:7px 10px 7px 32px;color:white;font-size:12px;outline:none;box-sizing:border-box;">
+                            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569;font-size:12px;">🔍</span>
                         </div>
-                        <div class="flex gap-1.5 text-[10px]">
-                            <button onclick="setMediaTypeFilter('all')" id="mf-all" class="px-3 py-1.5 rounded-lg border border-emerald-500 bg-emerald-950/30 text-emerald-400 font-bold transition">Wszystkie</button>
-                            <button onclick="setMediaTypeFilter('image')" id="mf-image" class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-950/40 text-slate-400 font-semibold hover:border-slate-700 transition">🖼 Grafiki</button>
-                            <button onclick="setMediaTypeFilter('video')" id="mf-video" class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-950/40 text-slate-400 font-semibold hover:border-slate-700 transition">🎥 Video</button>
+                        <div style="display:flex;gap:6px;">
+                            <button id="mp-type-all"   onclick="_mediaSetType('all')"   style="background:#064e3b;border:1px solid #10b981;border-radius:8px;padding:6px 12px;color:#10b981;font-weight:bold;font-size:11px;cursor:pointer;">Wszystkie</button>
+                            <button id="mp-type-image" onclick="_mediaSetType('image')" style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:6px 12px;color:#64748b;font-size:11px;cursor:pointer;">🖼 Grafiki</button>
+                            <button id="mp-type-video" onclick="_mediaSetType('video')" style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:6px 12px;color:#64748b;font-size:11px;cursor:pointer;">▶ Video</button>
                         </div>
-                        <span id="media-picker-count" class="text-[10px] text-slate-600 font-mono whitespace-nowrap"></span>
+                        <span id="mp-count" style="font-size:11px;color:#334155;font-family:monospace;white-space:nowrap;"></span>
                     </div>
 
-                    <!-- Siatka wyników -->
-                    <div id="media-picker-grid" style="flex:1;overflow-y:auto;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-content:start;">
-                        <div class="col-span-full text-center py-10 text-slate-600 text-xs">
-                            <i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>
-                            Ładowanie banku mediów...
-                        </div>
+                    <!-- Siatka -->
+                    <div id="mp-grid" style="flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-content:start;">
+                        <p style="grid-column:1/-1;text-align:center;color:#475569;padding:40px;">Ładowanie...</p>
                     </div>
+
                 </div>
             </div>
 </body>
